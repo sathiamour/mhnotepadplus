@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<resources>
+
+    <string-array name="noteviewstyle">
+        <item>列表视图</item>
+        <item>栅格视图</item> 
+    </string-array>
+
+</resources>
+
