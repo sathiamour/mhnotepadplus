@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -12,22 +13,17 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.DialogInterface.OnKeyListener;
 import android.database.Cursor;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ContextMenu;
-import android.view.Gravity;
-import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -37,8 +33,6 @@ import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
-import android.widget.TextView;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class NotePadPlus extends Activity {
@@ -52,6 +46,7 @@ public class NotePadPlus extends Activity {
 	private static final int PwdErr_Dlg = 4;
 	private static final int EidtNote_PwdPrompt_Dlg = 5;
 	private static final int DelNote_PwdPrompt_Dlg = 6;
+	private static final int ViewStyle_Dlg = 7;
 
 	/** Action id for activity redirection */
 	public static final int ACTIVITY_CREATE = 0;
@@ -188,6 +183,7 @@ public class NotePadPlus extends Activity {
 		NoteGrid.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+				
 				actionClickEditNote(position);
 			}
 		});
@@ -398,8 +394,29 @@ public class NotePadPlus extends Activity {
 		menu.add(Menu.NONE, ITEM5, 6, "关于").setIcon(android.R.drawable.ic_menu_info_details);
         return true;
 	}
-
-	
+    
+	@Override 
+	public boolean onOptionsItemSelected(MenuItem item) {  
+           switch(item.getItemId()) 
+           {  
+              case ITEM0:
+	               actionClickAddNote();
+	               break;
+              case ITEM1:
+	               break;
+              case ITEM2:
+	               break;
+              case ITEM3:
+	               showDialog(ViewStyle_Dlg);
+	               break;
+              case ITEM4:
+	               break;
+              case ITEM5:
+	               showDialog(About_Dlg);
+	               break;
+           }
+           return false;
+	}
 	/*
 	 * Hook menu opened
 	 */
@@ -463,6 +480,7 @@ public class NotePadPlus extends Activity {
 			 * the same with CusorAdapter
 			 */
 			TmpCursor.moveToPosition(Pos);
+			Log.d("log","pos "+Pos+" "+TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)));
 			// Check password
 			if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).length() > 0 )
                 showDialog(EidtNote_PwdPrompt_Dlg);
@@ -577,12 +595,12 @@ public class NotePadPlus extends Activity {
                .setView(PromptView)
                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int whichButton) {
-            	      EditText Pwd = (EditText)findViewById(R.id.pwd_edit);
+            	      EditText Pwd = (EditText)PromptView.findViewById(R.id.pwd_edit);
             	      Cursor TmpCursor = NotesCursor;
-    			      TmpCursor.moveToPosition(NoteIndex);
+            	      TmpCursor.moveToPosition(NoteIndex);
     			      // Check password
     			      if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).equals(Pwd.getText().toString()) )
-    				      DelNoteHelper(TmpCursor);
+    			    	  EditNoteHelper(TmpCursor);
     			      else
     				      showDialog(PwdErr_Dlg);	
               }
@@ -604,12 +622,12 @@ public class NotePadPlus extends Activity {
                .setView(PromptView)
                .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
                    public void onClick(DialogInterface dialog, int whichButton) {
-            	      EditText Pwd = (EditText)findViewById(R.id.pwd_edit);
+            	      EditText Pwd = (EditText)PromptView.findViewById(R.id.pwd_edit);
             	      Cursor TmpCursor = NotesCursor;
     			      TmpCursor.moveToPosition(NoteIndex);
     			      // Check password
     			      if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).equals(Pwd.getText().toString()) )
-    				      EditNoteHelper(TmpCursor);
+    			    	  DelNoteHelper(TmpCursor);
     			      else
     				      showDialog(PwdErr_Dlg);	
               }
@@ -635,6 +653,7 @@ public class NotePadPlus extends Activity {
 						   Intent ChgPwdDlgIntent = new Intent(NotePadPlus.this, ChgPwdDlgActivity.class);
 						   ChgPwdDlgIntent.putExtra(OneNote.KEY_ROWID, TmpCursor.getInt(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
 						   startActivityForResult(ChgPwdDlgIntent, ACTIVITY_CHG_PWD);
+						   Log.d("log","index "+NoteIndex + "  rowid is "+TmpCursor.getInt(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
 					}
 				});
 		builder.setCancelable(false);
@@ -657,7 +676,24 @@ public class NotePadPlus extends Activity {
 
 		return builder.create();
 	}
-
+    
+	private Dialog BuildSelViewDlg(Context AppContext, int Title, int Items)
+	{
+        return new AlertDialog.Builder(AppContext)
+               .setTitle(Title)
+               .setItems(Items, new DialogInterface.OnClickListener() {
+               public void onClick(DialogInterface dialog, int which) {
+            	      if( which == 0 )
+            			  AppSettings.ViewStyle = AppSetting.ViewStyle_List;
+            		  else
+            			  AppSettings.ViewStyle = AppSetting.ViewStyle_Grid;
+            			
+            		  RefreshListView();
+               }
+        })
+        .create();
+	}
+	
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
@@ -673,7 +709,8 @@ public class NotePadPlus extends Activity {
 			 return BuildEditNotePromptPwdDlg(NotePadPlus.this, R.string.pwdprompt_title, R.string.pwdprompt_tip);
 		case PwdErr_Dlg:
 			 return HelperFunctions.BuildAltertDialog(NotePadPlus.this, R.string.pwderr_title, R.string.pwderr_prompt);
-
+		case ViewStyle_Dlg:
+			 return BuildSelViewDlg(NotePadPlus.this, R.string.viewstyle_title, R.array.noteviewstyle);
 		}
 		return null;
 	}
@@ -699,65 +736,5 @@ public class NotePadPlus extends Activity {
 		if( requestCode == ACTIVITY_SET_TAGCLR || requestCode == ACTIVITY_EDIT || requestCode == ACTIVITY_CREATE ) 
 		    RefreshListView();
 		
-	}
-
-	private void CreateMenuView() {
-		MainMenuView = View.inflate(this, R.layout.mainmenu, null);
-
-		GridView MenuGrid = (GridView) MainMenuView.findViewById(R.id.MainMenu);
-
-		ArrayList<HashMap<String, Object>> MenuItems = new ArrayList<HashMap<String, Object>>();
-		String[] ItemTitle = { "添加日志", "系统设置", "栅格视图", "关于" };
-		for (int i = 0; i <= SubMenu_About; ++i) {
-			HashMap<String, Object> OneItem = new HashMap<String, Object>();
-			// Item
-			if (i == SubMenu_NoteView)
-				if (AppSettings.IsListView())
-					OneItem.put("ItemTitle", ItemTitle[i]);
-				else
-					OneItem.put("ItemTitle", "列表视图");
-			else
-				OneItem.put("ItemTitle", ItemTitle[i]);
-			MenuItems.add(OneItem);
-		}
-
-		SimpleAdapter ItemsAdapter = new SimpleAdapter(this, MenuItems,
-				R.layout.mainmenuitem, new String[] { "ItemTitle" },
-				new int[] { R.id.MainMenuItem });
-
-		MenuGrid.setAdapter(ItemsAdapter);
-
-		MenuGrid.setOnItemClickListener(new OnItemClickListener() {
-			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2,
-					long arg3) {
-				switch (arg2) {
-				case SubMenu_AddNote:
-					actionClickAddNote();
-					MenuDlg.dismiss();
-					break;
-				case SubMenu_SysSet:
-					MenuDlg.dismiss();
-					break;
-				case SubMenu_NoteView:
-					TextView Item = (TextView) arg1
-							.findViewById(R.id.MainMenuItem);
-					if (AppSettings.IsListView()) {
-						AppSettings.ViewStyle = AppSetting.ViewStyle_Grid;
-						Item.setText("列表视图");
-					} else {
-						AppSettings.ViewStyle = AppSetting.ViewStyle_List;
-						Item.setText("栅格视图");
-					}
-					RefreshListView();
-					MenuDlg.dismiss();
-					break;
-
-				case SubMenu_About:
-					showDialog(About_Dlg);
-					MenuDlg.dismiss();
-					break;
-				}
-			}
-		});
 	}
 }
