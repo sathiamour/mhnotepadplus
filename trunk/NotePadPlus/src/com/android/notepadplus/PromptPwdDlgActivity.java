@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -28,7 +29,7 @@ public class PromptPwdDlgActivity extends Activity {
         Bundle Parameters = getIntent().getExtras();
 		if( Parameters != null )
 			NoteRowId = Parameters.getInt(OneNote.KEY_ROWID);
-        
+		
         Button Confirm =(Button)findViewById(R.id.clrpwd_confirm);
         Confirm.setWidth(NotePadPlus.ScreenWidth/2);
         Confirm.setOnClickListener(new OnClickListener(){
