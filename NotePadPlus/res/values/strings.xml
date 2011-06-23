@@ -57,4 +57,5 @@
 <string name="orignalpwd_err_prompt">原密码输入错误！</string>
 <string name="pwdprompt_title">该日志已经被密码锁定</string>
 <string name="pwdprompt_tip">请输入密码进行进一步操作性</string>
+<string name="viewstyle_title">请选择视图</string>
 </resources>
