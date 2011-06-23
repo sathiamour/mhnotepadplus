@@ -1,0 +1,5 @@
+<resources>
+   <style name="Theme.menu_dlg" parent="android:style/Theme.Dialog" >
+          <item name="android:windowBackground">@drawable/custom_dialog_shape</item>
+   </style>
+</resources>
