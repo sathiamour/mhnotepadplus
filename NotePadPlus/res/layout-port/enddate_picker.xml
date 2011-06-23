@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:orientation="vertical" 
+	android:layout_width="fill_parent"
+	android:layout_height="fill_parent">
+
+    <CheckBox android:id="@+id/wether_use_enddate"
+              android:text="@string/use_enddate"
+              android:layout_width="fill_parent"  
+              android:layout_height="wrap_content" 
+              android:checked="false" />
+              
+    <CheckBox android:id="@+id/wether_delnote_expire"
+              android:text="@string/delnote_expire_enddate"
+              android:layout_width="fill_parent"  
+              android:layout_height="wrap_content" 
+              android:checked="false" />
+              
+     
+    <TextView android:layout_width="fill_parent"  
+              android:layout_height="wrap_content"
+              android:layout_marginTop="5dip"  
+              android:layout_marginBottom="5dip"
+              android:textSize="17dp"
+              android:text="@string/endtimetip" />
+              
+    <TextView android:id="@+id/time_text" 
+              android:layout_width="fill_parent"  
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="10dip"
+              android:textSize="17dp"
+              android:gravity="center"
+              android:textColor="#ffff0000"
+              android:text="@string/noendtime" />  
+    
+    <DatePicker android:id="@+id/enddate"  
+                android:layout_width="fill_parent"  
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dip" />  
+</LinearLayout>
