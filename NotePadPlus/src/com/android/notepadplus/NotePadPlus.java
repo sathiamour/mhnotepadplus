@@ -38,15 +38,18 @@ import android.widget.AdapterView.OnItemClickListener;
 public class NotePadPlus extends Activity {
 
 	/** Action */
-	public static final String Action_Edit_Note = "com.android.notepadplus.EditNote";;
+	public static final String Action_Edit_Note = "com.android.notepadplus.EditNote";
+	/** Broadcast action */
+	public static final String BROADCAST_REFRESHLIST = "com.android.notepadplus.refreshlist";
+	
 	/** Dialog id */
 	private static final int Del_Prompt_Dlg = 1;
-	private static final int About_Dlg = 2;
-	private static final int NoteHasLock_Dlg = 3;
-	private static final int PwdErr_Dlg = 4;
-	private static final int EidtNote_PwdPrompt_Dlg = 5;
-	private static final int DelNote_PwdPrompt_Dlg = 6;
-	private static final int ViewStyle_Dlg = 7;
+	private static final int About_Dlg = Del_Prompt_Dlg+1;
+	private static final int NoteHasLock_Dlg = About_Dlg+1;
+	private static final int PwdErr_Dlg = NoteHasLock_Dlg+1;
+	private static final int EidtNote_PwdPrompt_Dlg = PwdErr_Dlg+1;
+	private static final int DelNote_PwdPrompt_Dlg = EidtNote_PwdPrompt_Dlg+1;
+	private static final int ViewStyle_Dlg = DelNote_PwdPrompt_Dlg+1;
 
 	/** Action id for activity redirection */
 	public static final int ACTIVITY_CREATE = 0;
@@ -65,25 +68,11 @@ public class NotePadPlus extends Activity {
 	public static final int ITEM4 = Menu.FIRST + 4;
 	public static final int ITEM5 = Menu.FIRST + 5;
 
-	/** Main menu id */
-	public static final int SubMenu_AddNote = 0;
-	public static final int SubMenu_SysSet = SubMenu_AddNote + 1;
-	public static final int SubMenu_NoteView = SubMenu_SysSet + 1;
-	public static final int SubMenu_About = SubMenu_NoteView + 1;
-
 	/** Database helper */
 	private NoteDbAdapter NotesDb = null;
 	private Cursor NotesCursor;
 
-	/** Broadcast action */
-	public static final String BROADCAST_REFRESHLIST = "com.android.notepadplus.refreshlist";
-
-	/** Note tag images */
-	public static final int[] TagImages = { R.drawable.pin_note_blue,
-			R.drawable.pin_note_pink, R.drawable.pin_note_kelly,
-			R.drawable.pin_note_greenyellow, R.drawable.pin_note_purple,
-			R.drawable.pin_note_claybank, R.drawable.pin_note_lightblue,
-			R.drawable.pin_note_deepyellow, R.drawable.pin_note_red };
+	/** Note tag color */
 	public static final int[] TagClr = { 0xff6596cf, 0xfff58f7f, 0xffbaa131,
 			0xff4fb248, 0xffa052a0, 0xfff15b22, 0xff90a8d7, 0xffe28f25,
 			0xffdb2636 };
@@ -105,9 +94,6 @@ public class NotePadPlus extends Activity {
 	// Application settings
 	AppSetting AppSettings;
 
-	// User defined menu
-	View MainMenuView;
-	AlertDialog MenuDlg;
 	/** Note's index */
 	private static final int ErrNoteIndex = -1;
 	private int NoteIndex = ErrNoteIndex;
@@ -116,11 +102,8 @@ public class NotePadPlus extends Activity {
 	public BroadcastReceiver RefreshReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-
-			// Refresh list view on GUI
-			RefreshListView();
-			// Refresh widget view on desktop
-			// HelperFunctions.RefreshWidgetNoteList(context,NotesDb.GetAllNotes());
+			     // Refresh list view on GUI
+			     RefreshListView();
 		}
 	};
 
@@ -297,7 +280,6 @@ public class NotePadPlus extends Activity {
 
 			HashMap<String, Object> OneNote = new HashMap<String, Object>();
 			// Set list item's data
-			// OneNote.put("NoteTag", TagImages[TagImgIdx]);
 			OneNote.put("NoteTitle", Title);
 			OneNote.put("NoteCreatedTime", Time);
 			Notes.add(OneNote);
@@ -417,54 +399,7 @@ public class NotePadPlus extends Activity {
            }
            return false;
 	}
-	/*
-	 * Hook menu opened
-	 */
-	//public boolean onMenuOpened(int featureId, Menu menu) {
-	//	if (MenuDlg == null) {
-	//		MenuDlg = new AlertDialog.Builder(this).create();
-	//		MenuDlg.setOnKeyListener(new OnKeyListener() {
-	//			public boolean onKey(DialogInterface dialog, int keyCode,
-	//					KeyEvent event) {
-	//				if (keyCode == KeyEvent.KEYCODE_MENU)// 监听按键
-	//					dialog.dismiss();
-	//				return false;
-	//			}
-	//		});
-	//		CreateMenuView();
-	//		MenuDlg.setView(MainMenuView);
-			// Set window parameters
-	//		WindowManager.LayoutParams WinAttributes = MenuDlg.getWindow()
-	//				.getAttributes();
-	//		WinAttributes.gravity = Gravity.BOTTOM;
-	//		WinAttributes.y = 0;
-	//		WinAttributes.width = LayoutParams.FILL_PARENT;
-	//		WinAttributes.flags = WinAttributes.flags
-	//				| android.view.WindowManager.LayoutParams.FLAG_NOT_TOUCH_MODAL;
-	//		MenuDlg.getWindow().setAttributes(WinAttributes);
-			// Show window
-	//		MenuDlg.show();
-	//	} else
-	//		MenuDlg.show();
-
-		// If return true, it will show system menu
-	//	return false;
-	//}
-
-	// @Override
-	/** Add menu item */
-	// public boolean onCreateOptionsMenu(Menu menu) {
-	// super.onCreateOptionsMenu(menu);
-	// menu.add(0, ITEM0, 1, "添加日志");
-	// menu.add(0, ITEM1, 2, "系统设置");
-	// if( AppSettings.ViewStyle.compareTo(AppSetting.DefaultViewStyle) == 0 )
-	// menu.add(0, ITEM2, 3, "栅格视图");
-	// else
-	// menu.add(0, ITEM2, 3, "列表视图");
-	// menu.add(0, ITEM3, 4, "关于");
-	//	
-	// return true;
-	// }
+	
 	/** Action for menu item */
 	private void actionClickAddNote() {
 
@@ -480,7 +415,6 @@ public class NotePadPlus extends Activity {
 			 * the same with CusorAdapter
 			 */
 			TmpCursor.moveToPosition(Pos);
-			Log.d("log","pos "+Pos+" "+TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)));
 			// Check password
 			if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).length() > 0 )
                 showDialog(EidtNote_PwdPrompt_Dlg);
@@ -653,7 +587,6 @@ public class NotePadPlus extends Activity {
 						   Intent ChgPwdDlgIntent = new Intent(NotePadPlus.this, ChgPwdDlgActivity.class);
 						   ChgPwdDlgIntent.putExtra(OneNote.KEY_ROWID, TmpCursor.getInt(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
 						   startActivityForResult(ChgPwdDlgIntent, ACTIVITY_CHG_PWD);
-						   Log.d("log","index "+NoteIndex + "  rowid is "+TmpCursor.getInt(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
 					}
 				});
 		builder.setCancelable(false);
