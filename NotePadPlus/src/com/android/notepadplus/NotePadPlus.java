@@ -2,6 +2,7 @@ package com.android.notepadplus;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 
 
@@ -229,8 +230,7 @@ public class NotePadPlus extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		registerReceiver(RefreshReceiver, new IntentFilter(
-				BROADCAST_REFRESHLIST));
+		registerReceiver(RefreshReceiver, new IntentFilter(BROADCAST_REFRESHLIST));
 	}
 
 	/** Refresh note list from database */
@@ -249,6 +249,7 @@ public class NotePadPlus extends Activity {
 			if (AppSettings.IsListView()) {
 				NoteGrid.setVisibility(View.GONE);
 				NoteList.setVisibility(View.VISIBLE);
+				Log.d("log","in List RefreshListView");
 				ShowNoteInListView(Count);
 			} else {
 				NoteList.setVisibility(View.GONE);
@@ -268,30 +269,33 @@ public class NotePadPlus extends Activity {
 		ArrayList<HashMap<String, Object>> Notes = new ArrayList<HashMap<String, Object>>();
 		int[] BgColor = new int[Count];
 		int[] TagColor = new int[Count];
+		boolean[] IsLock = new boolean[Count];
+		boolean[] IsNotify = new boolean[Count];
 		for (int i = 0; i < Count && NotesCursor.moveToNext(); ++i) {
-			String Title = NotesCursor.getString(NotesCursor
-					.getColumnIndexOrThrow(OneNote.KEY_TITLE));
-			String Time = NotesCursor.getString(NotesCursor
-					.getColumnIndexOrThrow(OneNote.KEY_CREATED));
-			int TagImgIdx = NotesCursor.getInt(NotesCursor
-					.getColumnIndexOrThrow(OneNote.KEY_TAGIMG_ID));
-			int BgClrIdx = NotesCursor.getInt(NotesCursor
-					.getColumnIndexOrThrow(OneNote.KEY_BGCLR));
-
+			// Get note's parameter
+			String Title = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_TITLE));
+			String Time = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_CREATED));
+			String Pwd = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_PWD));
+			String Use_NotifyTime = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_USE_NOTIFYTIME));
+			Calendar NotifyTime = HelperFunctions.String2Calenar(NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_NOTIFYTIME)));
+			int TagImgIdx = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_TAGIMG_ID));
+			int BgClrIdx = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_BGCLR));
+            // Create one item
 			HashMap<String, Object> OneNote = new HashMap<String, Object>();
 			// Set list item's data
 			OneNote.put("NoteTitle", Title);
 			OneNote.put("NoteCreatedTime", Time);
 			Notes.add(OneNote);
-			// Set up colors
+			// Set up parameters
 			BgColor[i] = ItemBgClr[BgClrIdx];
 			TagColor[i] = TagClr[TagImgIdx];
+			IsLock[i] = Pwd.length() > 0 ;
+			IsNotify[i] = (Use_NotifyTime.equals(ProjectConst.Yes) && HelperFunctions.CmpDatePrefix2(NotifyTime, Calendar.getInstance()) > 0);
 		}
 
 		NoteItemAdapter ListItemAdapter = new NoteItemAdapter(this, Notes,
-				R.layout.listitem, new String[] { "NoteTitle",
-						"NoteCreatedTime" }, new int[] { R.id.NoteTitle,
-						R.id.NoteCreatedTime }, BgColor, TagColor);
+				                              R.layout.listitem, new String[] { "NoteTitle", "NoteCreatedTime" }, 
+				                              new int[] { R.id.NoteTitle, R.id.NoteCreatedTime }, BgColor, TagColor, IsLock, IsNotify);
 
 		NoteList.setAdapter(ListItemAdapter);
 		NoteList.setLayoutAnimation(ListAnimController);
@@ -302,10 +306,8 @@ public class NotePadPlus extends Activity {
 		ArrayList<HashMap<String, Object>> GridNotes = new ArrayList<HashMap<String, Object>>();
 		int[] ItemColor = new int[Count];
 		for (int i = 0; i < Count && NotesCursor.moveToNext(); ++i) {
-			String Title = NotesCursor.getString(NotesCursor
-					.getColumnIndexOrThrow(OneNote.KEY_TITLE));
-			int TagImgIdx = NotesCursor.getInt(NotesCursor
-					.getColumnIndexOrThrow(OneNote.KEY_TAGIMG_ID));
+			String Title = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_TITLE));
+			int TagImgIdx = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_TAGIMG_ID));
 
 			HashMap<String, Object> OneNote = new HashMap<String, Object>();
 			// Item
@@ -417,8 +419,10 @@ public class NotePadPlus extends Activity {
 			TmpCursor.moveToPosition(Pos);
 			// Check password
 			if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).length() > 0 )
+			{
+				Log.d("log"," pwd "+TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)));
                 showDialog(EidtNote_PwdPrompt_Dlg);
-			else
+			}else
 				EditNoteHelper(TmpCursor);
 		}	
     }
@@ -476,7 +480,7 @@ public class NotePadPlus extends Activity {
 		TmpCursor.moveToPosition(Pos);
 		// Check password
 		if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).length() > 0 )
-            showDialog(EidtNote_PwdPrompt_Dlg);
+            showDialog(DelNote_PwdPrompt_Dlg);
 		else
 			DelNoteHelper(TmpCursor);
 	}
@@ -641,7 +645,7 @@ public class NotePadPlus extends Activity {
 		case EidtNote_PwdPrompt_Dlg:
 			 return BuildEditNotePromptPwdDlg(NotePadPlus.this, R.string.pwdprompt_title, R.string.pwdprompt_tip);
 		case PwdErr_Dlg:
-			 return HelperFunctions.BuildAltertDialog(NotePadPlus.this, R.string.pwderr_title, R.string.pwderr_prompt);
+			 return HelperFunctions.BuildAltertDialog(NotePadPlus.this, R.string.pwderr_title, R.string.orignalpwd_err_prompt);
 		case ViewStyle_Dlg:
 			 return BuildSelViewDlg(NotePadPlus.this, R.string.viewstyle_title, R.array.noteviewstyle);
 		}
@@ -651,6 +655,7 @@ public class NotePadPlus extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
+		Log.d("log","onActivityResult");
 		if (requestCode == ACTIVITY_SET_TAGCLR) {
 			if (resultCode == RESULT_OK) {
 				Bundle SelIdxData = intent.getExtras();
@@ -664,7 +669,7 @@ public class NotePadPlus extends Activity {
 			}
 		}else if( requestCode == ACTIVITY_SET_PWD || requestCode == ACTIVITY_CHG_PWD || requestCode == ACTIVITY_CLR_PWD ) {
 			if( resultCode == RESULT_OK )
-				NotesCursor = NotesDb.GetAllNotes();
+				RefreshListView();
 		}
 		if( requestCode == ACTIVITY_SET_TAGCLR || requestCode == ACTIVITY_EDIT || requestCode == ACTIVITY_CREATE ) 
 		    RefreshListView();

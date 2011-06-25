@@ -3,7 +3,6 @@ package com.android.notepadplus;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.util.DisplayMetrics;
 import android.util.Log;
 
 class AppSetting

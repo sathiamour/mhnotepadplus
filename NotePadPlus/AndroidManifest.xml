@@ -30,8 +30,12 @@
                   android:label="@string/note_lock_dlg_title"
                   android:theme="@style/Theme.menu_dlg" android:screenOrientation="portrait"/>
         <activity android:name=".ClearPwdDlgActivity" 
-                  android:label="@string/note_lock_dlg_title"
+                  android:label="@string/note_lock_clear_title"
                   android:theme="@style/Theme.menu_dlg" android:screenOrientation="portrait"/>
+        <activity android:name=".PwdDlgActivity" 
+                  android:label="@string/note_lock_clear_title"
+                  android:theme="@style/Theme.menu_dlg" android:screenOrientation="portrait"/>
+                  
 
         <activity android:name=".NotifyActivity" android:label="@string/note_notify_title" android:screenOrientation="portrait" />
         

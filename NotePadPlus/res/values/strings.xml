@@ -58,4 +58,6 @@
 <string name="pwdprompt_title">该日志已经被密码锁定</string>
 <string name="pwdprompt_tip">请输入密码进行进一步操作性</string>
 <string name="viewstyle_title">请选择视图</string>
+<string name="note_lock_clear_title">日志密码解除</string>
+<string name="pwdnull_prompt">不能输入空密码！</string>
 </resources>

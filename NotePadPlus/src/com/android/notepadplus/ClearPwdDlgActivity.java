@@ -27,7 +27,7 @@ public class ClearPwdDlgActivity extends Activity {
         Bundle Parameters = getIntent().getExtras();
 		if( Parameters != null )
 			NoteRowId = Parameters.getInt(OneNote.KEY_ROWID);
-        
+
         Button Confirm =(Button)findViewById(R.id.clrpwd_confirm);
         Confirm.setWidth(NotePadPlus.ScreenWidth/2);
         Confirm.setOnClickListener(new OnClickListener(){
@@ -48,14 +48,14 @@ public class ClearPwdDlgActivity extends Activity {
 			        NotesDb.SetNotePwd(NoteRowId, ProjectConst.EmptyStr);
 			        NotesDb.close();
                 }	
-		        
+    			ClearPwdDlgActivity.this.setResult(RESULT_OK, null);
 		        finish();
     		}
        	});
-        
-        Button Cancel=(Button)findViewById(R.id.chgpwd_cancel);
+		
+        Button Cancel=(Button)findViewById(R.id.clrpwd_cancel);
         Cancel.setWidth(NotePadPlus.ScreenWidth/2);
-        Confirm.setOnClickListener(new OnClickListener(){
+        Cancel.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
 		    	finish();				
     		}

@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.database.Cursor;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -57,7 +56,7 @@ public class PromptPwdDlgActivity extends Activity {
         
         Button Cancel=(Button)findViewById(R.id.chgpwd_cancel);
         Cancel.setWidth(NotePadPlus.ScreenWidth/2);
-        Confirm.setOnClickListener(new OnClickListener(){
+        Cancel.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
 		    	finish();				
     		}
