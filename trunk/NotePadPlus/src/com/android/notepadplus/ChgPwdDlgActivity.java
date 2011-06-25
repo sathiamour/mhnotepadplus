@@ -16,6 +16,7 @@ public class ChgPwdDlgActivity extends Activity {
 	/** Dialog id */
 	private static final int PwdErr_Dlg = 1;
 	private static final int OrignalPwdErr_Dlg = PwdErr_Dlg+1;
+	private static final int PwdNull_Dlg = OrignalPwdErr_Dlg+1;
 	
 	// Row id
 	private int NoteRowId = 0;
@@ -39,6 +40,14 @@ public class ChgPwdDlgActivity extends Activity {
     			EditText Pwd_Orignal = (EditText)findViewById(R.id.pwd_orignal_edit);
     			EditText Pwd_First = (EditText)findViewById(R.id.pwd_first_edit);
 		        EditText Pwd_Second = (EditText)findViewById(R.id.pwd_second_edit);
+		        
+		        // Empty check
+		        if( Pwd_First.getText().toString().length() == 0 )
+		        {
+		        	showDialog(PwdNull_Dlg);
+		        	return;
+		        }
+		        // Is same ?
 		        if( !Pwd_First.getText().toString().equals(Pwd_Second.getText().toString())) {
 			        showDialog(PwdErr_Dlg);
 			        return;
@@ -57,14 +66,14 @@ public class ChgPwdDlgActivity extends Activity {
 			        NotesDb.SetNotePwd(NoteRowId, Pwd_First.getText().toString());
 			        NotesDb.close();
                 }	
-		        
+		        ChgPwdDlgActivity.this.setResult(RESULT_OK, null);
 		        finish();
     		}
        	});
         
         Button Cancel=(Button)findViewById(R.id.chgpwd_cancel);
         Cancel.setWidth(NotePadPlus.ScreenWidth/2);
-        Confirm.setOnClickListener(new OnClickListener(){
+        Cancel.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
 		    	finish();				
     		}
@@ -78,6 +87,8 @@ public class ChgPwdDlgActivity extends Activity {
 			     return HelperFunctions.BuildAltertDialog(ChgPwdDlgActivity.this, R.string.pwderr_title, R.string.pwderr_prompt);
             case OrignalPwdErr_Dlg:
             	 return HelperFunctions.BuildAltertDialog(ChgPwdDlgActivity.this, R.string.pwderr_title, R.string.orignalpwd_err_prompt);
+            case PwdNull_Dlg:
+           	     return HelperFunctions.BuildAltertDialog(ChgPwdDlgActivity.this, R.string.pwderr_title, R.string.pwdnull_prompt);
 		}
 		
 		return null;
