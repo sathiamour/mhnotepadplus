@@ -12,7 +12,9 @@
                   android:background="#ffffffff"
                   android:scrollbars="none"
                   android:fastScrollEnabled="true"
-                  android:focusable="true" />
+                  android:focusable="true" 
+                  android:persistentDrawingCache="animation|scrolling"
+                  />
         <GridView android:id="@+id/notegrid"
                   android:layoutAnimation="@anim/grid_fade"
 	              android:layout_width="fill_parent" 

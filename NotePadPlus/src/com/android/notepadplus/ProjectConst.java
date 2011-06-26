@@ -12,7 +12,7 @@ public class ProjectConst
 	public static final String Yes = "Y";
 	public static final String No = "N";
 	public static final String EmptyStr = "";
-	public static final String InvalidateDate = "1900-0-1 00:00:01";
+	public static final String InvalidateDate = "1900-01-01 00:00:01";
 	
 	/** Integration const */
 	public static final int NegativeOne  = -1;

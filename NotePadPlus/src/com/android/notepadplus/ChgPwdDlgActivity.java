@@ -35,18 +35,21 @@ public class ChgPwdDlgActivity extends Activity {
 		
         Button Confirm =(Button)findViewById(R.id.chgpwd_confirm);
         Confirm.setWidth(NotePadPlus.ScreenWidth/2);
+        Log.d("log","setWidth");
         Confirm.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
     			EditText Pwd_Orignal = (EditText)findViewById(R.id.pwd_orignal_edit);
-    			EditText Pwd_First = (EditText)findViewById(R.id.pwd_first_edit);
-		        EditText Pwd_Second = (EditText)findViewById(R.id.pwd_second_edit);
-		        
+    			EditText Pwd_First = (EditText)findViewById(R.id.chgpwd_first_edit);
+		        EditText Pwd_Second = (EditText)findViewById(R.id.chgpwd_second_edit);
+		        if( Pwd_First== null)
+		        Log.d("log","before Empty check");
 		        // Empty check
 		        if( Pwd_First.getText().toString().length() == 0 )
 		        {
 		        	showDialog(PwdNull_Dlg);
 		        	return;
 		        }
+    			Log.d("log","Empty check");
 		        // Is same ?
 		        if( !Pwd_First.getText().toString().equals(Pwd_Second.getText().toString())) {
 			        showDialog(PwdErr_Dlg);

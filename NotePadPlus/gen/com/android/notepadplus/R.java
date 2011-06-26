@@ -12,7 +12,9 @@ public final class R {
         public static final int fade=0x7f040000;
         public static final int grid_fade=0x7f040001;
         public static final int grid_wavescale=0x7f040002;
-        public static final int wavescale=0x7f040003;
+        public static final int slide_left=0x7f040003;
+        public static final int top_to_bottom_slide=0x7f040004;
+        public static final int wavescale=0x7f040005;
     }
     public static final class array {
         public static final int noteviewstyle=0x7f050000;
