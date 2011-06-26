@@ -7,12 +7,14 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 public class NoteDbAdapter {
 
+	// Database class
 	private DatabaseHelper mDbHelper;
 	private SQLiteDatabase mDb;
-
+    // Note database table create sql
 	private static final String DATABASE_CREATE = "create table diary (_id integer primary key autoincrement, "
 			+ "title text not null, path text not null, created_time text not null, "
 			+ "updated_time text not null,end_time text not null, use_endtime text not null," 
@@ -21,12 +23,18 @@ public class NoteDbAdapter {
 			+ "ringmusic text not null,notifydura integer not null, "
 			+ "notifymethod integer not null, notify_ringtime text not null, "
 			+ "pwd text)";
-
+    // Database name & table name & database version
 	private static final String DATABASE_NAME = "database";
 	private static final String DATABASE_TABLE = "diary";
-	private static final int DATABASE_VERSION = 12;
-
+	private static final int DATABASE_VERSION = 14;
+	// Order by options
+	public static final String OrderByCreatedTime = "_id desc";
+	public static final String OrderByUpdatedTime = "updated_time desc";
+	public static final String OrderByTagClr = "tagimg_id";
+	
+    // Database context(application's context)
 	private final Context mCtx;
+	
 
 	private static class DatabaseHelper extends SQLiteOpenHelper {
 
@@ -65,7 +73,7 @@ public class NoteDbAdapter {
 		InitialValues.put(OneNote.KEY_TITLE, Note.NoteTitle);
 		InitialValues.put(OneNote.KEY_PATH, Note.NoteFilePath);
 		InitialValues.put(OneNote.KEY_CREATED, HelperFunctions.FormatCalendar2ReadableStr(Calendar.getInstance()));
-		InitialValues.put(OneNote.KEY_UPDATED, HelperFunctions.FormatCalendar2ReadableStr(Calendar.getInstance()));
+		InitialValues.put(OneNote.KEY_UPDATED, HelperFunctions.Calendar2String(Calendar.getInstance()));
 		InitialValues.put(OneNote.KEY_ENDTIME, HelperFunctions.Calendar2String(Note.EndTime));
 		InitialValues.put(OneNote.KEY_USE_ENDTIME, Note.Use_EndTime);
 		InitialValues.put(OneNote.KEY_NOTIFYTIME, HelperFunctions.Calendar2String(Note.NotifyTime));
@@ -90,12 +98,12 @@ public class NoteDbAdapter {
 	public Cursor GetAllNotes() {
         /** Order by created date descending order */
 		return mDb.query(DATABASE_TABLE, 
-				         new String[] { OneNote.KEY_ROWID, OneNote.KEY_TITLE, OneNote.KEY_PATH, 
+				         new String[] { OneNote.KEY_ROWID, OneNote.KEY_TITLE, OneNote.KEY_PATH, OneNote.KEY_UPDATED,
 				                        OneNote.KEY_CREATED, OneNote.KEY_ENDTIME, OneNote.KEY_USE_ENDTIME, 
 				                        OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME, OneNote.KEY_DELNOTE_EXP,
 				                        OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, OneNote.KEY_RINGMUSIC,
 				                        OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD, OneNote.KEY_PWD}, 
-				         null, null, null, null, OneNote.KEY_CREATED+" desc");
+				         null, null, null, null, OrderByUpdatedTime);
 	}
 
 	public Cursor GetNotesByCondition(String Condition, String OrderBy){
@@ -128,7 +136,7 @@ public class NoteDbAdapter {
 		ContentValues UpdateArgs = new ContentValues();
 		UpdateArgs.put(OneNote.KEY_TITLE, Note.NoteTitle);
 		UpdateArgs.put(OneNote.KEY_PATH, Note.NoteFilePath);
-		UpdateArgs.put(OneNote.KEY_UPDATED, HelperFunctions.FormatCalendar2ReadableStr(Calendar.getInstance()));
+		UpdateArgs.put(OneNote.KEY_UPDATED, HelperFunctions.Calendar2String(Calendar.getInstance()));
 		UpdateArgs.put(OneNote.KEY_ENDTIME, HelperFunctions.Calendar2String(Note.EndTime));
 		UpdateArgs.put(OneNote.KEY_USE_ENDTIME, Note.Use_EndTime);
 		UpdateArgs.put(OneNote.KEY_NOTIFYTIME, HelperFunctions.Calendar2String(Note.NotifyTime));

@@ -29,10 +29,10 @@ public class NoteItemAdapter extends SimpleAdapter
 	{
 		super(context, data, resource, from, to);
 		// TODO Auto-generated constructor stub
-		ItemBgColor = BgClr.clone();
-		TagColor = TagClr.clone();
-		IsLock = Lock.clone();
-		IsNotify = Notify.clone();
+		ItemBgColor = BgClr;
+		TagColor = TagClr;
+		IsLock = Lock;
+		IsNotify = Notify;
 		
 		// Get height of font   
 		Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);   

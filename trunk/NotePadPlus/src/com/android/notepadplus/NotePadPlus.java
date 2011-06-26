@@ -25,6 +25,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
+import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
@@ -117,7 +118,7 @@ public class NotePadPlus extends Activity {
 		// Note database
 		NotesDb = new NoteDbAdapter(this);
 		NotesDb.open();
-
+		
 		// Application setting
 		AppSettings = new AppSetting(this);
 
@@ -130,12 +131,12 @@ public class NotePadPlus extends Activity {
 			/** When user clicks a note, show edit activity */
 			public void onItemClick(AdapterView<?> Adapater, View ListView,
 					int position, long id) {
+				NoteIndex = position;
 				actionClickEditNote(position);
 			}
 		});
 		// List item long click listener
-		NoteList
-				.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+		NoteList.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
 					/** When user push the item long time, show menu */
 					public void onCreateContextMenu(ContextMenu menu, View v,
 							ContextMenuInfo menuInfo) {
@@ -167,12 +168,11 @@ public class NotePadPlus extends Activity {
 		NoteGrid.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				
+				NoteIndex = position;
 				actionClickEditNote(position);
 			}
 		});
-		NoteGrid
-				.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+		NoteGrid.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
 					/** When user push the item long time, show menu */
 					public void onCreateContextMenu(ContextMenu menu, View v,
 							ContextMenuInfo menuInfo) {
@@ -191,18 +191,20 @@ public class NotePadPlus extends Activity {
 
 		// Display animation
 		AnimationSet set = new AnimationSet(true);
-
-		Animation animation = new AlphaAnimation(0.0f, 1.0f);
+        set.setInterpolator(new AccelerateInterpolator());
+		
+        Animation animation = new AlphaAnimation(0.0f, 1.0f);
 		animation.setDuration(60);
 		set.addAnimation(animation);
 
-		animation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 0.0f,
+		animation = new TranslateAnimation(Animation.RELATIVE_TO_SELF, 1.0f,
 				Animation.RELATIVE_TO_SELF, 0.0f, Animation.RELATIVE_TO_SELF,
-				-2.0f, Animation.RELATIVE_TO_SELF, 0.0f);
-		animation.setDuration(150);
+				0.0f, Animation.RELATIVE_TO_SELF, 0.0f);
+		animation.setDuration(60);
 		set.addAnimation(animation);
 
-		ListAnimController = new LayoutAnimationController(set, 0.5f);
+		ListAnimController = new LayoutAnimationController(set, 2.5f);
+		ListAnimController.setOrder(LayoutAnimationController.ORDER_NORMAL);
 		NoteList.setLayoutAnimation(ListAnimController);
 	}
 
@@ -249,7 +251,6 @@ public class NotePadPlus extends Activity {
 			if (AppSettings.IsListView()) {
 				NoteGrid.setVisibility(View.GONE);
 				NoteList.setVisibility(View.VISIBLE);
-				Log.d("log","in List RefreshListView");
 				ShowNoteInListView(Count);
 			} else {
 				NoteList.setVisibility(View.GONE);
@@ -271,10 +272,18 @@ public class NotePadPlus extends Activity {
 		int[] TagColor = new int[Count];
 		boolean[] IsLock = new boolean[Count];
 		boolean[] IsNotify = new boolean[Count];
+		NoteItemAdapter ListItemAdapter = new NoteItemAdapter(this, Notes,
+                R.layout.listitem, new String[] { "NoteTitle", "Time" }, 
+                new int[] { R.id.NoteTitle, R.id.NoteCreatedTime }, BgColor, TagColor, IsLock, IsNotify);
+
+        NoteList.setAdapter(ListItemAdapter);
+		NoteList.setLayoutAnimation(ListAnimController);
+		
 		for (int i = 0; i < Count && NotesCursor.moveToNext(); ++i) {
+			Log.d("log","start one "+i);
 			// Get note's parameter
 			String Title = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_TITLE));
-			String Time = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_CREATED));
+			String Time = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_UPDATED));
 			String Pwd = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_PWD));
 			String Use_NotifyTime = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_USE_NOTIFYTIME));
 			Calendar NotifyTime = HelperFunctions.String2Calenar(NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_NOTIFYTIME)));
@@ -284,22 +293,17 @@ public class NotePadPlus extends Activity {
 			HashMap<String, Object> OneNote = new HashMap<String, Object>();
 			// Set list item's data
 			OneNote.put("NoteTitle", Title);
-			OneNote.put("NoteCreatedTime", Time);
+			OneNote.put("Time", HelperFunctions.FormatCalendar2ReadableStr(HelperFunctions.String2Calenar(Time)));
 			Notes.add(OneNote);
 			// Set up parameters
 			BgColor[i] = ItemBgClr[BgClrIdx];
 			TagColor[i] = TagClr[TagImgIdx];
 			IsLock[i] = Pwd.length() > 0 ;
 			IsNotify[i] = (Use_NotifyTime.equals(ProjectConst.Yes) && HelperFunctions.CmpDatePrefix2(NotifyTime, Calendar.getInstance()) > 0);
+			
+			ListItemAdapter.notifyDataSetChanged();   
+			Log.d("log","end one "+i);
 		}
-
-		NoteItemAdapter ListItemAdapter = new NoteItemAdapter(this, Notes,
-				                              R.layout.listitem, new String[] { "NoteTitle", "NoteCreatedTime" }, 
-				                              new int[] { R.id.NoteTitle, R.id.NoteCreatedTime }, BgColor, TagColor, IsLock, IsNotify);
-
-		NoteList.setAdapter(ListItemAdapter);
-		NoteList.setLayoutAnimation(ListAnimController);
-
 	}
 
 	public void ShowNoteInGridView(int Count) {
@@ -333,8 +337,6 @@ public class NotePadPlus extends Activity {
 		switch (Item.getItemId()) {
 		case ITEM0:
 			actionClickEditNote(NoteIndex);
-			// Reset selected noted index
-			//NoteIndex = ErrNoteIndex;
 			return true;
 		case ITEM1:
 			showDialog(Del_Prompt_Dlg);
@@ -369,7 +371,6 @@ public class NotePadPlus extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Must create one menu
-		//menu.add("menu");
 		menu.add(Menu.NONE, ITEM0, 1, "添加").setIcon(android.R.drawable.ic_menu_add);
 		menu.add(Menu.NONE, ITEM1, 2, "备份").setIcon(android.R.drawable.ic_menu_save);
 		menu.add(Menu.NONE, ITEM2, 3, "设置").setIcon(android.R.drawable.ic_menu_manage);
@@ -420,7 +421,7 @@ public class NotePadPlus extends Activity {
 			// Check password
 			if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).length() > 0 )
 			{
-				Log.d("log"," pwd "+TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)));
+				Log.d("log","pwd "+TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)));
                 showDialog(EidtNote_PwdPrompt_Dlg);
 			}else
 				EditNoteHelper(TmpCursor);
@@ -510,8 +511,6 @@ public class NotePadPlus extends Activity {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						// Delete the selected note
 						actionClickDelNote(NoteIndex);
-						// Reset selected noted index
-						//NoteIndex = ErrNoteIndex;
 					}
 				});
 
@@ -526,7 +525,7 @@ public class NotePadPlus extends Activity {
 	private Dialog BuildEditNotePromptPwdDlg(Context AppContext, int Title, int Msg){
         LayoutInflater factory = LayoutInflater.from(this);
         final View PromptView = factory.inflate(R.layout.promptpwd_dlg, null);
-		return new AlertDialog.Builder(NotePadPlus.this)
+        return new AlertDialog.Builder(NotePadPlus.this)
                .setIcon(R.drawable.alert_dialog_icon)
                .setTitle(Title)
                .setMessage(Msg)
@@ -541,10 +540,15 @@ public class NotePadPlus extends Activity {
     			    	  EditNoteHelper(TmpCursor);
     			      else
     				      showDialog(PwdErr_Dlg);	
+    			      // Clear input
+    			      Pwd.setText(ProjectConst.EmptyStr);
               }
               })
               .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                     public void onClick(DialogInterface dialog, int whichButton) {
+                   public void onClick(DialogInterface dialog, int whichButton) {
+                	  EditText Pwd = (EditText)PromptView.findViewById(R.id.pwd_edit);
+                	  // Clear input
+    			      Pwd.setText(ProjectConst.EmptyStr);
               }
               })
               .create();
@@ -567,11 +571,16 @@ public class NotePadPlus extends Activity {
     			      if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).equals(Pwd.getText().toString()) )
     			    	  DelNoteHelper(TmpCursor);
     			      else
-    				      showDialog(PwdErr_Dlg);	
+    				      showDialog(PwdErr_Dlg);
+    			      // Clear input
+    			      Pwd.setText(ProjectConst.EmptyStr);
               }
               })
               .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
-                     public void onClick(DialogInterface dialog, int whichButton) {
+                  public void onClick(DialogInterface dialog, int whichButton) {
+                	  EditText Pwd = (EditText)PromptView.findViewById(R.id.pwd_edit);
+                	  // Clear input
+    			      Pwd.setText(ProjectConst.EmptyStr);
               }
               })
               .create();
@@ -655,7 +664,6 @@ public class NotePadPlus extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
-		Log.d("log","onActivityResult");
 		if (requestCode == ACTIVITY_SET_TAGCLR) {
 			if (resultCode == RESULT_OK) {
 				Bundle SelIdxData = intent.getExtras();
@@ -667,10 +675,11 @@ public class NotePadPlus extends Activity {
 						.getColumnIndexOrThrow(OneNote.KEY_ROWID)), TagImgIdx,
 						BgClrIdx);
 			}
-		}else if( requestCode == ACTIVITY_SET_PWD || requestCode == ACTIVITY_CHG_PWD || requestCode == ACTIVITY_CLR_PWD ) {
+		}else if( requestCode == ACTIVITY_SET_PWD ||  requestCode == ACTIVITY_CLR_PWD ) {
 			if( resultCode == RESULT_OK )
 				RefreshListView();
-		}
+		}else if( requestCode == ACTIVITY_CHG_PWD && resultCode == RESULT_OK ) // Needn't refresh
+			NotesCursor = NotesDb.GetAllNotes();
 		if( requestCode == ACTIVITY_SET_TAGCLR || requestCode == ACTIVITY_EDIT || requestCode == ACTIVITY_CREATE ) 
 		    RefreshListView();
 		
