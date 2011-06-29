@@ -48,7 +48,7 @@ public class ClearPwdDlgActivity extends Activity {
 			        NotesDb.SetNotePwd(NoteRowId, ProjectConst.EmptyStr);
 			        NotesDb.close();
                 }	
-    			ClearPwdDlgActivity.this.setResult(RESULT_OK, null);
+    			ClearPwdDlgActivity.this. setResult(RESULT_OK);
 		        finish();
     		}
        	});

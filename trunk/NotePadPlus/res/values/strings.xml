@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="pref_fontsize_defval">1</string>
+    <string name="pref_fontsize_key">FontSize_Key</string>
+    <string name="pref_fontsize_title">显示字体大小</string>
+    <string name="pref_disp_title">显示相关</string>
     <string name="hello">Hello World       NotePadPlus!</string>
     <string name="app_name">NotePadPlus</string>
     <string name="addnote_title">日志标题</string>
@@ -60,4 +64,18 @@
 <string name="viewstyle_title">请选择视图</string>
 <string name="note_lock_clear_title">日志密码解除</string>
 <string name="pwdnull_prompt">不能输入空密码！</string>
+<string name="syssetting_title">系统设置</string>
+<string name="pref_item_fontsize_title">字体大小</string>
+<string name="syssetting_key">sys_setting_key</string>
+
+<string name="pref_fullscreen_on">全屏显示</string>
+<string name="pref_fullscreen_off">非全屏显示</string>
+<string name="pref_fullscreen_option">是否全屏显示日志</string>
+<string name="pref_orderby_dlgtitle">排序依据</string>
+<string name="pref_orderby_key">OrderBy_Key</string>
+<string name="pref_orderby_title">日志排序</string>
+<string name="pref_orderby_defval">1</string>
+<string name="pref_bgclr_key">BgClr_Key</string>
+<string name="pref_bgclr_title">背景颜色</string>
+<string name="pref_fullscreen_key">FullScreen_Key</string>
 </resources>
