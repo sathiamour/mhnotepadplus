@@ -69,7 +69,7 @@ public class ChgPwdDlgActivity extends Activity {
 			        NotesDb.SetNotePwd(NoteRowId, Pwd_First.getText().toString());
 			        NotesDb.close();
                 }	
-		        ChgPwdDlgActivity.this.setResult(RESULT_OK, null);
+		        ChgPwdDlgActivity.this.setResult(RESULT_OK);;
 		        finish();
     		}
        	});

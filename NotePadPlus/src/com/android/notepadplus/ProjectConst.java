@@ -12,6 +12,8 @@ public class ProjectConst
 	public static final String Yes = "Y";
 	public static final String No = "N";
 	public static final String EmptyStr = "";
+	public static final String True = "true";
+	public static final String False = "false";
 	public static final String InvalidateDate = "1900-01-01 00:00:01";
 	
 	/** Integration const */

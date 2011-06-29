@@ -24,6 +24,9 @@
         <activity android:name=".EditNoteActivity" android:screenOrientation="portrait"></activity>
         <activity android:name=".EndDateActivity" android:screenOrientation="portrait"></activity>
         <activity android:name=".NotifyDateActivity" android:screenOrientation="portrait"></activity>
+        <activity android:name=".SysSettingActivity" android:screenOrientation="portrait"></activity>
+        <activity android:name=".ColorPreferencePicker" android:screenOrientation="portrait"></activity>
+        
         <activity android:name=".SetTagClrActivity" 
                   android:theme="@android:style/Theme.Translucent" android:screenOrientation="portrait"></activity>
         <activity android:name=".ChgPwdDlgActivity" 

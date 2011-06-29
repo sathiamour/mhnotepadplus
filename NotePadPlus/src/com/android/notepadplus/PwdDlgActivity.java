@@ -53,7 +53,7 @@ public class PwdDlgActivity extends Activity {
 			        NotesDb.SetNotePwd(NoteRowId, Pwd_First.getText().toString());
 			        NotesDb.close();
                 }	
-		        PwdDlgActivity.this.setResult(RESULT_OK, null);
+		        PwdDlgActivity.this. setResult(RESULT_OK);
 		        finish();
     		}
        	});

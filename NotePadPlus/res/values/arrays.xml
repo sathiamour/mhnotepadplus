@@ -8,5 +8,31 @@
         <item>栅格视图</item> 
     </string-array>
 
+    <string-array name="fontsize">
+       <item>小型字体</item>
+       <item>中型字体</item>
+       <item>大型字体</item>
+    </string-array>
+    
+    <string-array name="fontsizevalue">
+       <item>0</item>
+       <item>1</item>
+       <item>2</item>
+    </string-array>
+    
+    <string-array name="orderby">
+       <item>日志创建时间</item>
+       <item>日志更新时间</item>
+       <item>日志标题字母顺序</item>
+       <item>日志颜色</item>
+    </string-array>
+    
+    <string-array name="orderbyvalue">
+       <item>0</item>
+       <item>1</item>
+       <item>2</item>
+       <item>3</item>
+    </string-array>
+    
 </resources>
 

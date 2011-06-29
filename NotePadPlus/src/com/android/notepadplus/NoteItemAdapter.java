@@ -23,12 +23,16 @@ public class NoteItemAdapter extends SimpleAdapter
     private float FontHeight;
     private static int FontSize = 25;
     private static int TagWidth = 7;
+    Context AppContext;
 	public NoteItemAdapter(Context context,
 			List<? extends Map<String, ?>> data, int resource, String[] from,
 			int[] to, int[] BgClr, int[] TagClr, boolean[] Lock, boolean[] Notify) 
 	{
 		super(context, data, resource, from, to);
 		// TODO Auto-generated constructor stub
+		// Application context
+		AppContext = context;
+		// Array
 		ItemBgColor = BgClr;
 		TagColor = TagClr;
 		IsLock = Lock;
@@ -63,11 +67,14 @@ public class NoteItemAdapter extends SimpleAdapter
 		Ring.setBackgroundColor(ItemBgColor[position]);
 		Lock.setBackgroundColor(ItemBgColor[position]);
 		
+		Title.setTextSize(AppSetting.FontSizeArray[Integer.parseInt(NotePadPlus.AppSettings.FontSize)]);
+
 		Tag1.setWidth(TagWidth);
 		Tag2.setWidth(TagWidth);
 		Tag1.setHeight((int) (FontHeight*14/10));
 		Title.setHeight((int) (FontHeight*14/10));
 		Title.setWidth(NotePadPlus.ScreenWidth-TagWidth-64);
+		
 		if( !IsLock[position] )
 		{
 			Drawable LockImg = Lock.getDrawable();

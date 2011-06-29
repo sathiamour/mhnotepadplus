@@ -7,7 +7,6 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.util.Log;
 
 public class NoteDbAdapter {
 
@@ -28,9 +27,12 @@ public class NoteDbAdapter {
 	private static final String DATABASE_TABLE = "diary";
 	private static final int DATABASE_VERSION = 14;
 	// Order by options
+	private static String OrderBy;
 	public static final String OrderByCreatedTime = "_id desc";
 	public static final String OrderByUpdatedTime = "updated_time desc";
 	public static final String OrderByTagClr = "tagimg_id";
+	public static final String OrderByTitle = "title";
+	public static final String[] OrderByArray={OrderByCreatedTime,OrderByUpdatedTime,OrderByTitle,OrderByTagClr};
 	
     // Database context(application's context)
 	private final Context mCtx;
@@ -40,6 +42,8 @@ public class NoteDbAdapter {
 
 		DatabaseHelper(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
+			
+			OrderBy = OrderByCreatedTime;
 		}
 
 		@Override
@@ -103,7 +107,7 @@ public class NoteDbAdapter {
 				                        OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME, OneNote.KEY_DELNOTE_EXP,
 				                        OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, OneNote.KEY_RINGMUSIC,
 				                        OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD, OneNote.KEY_PWD}, 
-				         null, null, null, null, OrderByUpdatedTime);
+				         null, null, null, null, OrderBy);
 	}
 
 	public Cursor GetNotesByCondition(String Condition, String OrderBy){
@@ -181,4 +185,7 @@ public class NoteDbAdapter {
 		return mDb.update(DATABASE_TABLE, Content, OneNote.KEY_ROWID + "=" + RowId, null) > 0;
 	}
 	
+	public void SetOrderBy(String Condition){
+		OrderBy = Condition;
+	}
 }

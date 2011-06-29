@@ -23,6 +23,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
 import android.view.animation.AccelerateInterpolator;
@@ -61,6 +62,7 @@ public class NotePadPlus extends Activity {
 	public static final int ACTIVITY_CHG_PWD = 4;
 	public static final int ACTIVITY_CLR_PWD = 5;
 	public static final int ACTIVITY_ENTERPWD_EDIT = 6;
+	public static final int ACTIVITY_SETTING = ACTIVITY_ENTERPWD_EDIT+1;
 
 	/** Long touch Menu id */
 	public static final int ITEM0 = Menu.FIRST;
@@ -94,7 +96,7 @@ public class NotePadPlus extends Activity {
 	public  static int ScreenHeight;
 
 	// Application settings
-	AppSetting AppSettings;
+	public static AppSetting AppSettings;
 
 	/** Note's index */
 	private static final int ErrNoteIndex = -1;
@@ -104,8 +106,8 @@ public class NotePadPlus extends Activity {
 	public BroadcastReceiver RefreshReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			     // Refresh list view on GUI
-			     RefreshListView();
+			   // Refresh list view on GUI
+			   RefreshListView();
 		}
 	};
 
@@ -122,44 +124,41 @@ public class NotePadPlus extends Activity {
 		// Application setting
 		AppSettings = new AppSetting(this);
 
-		// ListView
-		NoteList = (ListView) findViewById(R.id.nodelist);
-
-		// Add listener
-		// List item short click listener
-		NoteList.setOnItemClickListener(new OnItemClickListener() {
-			/** When user clicks a note, show edit activity */
-			public void onItemClick(AdapterView<?> Adapater, View ListView,
-					int position, long id) {
-				NoteIndex = position;
-				actionClickEditNote(position);
-			}
-		});
-		// List item long click listener
-		NoteList.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
-					/** When user push the item long time, show menu */
-					public void onCreateContextMenu(ContextMenu menu, View v,
-							ContextMenuInfo menuInfo) {
-						menu.setHeaderTitle("日志编辑菜单");
-						menu.add(0, ITEM0, 1, "编辑当前日志");
-						menu.add(0, ITEM1, 2, "删除当前日志");
-						menu.add(0, ITEM2, 3, "增加新日志");
-						menu.add(0, ITEM3, 4, "修改日志标签颜色");
-						menu.add(0, ITEM4, 5, "锁定当前日志");
-
-					}
-				});
-
 		// Get screen's widht & height
 		DisplayMetrics ScreenMetrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(ScreenMetrics);
 		ScreenHeight = ScreenMetrics.heightPixels;
 		ScreenWidth = ScreenMetrics.widthPixels;
+		
+		// Note dislpay view
+		NoteList = (ListView) findViewById(R.id.nodelist);
+		NoteGrid = (GridView) findViewById(R.id.notegrid);
+		
+		// Listview Add listener
+		// List item short click listener
+		NoteList.setOnItemClickListener(new OnItemClickListener() {
+			/** When user clicks a note, show edit activity */
+			public void onItemClick(AdapterView<?> Adapater, View ListView, int position, long id) {
+				   NoteIndex = position;
+				   actionClickEditNote(position);
+			}
+		});
+		// List item long click listener
+		NoteList.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
+			/** When user push the item long time, show menu */
+			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+				   menu.setHeaderTitle("日志编辑菜单");
+				   menu.add(0, ITEM0, 1, "编辑当前日志");
+				   menu.add(0, ITEM1, 2, "删除当前日志");
+				   menu.add(0, ITEM2, 3, "增加新日志");
+				   menu.add(0, ITEM3, 4, "修改日志标签颜色");
+				   menu.add(0, ITEM4, 5, "锁定当前日志");
+			}
+		});
+
 
 		// GridView
-		int Length = Math.min(ScreenHeight, ScreenWidth);
-		EdgeWidth = (Length - ScreenPadding * 2 - SpacePadding * 2) / 3;
-		NoteGrid = (GridView) findViewById(R.id.notegrid);
+		EdgeWidth = (Math.min(ScreenHeight, ScreenWidth) - ScreenPadding * 2 - SpacePadding * 2) / 3;
 		NoteGrid.setPadding(ScreenPadding, ScreenPadding, ScreenPadding, ScreenPadding);
 		NoteGrid.setColumnWidth(EdgeWidth);
 		NoteGrid.setHorizontalSpacing(SpacePadding);
@@ -168,24 +167,23 @@ public class NotePadPlus extends Activity {
 		NoteGrid.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				NoteIndex = position;
-				actionClickEditNote(position);
+				   NoteIndex = position;
+				   actionClickEditNote(position);
 			}
 		});
 		NoteGrid.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
-					/** When user push the item long time, show menu */
-					public void onCreateContextMenu(ContextMenu menu, View v,
-							ContextMenuInfo menuInfo) {
-						menu.setHeaderTitle("日志编辑菜单");
-						menu.add(0, ITEM0, 1, "编辑当前日志");
-						menu.add(0, ITEM1, 2, "删除当前日志");
-						menu.add(0, ITEM2, 3, "增加新日志");
-						menu.add(0, ITEM3, 4, "修改日志标签颜色");
-						menu.add(0, ITEM4, 5, "锁定当前日志");
-
-					}
-				});
-
+			/** When user push the item long time, show menu */
+			@Override
+			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
+			       menu.setHeaderTitle("日志编辑菜单");
+				   menu.add(0, ITEM0, 1, "编辑当前日志");
+				   menu.add(0, ITEM1, 2, "删除当前日志");
+				   menu.add(0, ITEM2, 3, "增加新日志");
+				   menu.add(0, ITEM3, 4, "修改日志标签颜色");
+				   menu.add(0, ITEM4, 5, "锁定当前日志");
+			}
+		});
+		
 		// Refresh the note list
 		RefreshListView();
 
@@ -280,7 +278,6 @@ public class NotePadPlus extends Activity {
 		NoteList.setLayoutAnimation(ListAnimController);
 		
 		for (int i = 0; i < Count && NotesCursor.moveToNext(); ++i) {
-			Log.d("log","start one "+i);
 			// Get note's parameter
 			String Title = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_TITLE));
 			String Time = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_UPDATED));
@@ -302,7 +299,6 @@ public class NotePadPlus extends Activity {
 			IsNotify[i] = (Use_NotifyTime.equals(ProjectConst.Yes) && HelperFunctions.CmpDatePrefix2(NotifyTime, Calendar.getInstance()) > 0);
 			
 			ListItemAdapter.notifyDataSetChanged();   
-			Log.d("log","end one "+i);
 		}
 	}
 
@@ -390,6 +386,8 @@ public class NotePadPlus extends Activity {
               case ITEM1:
 	               break;
               case ITEM2:
+            	   Intent PrefSetting = new Intent(NotePadPlus.this, SysSettingActivity.class);
+            	   startActivityForResult(PrefSetting, ACTIVITY_SETTING);
 	               break;
               case ITEM3:
 	               showDialog(ViewStyle_Dlg);
@@ -680,6 +678,24 @@ public class NotePadPlus extends Activity {
 				RefreshListView();
 		}else if( requestCode == ACTIVITY_CHG_PWD && resultCode == RESULT_OK ) // Needn't refresh
 			NotesCursor = NotesDb.GetAllNotes();
+		else if( requestCode == ACTIVITY_SETTING && resultCode == RESULT_OK ) {
+			
+		    WindowManager.LayoutParams attrs = getWindow().getAttributes();  
+			if( AppSettings.IsFullScreen() ) {
+	 			attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;   
+				getWindow().setAttributes(attrs);   
+				//getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS); 
+			} else {
+				attrs.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);   
+				getWindow().setAttributes(attrs);   
+				//getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+			}
+			
+			NotesDb.SetOrderBy(NoteDbAdapter.OrderByArray[Integer.parseInt(AppSettings.OrderBy)]);
+			RefreshListView();		    	
+		}
+		
+			
 		if( requestCode == ACTIVITY_SET_TAGCLR || requestCode == ACTIVITY_EDIT || requestCode == ACTIVITY_CREATE ) 
 		    RefreshListView();
 		
