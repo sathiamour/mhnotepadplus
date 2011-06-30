@@ -3,6 +3,7 @@ package com.android.notepadplus;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
@@ -14,9 +15,10 @@ class AppSetting
 	// Preference key name
 	public static final String Key_PrefViewStyle = "ViewStyle";
 	public static final String Key_PrefAppCount = "PrefAppCount";
-    public static String Key_PrefFullScreen = "FullScreen_Key";
-    public static String Key_PrefFontSize = "FontSize_Key";
+    public static final String Key_PrefFullScreen = "FullScreen_Key";
+    public static final String Key_PrefFontSize = "FontSize_Key";
     public static final String Key_PrefOrderBy = "OrderBy_Key";
+    public static final String Key_PrefBgClr = "BgClr_Key";
 	// Value for keys
 	public static final String ViewStyle_List = "List";
 	public static final String ViewStyle_Grid = "Grid";
@@ -29,6 +31,7 @@ class AppSetting
 	public boolean IsFullScreen;
 	public String FontSize;
 	public String OrderBy;
+	public int BgClr;
 	public static int ScreenOrient;
 	
 	// SharedPreference instantance 
@@ -61,6 +64,7 @@ class AppSetting
 		IsFullScreen = Settings.getBoolean(Key_PrefFullScreen, false);   
 		FontSize = Settings.getString(Key_PrefFontSize, "1");   
 		OrderBy = Settings.getString(Key_PrefOrderBy,"1");
+		BgClr = Settings.getInt(Key_PrefBgClr, Color.WHITE);
 	}
 	
 	public boolean IsListView()

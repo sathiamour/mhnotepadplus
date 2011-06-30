@@ -228,16 +228,18 @@ public class ColorPreferencePicker extends DialogPreference {
 
     public ColorPreferencePicker(Context contex) {
         this(contex, null);
-        Log.d("log","onCreateView");
+        Log.d("log","ColorPreferencePicker");
     }
 
     public ColorPreferencePicker(Context context, AttributeSet attrs) {
         super(context, attrs);
+        Log.d("log","ColorPreferencePicker");
 
     }
 
     public ColorPreferencePicker(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        Log.d("log","ColorPreferencePicker");
 
     }
 
@@ -253,10 +255,10 @@ public class ColorPreferencePicker extends DialogPreference {
         }
     }
 
-    @Override
+    //@Override
     protected View onCreateView(ViewGroup parent) {
         // TODO Auto-generated method stub
-
+        Log.d("log","onCreateView");
         View view = LayoutInflater.from(getContext()).inflate(R.layout.clrdlgpref, null);
 
         TextView title = (TextView) view.findViewById(R.id.title);
@@ -274,7 +276,7 @@ public class ColorPreferencePicker extends DialogPreference {
     @Override
     protected void onPrepareDialogBuilder(Builder builder) {
         super.onPrepareDialogBuilder(builder);
-
+        Log.d("log","onPrepareDialogBuilder");
         OnColorChangedListener l = new OnColorChangedListener() {
             public void colorChanged(int color) {
                 mCurrentColor = color;
@@ -282,7 +284,7 @@ public class ColorPreferencePicker extends DialogPreference {
                 getDialog().dismiss();
             }
         }; 
-
+         
         LinearLayout layout = new LinearLayout(getContext());
         layout.setPadding(20, 20, 20, 20);
         layout.setOrientation(LinearLayout.VERTICAL);
