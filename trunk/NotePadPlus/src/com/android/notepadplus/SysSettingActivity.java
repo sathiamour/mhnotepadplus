@@ -10,14 +10,17 @@ import android.preference.Preference.OnPreferenceClickListener;
 import android.util.Log;
 import android.view.WindowManager;
 
-public class SysSettingActivity extends PreferenceActivity implements OnPreferenceChangeListener, OnPreferenceClickListener
+public class SysSettingActivity extends PreferenceActivity 
+       implements OnPreferenceChangeListener, OnPreferenceClickListener, ColorPickerDialog.OnColorChangedListener
 {
 	private String FullScreenDispKey;
 	private String FontSizeKey;
 	private String OrderByKey;
+	private String BgClrKey;
 	private CheckBoxPreference FullScreenDispPref;
 	private ListPreference FontSizePref;
 	private ListPreference OrderByPref;
+	private Preference BgClr;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -26,9 +29,11 @@ public class SysSettingActivity extends PreferenceActivity implements OnPreferen
 		FullScreenDispKey = getString(R.string.pref_fullscreen_key);
 		FontSizeKey = getString(R.string.pref_fontsize_key);
 		OrderByKey = getString(R.string.pref_orderby_key);
+		BgClrKey = getString(R.string.pref_bgclr_key);
 		FullScreenDispPref = (CheckBoxPreference)findPreference(FullScreenDispKey);
 		FontSizePref = (ListPreference)findPreference(FontSizeKey);
 		OrderByPref = (ListPreference)findPreference(OrderByKey);
+		BgClr = (Preference)findPreference(BgClrKey);
 		// Register listener
 		FullScreenDispPref.setOnPreferenceChangeListener(this);
 		FullScreenDispPref.setOnPreferenceClickListener(this);
@@ -36,6 +41,9 @@ public class SysSettingActivity extends PreferenceActivity implements OnPreferen
 		FontSizePref.setOnPreferenceClickListener(this);
 		OrderByPref.setOnPreferenceChangeListener(this);
 		OrderByPref.setOnPreferenceClickListener(this);
+		BgClr.setOnPreferenceChangeListener(this);
+		BgClr.setOnPreferenceClickListener(this);
+		
 		// Initialize summary
 		String[] FontSizeArray = getResources().getStringArray(R.array.fontsize);
 		FontSizePref.setSummary(FontSizeArray[Integer.parseInt(NotePadPlus.AppSettings.FontSize)]);
@@ -73,15 +81,13 @@ public class SysSettingActivity extends PreferenceActivity implements OnPreferen
 		return true;
 	}
 
+    public void colorChanged(int BgClr) {
+    	NotePadPlus.AppSettings.BgClr = BgClr;
+    }
+    
 	@Override
 	public boolean onPreferenceClick(Preference Pref) {
 		// TODO Auto-generated method stub
-		if( Pref.getKey().equals(FullScreenDispKey) )
-		    Log.d("log","FullScreenDispKey Click");
-		else if( Pref.getKey().equals(FontSizeKey) )
-			Log.d("log", "FontSizeKey Click");
-		else
-			return false;
 		return true;
 	}
 	 @Override 
