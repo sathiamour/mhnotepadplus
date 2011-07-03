@@ -18,6 +18,9 @@ public class ProjectConst
 	
 	/** Integration const */
 	public static final int NegativeOne  = -1;
+	public static final int Zero = 0;
+	public static final int One = 1;
+	
 	
 	/** Note file's ext*/
 	public static final String NoteFileExt = ".txt";

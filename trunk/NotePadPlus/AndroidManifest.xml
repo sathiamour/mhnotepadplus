@@ -29,6 +29,9 @@
         
         <activity android:name=".SetTagClrActivity" 
                   android:theme="@android:style/Theme.Translucent" android:screenOrientation="portrait"></activity>
+
+                
+                  
         <activity android:name=".ChgPwdDlgActivity" 
                   android:label="@string/note_lock_dlg_title"
                   android:theme="@style/Theme.menu_dlg" android:screenOrientation="portrait"/>
@@ -37,6 +40,8 @@
                   android:theme="@style/Theme.menu_dlg" android:screenOrientation="portrait"/>
         <activity android:name=".PwdDlgActivity" 
                   android:label="@string/note_lock_clear_title"
+                  android:theme="@style/Theme.menu_dlg" android:screenOrientation="portrait"/>
+        <activity android:name=".NotificationPwdDlgActivity" android:label="@string/app_name"
                   android:theme="@style/Theme.menu_dlg" android:screenOrientation="portrait"/>
                   
 

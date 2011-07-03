@@ -157,7 +157,7 @@ public class HelperFunctions{
 		  // Just return, if haven't get our widget provider's id
 		  if( NotePadWidgetProvider.AppProviderId == 0 ) return;
 		  
-		  Log.d("log","RefreshWidgetNoteList"+NotePadWidgetProvider.AppProviderId);
+		  Log.d("log","RefreshWidgetNoteList AppProviderId is"+NotePadWidgetProvider.AppProviderId);
 		  AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(ActivityContext);  
 		  RemoteViews widgetViews;
 		  int Slot = 0;
@@ -166,7 +166,6 @@ public class HelperFunctions{
 		   	  widgetViews = new RemoteViews(ActivityContext.getPackageName(), R.layout.widgetmain);
 		   	  //appWidgetManager.getAppWidgetInfo(NotePadWidgetProvider.AppProviderId).minWidth = NotePadWidgetProvider.Portrait_MinWidth;
 		  } else {
-			  Log.d("log","in Landscape");
 		   	  Slot = NotePadWidgetProvider.Widget_Show_Landscape_Slot;
 		   	  widgetViews = new RemoteViews(ActivityContext.getPackageName(), R.layout.widgetmain);
 		   	  //appWidgetManager.getAppWidgetInfo(NotePadWidgetProvider.AppProviderId).minWidth = NotePadWidgetProvider.Landscape_MinWidth;

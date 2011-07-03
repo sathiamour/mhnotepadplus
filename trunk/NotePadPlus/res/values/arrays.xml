@@ -25,6 +25,7 @@
        <item>日志更新时间</item>
        <item>日志标题字母顺序</item>
        <item>日志颜色</item>
+       <item>重要日志在前</item>
     </string-array>
     
     <string-array name="orderbyvalue">
@@ -32,7 +33,19 @@
        <item>1</item>
        <item>2</item>
        <item>3</item>
+       <item>4</item>
     </string-array>
     
+    <string-array name="itemheight">
+       <item>最小高度</item>
+       <item>中等高度</item>
+       <item>最大高度</item>
+    </string-array>
+    
+    <string-array name="itemheightvalue">
+       <item>0</item>
+       <item>1</item>
+       <item>2</item>
+    </string-array>
 </resources>
 

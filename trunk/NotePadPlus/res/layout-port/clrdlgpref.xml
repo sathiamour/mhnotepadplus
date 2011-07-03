@@ -1,17 +1,38 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<LinearLayout android:id="@+id/LinearLayout01"
-    android:layout_width="fill_parent" android:layout_height="fill_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
-<RelativeLayout android:layout_width="fill_parent"
-         android:layout_height="fill_parent">
-<TextView android:id="@+id/title" android:layout_width="wrap_content"
-            android:layout_marginLeft="15dp" android:textAppearance="?android:attr/textAppearanceLarge"
-            android:layout_height="wrap_content"></TextView>
-<ImageView android:src="@drawable/ic_dialog_menu_generic"
-            android:layout_marginRight="15dp" android:layout_alignParentRight="true"
-            android:layout_width="wrap_content" android:layout_height="wrap_content"></ImageView>
-<TextView android:id="@+id/summary" android:layout_below="@id/title"
-            android:layout_marginLeft="15dp" android:layout_width="wrap_content"
-            android:layout_height="wrap_content"></TextView>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:id="@+id/LinearLayout01"
+              android:layout_width="fill_parent" 
+              android:layout_height="wrap_content"
+              android:minHeight="?android:attr/listPreferredItemHeight"
+              android:gravity="center_vertical"
+              android:paddingRight="?android:attr/scrollbarSize">
+    
+
+    <RelativeLayout  
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="15dip"
+        android:layout_marginRight="4dip"
+        android:layout_marginTop="6dip"
+        android:layout_marginBottom="6dip"
+        android:layout_weight="1">
+<TextView android:id="@+id/title" 
+          android:layout_height="wrap_content"
+          android:layout_width="wrap_content"
+          android:textAppearance="?android:attr/textAppearanceLarge"
+          android:ellipsize="marquee"
+          android:fadingEdge="horizontal"/>
+<ImageView  android:background="@drawable/btn_circle"
+            android:src="@drawable/ic_btn_round_more"
+            android:layout_alignParentRight="true"
+            android:layout_width="wrap_content" 
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"/>
+<TextView android:id="@+id/summary" 
+          android:layout_below="@id/title"
+          android:layout_alignLeft="@id/title"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:textAppearance="?android:attr/textAppearanceSmall"/>
 </RelativeLayout>
 </LinearLayout>

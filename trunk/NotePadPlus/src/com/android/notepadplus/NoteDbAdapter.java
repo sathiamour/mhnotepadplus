@@ -21,18 +21,19 @@ public class NoteDbAdapter {
 			+ "tagimg_id integer not null, bgclr integer not null, "
 			+ "ringmusic text not null,notifydura integer not null, "
 			+ "notifymethod integer not null, notify_ringtime text not null, "
-			+ "pwd text)";
+			+ "pwd text, rank integer not null)";
     // Database name & table name & database version
 	private static final String DATABASE_NAME = "database";
 	private static final String DATABASE_TABLE = "diary";
-	private static final int DATABASE_VERSION = 14;
+	private static final int DATABASE_VERSION = 15;
 	// Order by options
 	private static String OrderBy;
 	public static final String OrderByCreatedTime = "_id desc";
 	public static final String OrderByUpdatedTime = "updated_time desc";
 	public static final String OrderByTagClr = "tagimg_id";
 	public static final String OrderByTitle = "title";
-	public static final String[] OrderByArray={OrderByCreatedTime,OrderByUpdatedTime,OrderByTitle,OrderByTagClr};
+	public static final String OrderByRank = "rank  desc";
+	public static final String[] OrderByArray={OrderByCreatedTime,OrderByUpdatedTime,OrderByTitle,OrderByTagClr, OrderByRank};
 	
     // Database context(application's context)
 	private final Context mCtx;
@@ -42,8 +43,6 @@ public class NoteDbAdapter {
 
 		DatabaseHelper(Context context) {
 			super(context, DATABASE_NAME, null, DATABASE_VERSION);
-			
-			OrderBy = OrderByCreatedTime;
 		}
 
 		@Override
@@ -90,6 +89,7 @@ public class NoteDbAdapter {
 		InitialValues.put(OneNote.KEY_NOTIFYMETHOD, Note.NotifyMethod);
 		InitialValues.put(OneNote.KEY_NOTIFY_RINGTIME, HelperFunctions.Calendar2String(Note.NotifyTime));
 		InitialValues.put(OneNote.KEY_PWD, ProjectConst.EmptyStr);
+		InitialValues.put(OneNote.KEY_RANK, ProjectConst.Zero);
 		
 		return mDb.insert(DATABASE_TABLE, null, InitialValues);
 	}
@@ -106,11 +106,11 @@ public class NoteDbAdapter {
 				                        OneNote.KEY_CREATED, OneNote.KEY_ENDTIME, OneNote.KEY_USE_ENDTIME, 
 				                        OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME, OneNote.KEY_DELNOTE_EXP,
 				                        OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, OneNote.KEY_RINGMUSIC,
-				                        OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD, OneNote.KEY_PWD}, 
+				                        OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD, OneNote.KEY_PWD, OneNote.KEY_RANK}, 
 				         null, null, null, null, OrderBy);
 	}
 
-	public Cursor GetNotesByCondition(String Condition, String OrderBy){
+	public Cursor GetNotesByCondition(String Condition, String UserOrderBy){
 		return mDb.query(DATABASE_TABLE, 
 				         new String[] { OneNote.KEY_ROWID, OneNote.KEY_TITLE, OneNote.KEY_PATH, 
 				                        OneNote.KEY_CREATED, OneNote.KEY_ENDTIME, OneNote.KEY_USE_ENDTIME, 
@@ -118,7 +118,7 @@ public class NoteDbAdapter {
 				                        OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, OneNote.KEY_RINGMUSIC,
 				                        OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD, OneNote.KEY_NOTIFY_RINGTIME,
 				                        OneNote.KEY_PWD},
-				                        Condition, null, null, null, OrderBy);
+				                        Condition, null, null, null, UserOrderBy);
 	}
 	public Cursor GetOneNote(int RowId) throws SQLException {
 
@@ -128,7 +128,7 @@ public class NoteDbAdapter {
                                                         OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME, OneNote.KEY_DELNOTE_EXP,
                                                         OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, OneNote.KEY_NOTIFY_RINGTIME,
                                                         OneNote.KEY_RINGMUSIC, OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD,
-                                                        OneNote.KEY_PWD}, 
+                                                        OneNote.KEY_PWD, OneNote.KEY_RANK}, 
 				                         OneNote.KEY_ROWID + "=" + RowId, null, null, null, null, null);
 		if( mCursor != null )
 			mCursor.moveToFirst();
@@ -181,6 +181,13 @@ public class NoteDbAdapter {
 	public boolean SetNotePwd(int RowId, String NewPwd){
 		ContentValues Content = new ContentValues();
 		Content.put(OneNote.KEY_PWD, NewPwd);
+		
+		return mDb.update(DATABASE_TABLE, Content, OneNote.KEY_ROWID + "=" + RowId, null) > 0;
+	}
+	
+	public boolean SetNoteRank(int RowId, int Rank){
+		ContentValues Content = new ContentValues();
+		Content.put(OneNote.KEY_RANK, Rank);
 		
 		return mDb.update(DATABASE_TABLE, Content, OneNote.KEY_ROWID + "=" + RowId, null) > 0;
 	}

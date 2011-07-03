@@ -13,7 +13,6 @@ import android.graphics.Shader;
 import android.graphics.SweepGradient;
 import android.preference.DialogPreference;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -228,19 +227,14 @@ public class ColorPreferencePicker extends DialogPreference {
 
     public ColorPreferencePicker(Context contex) {
         this(contex, null);
-        Log.d("log","ColorPreferencePicker");
     }
 
     public ColorPreferencePicker(Context context, AttributeSet attrs) {
         super(context, attrs);
-        Log.d("log","ColorPreferencePicker");
-
     }
 
     public ColorPreferencePicker(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        Log.d("log","ColorPreferencePicker");
-
     }
 
     @Override
@@ -252,13 +246,13 @@ public class ColorPreferencePicker extends DialogPreference {
             editor.putInt(getKey(), mCurrentColor);
             editor.commit();
             callChangeListener(new Integer(mCurrentColor));
+            NotePadPlus.AppSettings.BgClr = mCurrentColor;
         }
     }
 
     //@Override
     protected View onCreateView(ViewGroup parent) {
         // TODO Auto-generated method stub
-        Log.d("log","onCreateView");
         View view = LayoutInflater.from(getContext()).inflate(R.layout.clrdlgpref, null);
 
         TextView title = (TextView) view.findViewById(R.id.title);
@@ -269,14 +263,13 @@ public class ColorPreferencePicker extends DialogPreference {
         SharedPreferences prefs = getPreferenceManager().getSharedPreferences();
         mInitialColor = prefs.getInt(getKey(), Color.LTGRAY);
         summary.setTextColor(mInitialColor);
-
+        mCurrentColor = mInitialColor;
         return view;
     }
 
     @Override
     protected void onPrepareDialogBuilder(Builder builder) {
         super.onPrepareDialogBuilder(builder);
-        Log.d("log","onPrepareDialogBuilder");
         OnColorChangedListener l = new OnColorChangedListener() {
             public void colorChanged(int color) {
                 mCurrentColor = color;
@@ -288,7 +281,7 @@ public class ColorPreferencePicker extends DialogPreference {
         LinearLayout layout = new LinearLayout(getContext());
         layout.setPadding(20, 20, 20, 20);
         layout.setOrientation(LinearLayout.VERTICAL);
-        mCPView = new ColorPickerView(getContext(), l, mInitialColor);
+        mCPView = new ColorPickerView(getContext(), l, mCurrentColor);
 
         LinearLayout.LayoutParams params1 = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.WRAP_CONTENT,

@@ -85,6 +85,14 @@ public class EditNoteActivity extends Activity {
 				// Remove notification on bar
 				NotificationManager notificationManager = (NotificationManager)getSystemService(android.content.Context.NOTIFICATION_SERVICE);
 				notificationManager.cancel(EditOneNote.NoteRowId);
+				// Check password
+				//if( EditOneNote.Password.length() > 0 )
+				//{
+				//    Intent PwdDlgIntent = new Intent(EditNoteActivity.this, PromptPwdDlgActivity.class);
+				//    PwdDlgIntent.putExtra(OneNote.KEY_ROWID, EditOneNote.NoteRowId);
+				//    startActivity(PwdDlgIntent);	
+				//}
+				
 				if( EditOneNote.NoteFilePath != null ) 
 					// Read note's content
 					EditOneNote.NoteBody = HelperFunctions.ReadTextFile(this, EditOneNote.NoteFilePath);

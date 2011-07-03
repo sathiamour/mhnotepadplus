@@ -78,4 +78,9 @@
 <string name="pref_bgclr_key">BgClr_Key</string>
 <string name="pref_bgclr_title">背景颜色</string>
 <string name="pref_fullscreen_key">FullScreen_Key</string>
+<string name="pref_itemheight_title">日志条目高度</string>
+<string name="pref_itemheight_key">ItemHeight_Key</string>
+<string name="pref_itemheight_defval">1</string>
+<string name="progress_load_msg">日志正在加载中请稍后... ...</string>
+<string name="progress_load_title">日志加载</string>
 </resources>
