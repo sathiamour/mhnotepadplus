@@ -3,14 +3,16 @@ package com.android.notepadplus;
 
 import android.app.Activity;
 import android.app.Dialog;
+import android.content.Intent;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class PromptPwdDlgActivity extends Activity {
+public class NotificationPwdDlgActivity extends Activity {
     
 	/** Dialog id */
 	private static final int OrignalPwdErr_Dlg = 1;
@@ -22,20 +24,20 @@ public class PromptPwdDlgActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.clearpassword_dlg);
+        setContentView(R.layout.notificationpwd_dlg);
         
         // Get passed parameter
         Bundle Parameters = getIntent().getExtras();
 		if( Parameters != null )
 			NoteRowId = Parameters.getInt(OneNote.KEY_ROWID);
-		
-        Button Confirm =(Button)findViewById(R.id.clrpwd_confirm);
+		Log.d("log","in NotificationPwdDlgActivity");
+        Button Confirm =(Button)findViewById(R.id.chk_pwd_confirm);
         Confirm.setWidth(NotePadPlus.ScreenWidth/2);
         Confirm.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
-    			EditText Pwd_Orignal = (EditText)findViewById(R.id.pwd_edit);
+    			EditText Pwd_Orignal = (EditText)findViewById(R.id.chk_pwd_edit);
     			if (NoteRowId != 0 ) {
-		        	NoteDbAdapter NotesDb = new NoteDbAdapter(PromptPwdDlgActivity.this);
+		        	NoteDbAdapter NotesDb = new NoteDbAdapter(NotificationPwdDlgActivity.this);
 		    		NotesDb.open();
 		        	// Check orignal password
 		    		Cursor Note = NotesDb.GetOneNote(NoteRowId);
@@ -44,17 +46,20 @@ public class PromptPwdDlgActivity extends Activity {
 		    			showDialog(OrignalPwdErr_Dlg);
 		    			NotesDb.close();
 		    			return;
+		    		} else {
+				        NotesDb.close();
+				        Intent EditNoteIntent = new Intent(NotificationPwdDlgActivity.this, EditNoteActivity.class);
+				        EditNoteIntent.putExtra(OneNote.KEY_ROWID, NoteRowId);
+				        EditNoteIntent.putExtra(EditNoteActivity.KEY_SOURCE, Alarms.ALARM_ALERT_ACTION);
+				        startActivity(EditNoteIntent);
 		    		}
-		    		// clear note's password
-			        NotesDb.SetNotePwd(NoteRowId, ProjectConst.EmptyStr);
-			        NotesDb.close();
                 }	
 		        
 		        finish();
     		}
        	});
         
-        Button Cancel=(Button)findViewById(R.id.chgpwd_cancel);
+        Button Cancel=(Button)findViewById(R.id.chk_pwd_cancel);
         Cancel.setWidth(NotePadPlus.ScreenWidth/2);
         Cancel.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
@@ -67,7 +72,7 @@ public class PromptPwdDlgActivity extends Activity {
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
             case OrignalPwdErr_Dlg:
-            	 return HelperFunctions.BuildAltertDialog(PromptPwdDlgActivity.this, R.string.pwderr_title, R.string.orignalpwd_err_prompt);
+            	 return HelperFunctions.BuildAltertDialog(NotificationPwdDlgActivity.this, R.string.pwderr_title, R.string.orignalpwd_err_prompt);
 		}
 		
 		return null;
