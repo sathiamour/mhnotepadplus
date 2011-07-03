@@ -9,6 +9,7 @@ import java.util.HashMap;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -35,6 +36,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
@@ -44,6 +46,7 @@ public class NotePadPlus extends Activity {
 	public static final String Action_Edit_Note = "com.android.notepadplus.EditNote";
 	/** Broadcast action */
 	public static final String BROADCAST_REFRESHLIST = "com.android.notepadplus.refreshlist";
+	public static final String BROADCAST_RANKNOTE = "com.android.notepadplus.ranknote";
 	
 	/** Dialog id */
 	private static final int Del_Prompt_Dlg = 1;
@@ -53,6 +56,7 @@ public class NotePadPlus extends Activity {
 	private static final int EidtNote_PwdPrompt_Dlg = PwdErr_Dlg+1;
 	private static final int DelNote_PwdPrompt_Dlg = EidtNote_PwdPrompt_Dlg+1;
 	private static final int ViewStyle_Dlg = DelNote_PwdPrompt_Dlg+1;
+	private static final int SetTag_PwdPrompt_Dlg = ViewStyle_Dlg+1;
 
 	/** Action id for activity redirection */
 	public static final int ACTIVITY_CREATE = 0;
@@ -89,6 +93,7 @@ public class NotePadPlus extends Activity {
 	private ListView NoteList = null;
 	private LayoutAnimationController ListAnimController = null;
 	private GridView NoteGrid = null;
+	private LinearLayout Main = null;
 	private int EdgeWidth = 0;
 	private static final int ScreenPadding = 15;
 	private static final int SpacePadding = 10;
@@ -111,36 +116,86 @@ public class NotePadPlus extends Activity {
 		}
 	};
 
+	/** Refresh receiver when end date check finish */
+	public BroadcastReceiver RankReceiver = new BroadcastReceiver() {
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			   int Index = intent.getIntExtra(OneNote.KEY_INDEX, ErrNoteIndex);
+			   int IsCheck = intent.getBooleanExtra(OneNote.KEY_RANK, false)?ProjectConst.One:ProjectConst.Zero;
+			   if( Index != ErrNoteIndex )
+			   {
+				   Cursor TmpCursor = NotesCursor;
+				   TmpCursor.moveToPosition(Index);
+				   NotesDb.SetNoteRank(TmpCursor.getInt(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_ROWID)), IsCheck);
+				   // Refresh list view on GUI, if needed
+				   if( AppSettings.OrderBy.equals(NoteDbAdapter.OrderByRank) )
+				       RefreshListView();
+			   }
+		}
+	};
+	
+	private ProgressDialog ProgressDlg;  
+	boolean NotesIsLoaded = false;
+	private Thread LoadNotesProgThread = new Thread(){  
+        @Override  
+        public void run() {    
+            // TODO Auto-generated method stub  
+            while (!NotesIsLoaded) {  
+                try {  
+                    sleep(100);  
+                } catch (InterruptedException e) {  
+                    e.printStackTrace();  
+                }  
+            }  
+            // Close progress dialog
+            ProgressDlg.dismiss();  
+        }       
+    };  
+    
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		// Application setting
+		AppSettings = new AppSetting(this);
+		
+		// Note dislpay view
+		NoteList = (ListView) findViewById(R.id.nodelist);
+		NoteGrid = (GridView) findViewById(R.id.notegrid);
+		Main = (LinearLayout)findViewById(R.id.mainview);
+		Main.setBackgroundColor(AppSettings.BgClr);
+		
+		// Set notes load progress dialog
+		ProgressDlg = new ProgressDialog(this);  
+		ProgressDlg.setIcon(R.drawable.icon);  
+		ProgressDlg.setTitle(R.string.progress_load_title);
+		ProgressDlg.setMessage(getString(R.string.progress_load_msg));  
+		ProgressDlg.setCancelable(false);  
+		ProgressDlg.show(); 
+        
+        LoadNotesProgThread.start();  
+        
 		// Note database
 		NotesDb = new NoteDbAdapter(this);
 		NotesDb.open();
+		NotesDb.SetOrderBy(NoteDbAdapter.OrderByArray[Integer.parseInt(AppSettings.OrderBy)]);
 		
-		// Application setting
-		AppSettings = new AppSetting(this);
-
 		// Get screen's widht & height
 		DisplayMetrics ScreenMetrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(ScreenMetrics);
 		ScreenHeight = ScreenMetrics.heightPixels;
 		ScreenWidth = ScreenMetrics.widthPixels;
 		
-		// Note dislpay view
-		NoteList = (ListView) findViewById(R.id.nodelist);
-		NoteGrid = (GridView) findViewById(R.id.notegrid);
-		
+
 		// Listview Add listener
 		// List item short click listener
 		NoteList.setOnItemClickListener(new OnItemClickListener() {
 			/** When user clicks a note, show edit activity */
 			public void onItemClick(AdapterView<?> Adapater, View ListView, int position, long id) {
 				   NoteIndex = position;
-				   actionClickEditNote(position);
+				   OnClickEditNote(position);
 			}
 		});
 		// List item long click listener
@@ -156,7 +211,6 @@ public class NotePadPlus extends Activity {
 			}
 		});
 
-
 		// GridView
 		EdgeWidth = (Math.min(ScreenHeight, ScreenWidth) - ScreenPadding * 2 - SpacePadding * 2) / 3;
 		NoteGrid.setPadding(ScreenPadding, ScreenPadding, ScreenPadding, ScreenPadding);
@@ -168,7 +222,7 @@ public class NotePadPlus extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				   NoteIndex = position;
-				   actionClickEditNote(position);
+				   OnClickEditNote(position);
 			}
 		});
 		NoteGrid.setOnCreateContextMenuListener(new OnCreateContextMenuListener() {
@@ -183,7 +237,7 @@ public class NotePadPlus extends Activity {
 				   menu.add(0, ITEM4, 5, "锁定当前日志");
 			}
 		});
-		
+        
 		// Refresh the note list
 		RefreshListView();
 
@@ -204,13 +258,14 @@ public class NotePadPlus extends Activity {
 		ListAnimController = new LayoutAnimationController(set, 2.5f);
 		ListAnimController.setOrder(LayoutAnimationController.ORDER_NORMAL);
 		NoteList.setLayoutAnimation(ListAnimController);
+		
+		// Notes loading is over
+		NotesIsLoaded = true;  
 	}
 
 	/** When the activity is destroyed, close database */
 	@Override
 	protected void onDestroy() {
-		// Log
-		Log.d("log", "NotePadPlus onDestroy");
 		// Close database
 		if (NotesDb != null)
 			NotesDb.close();
@@ -225,12 +280,14 @@ public class NotePadPlus extends Activity {
 	protected void onPause() {
 		super.onPause();
 		unregisterReceiver(RefreshReceiver);
+		unregisterReceiver(RankReceiver);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 		registerReceiver(RefreshReceiver, new IntentFilter(BROADCAST_REFRESHLIST));
+		registerReceiver(RankReceiver, new IntentFilter(BROADCAST_RANKNOTE));
 	}
 
 	/** Refresh note list from database */
@@ -270,9 +327,10 @@ public class NotePadPlus extends Activity {
 		int[] TagColor = new int[Count];
 		boolean[] IsLock = new boolean[Count];
 		boolean[] IsNotify = new boolean[Count];
+		boolean[] IsRank = new boolean[Count];
 		NoteItemAdapter ListItemAdapter = new NoteItemAdapter(this, Notes,
                 R.layout.listitem, new String[] { "NoteTitle", "Time" }, 
-                new int[] { R.id.NoteTitle, R.id.NoteCreatedTime }, BgColor, TagColor, IsLock, IsNotify);
+                new int[] { R.id.NoteTitle, R.id.NoteCreatedTime }, BgColor, TagColor, IsLock, IsNotify, IsRank);
 
         NoteList.setAdapter(ListItemAdapter);
 		NoteList.setLayoutAnimation(ListAnimController);
@@ -286,6 +344,7 @@ public class NotePadPlus extends Activity {
 			Calendar NotifyTime = HelperFunctions.String2Calenar(NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_NOTIFYTIME)));
 			int TagImgIdx = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_TAGIMG_ID));
 			int BgClrIdx = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_BGCLR));
+			int Rank = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_RANK));
             // Create one item
 			HashMap<String, Object> OneNote = new HashMap<String, Object>();
 			// Set list item's data
@@ -297,7 +356,7 @@ public class NotePadPlus extends Activity {
 			TagColor[i] = TagClr[TagImgIdx];
 			IsLock[i] = Pwd.length() > 0 ;
 			IsNotify[i] = (Use_NotifyTime.equals(ProjectConst.Yes) && HelperFunctions.CmpDatePrefix2(NotifyTime, Calendar.getInstance()) > 0);
-			
+			IsRank[i] = (Rank == 0) ? false: true;
 			ListItemAdapter.notifyDataSetChanged();   
 		}
 	}
@@ -332,20 +391,18 @@ public class NotePadPlus extends Activity {
 		NoteIndex = (int) Info.id;
 		switch (Item.getItemId()) {
 		case ITEM0:
-			actionClickEditNote(NoteIndex);
-			return true;
+			 OnClickEditNote(NoteIndex);
+			 return true;
 		case ITEM1:
-			showDialog(Del_Prompt_Dlg);
-			return true;
+			 showDialog(Del_Prompt_Dlg);
+			 return true;
 		case ITEM2:
-			actionClickAddNote();
-			return true;
-		case ITEM3: {
-			Intent intent = new Intent();
-			intent.setClass(NotePadPlus.this, SetTagClrActivity.class);
-			startActivityForResult(intent, ACTIVITY_SET_TAGCLR);
-			return true;
-		}
+			 actionClickAddNote();
+			 return true;
+		case ITEM3: 
+			 OnClickSetTag(NoteIndex);
+			 return true;
+		
 		case ITEM4: {
 			Cursor TmpCursor = NotesCursor;
 			TmpCursor.moveToPosition(NoteIndex);
@@ -408,7 +465,7 @@ public class NotePadPlus extends Activity {
 		startActivityForResult(i, ACTIVITY_CREATE);
 	}
 
-	private void actionClickEditNote(int Pos) {
+	private void OnClickEditNote(int Pos) {
 		if (Pos != -1) {
 			Cursor TmpCursor = NotesCursor;
 			/**
@@ -473,7 +530,7 @@ public class NotePadPlus extends Activity {
 			startActivityForResult(OneNoteData, ACTIVITY_EDIT);
 	}
 
-	private void actionClickDelNote(int Pos) {
+	private void OnClickDelNote(int Pos) {
 		// Get path
 		Cursor TmpCursor = NotesCursor;
 		TmpCursor.moveToPosition(Pos);
@@ -499,6 +556,23 @@ public class NotePadPlus extends Activity {
 		noteFile.delete();
 	};
 
+	private void OnClickSetTag(int Pos) {
+		// Get path
+		Cursor TmpCursor = NotesCursor;
+		TmpCursor.moveToPosition(Pos);
+		// Check password
+		if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).length() > 0 )
+            showDialog(DelNote_PwdPrompt_Dlg);
+		else
+			SetTagHelper();
+	}
+	
+	private void SetTagHelper(){
+		Intent intent = new Intent();
+		intent.setClass(NotePadPlus.this, SetTagClrActivity.class);
+		startActivityForResult(intent, ACTIVITY_SET_TAGCLR);
+	}
+	
 	// Build a dialog to prompt user we want to delete the assigned note
 	private Dialog BuildDelPromptDialog(Context AppContext, int Title) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(AppContext);
@@ -508,7 +582,7 @@ public class NotePadPlus extends Activity {
 				new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						// Delete the selected note
-						actionClickDelNote(NoteIndex);
+						OnClickDelNote(NoteIndex);
 					}
 				});
 
@@ -584,6 +658,38 @@ public class NotePadPlus extends Activity {
               .create();
 	}
 	
+	private Dialog BuildSetTagPromptPwdDlg(Context AppContext, int Title, int Msg){
+		LayoutInflater factory = LayoutInflater.from(this);
+        final View PromptView = factory.inflate(R.layout.promptpwd_dlg, null);
+		return new AlertDialog.Builder(NotePadPlus.this)
+               .setIcon(R.drawable.alert_dialog_icon)
+               .setTitle(Title)
+               .setMessage(Msg)
+               .setView(PromptView)
+               .setPositiveButton(R.string.confirm, new DialogInterface.OnClickListener() {
+                   public void onClick(DialogInterface dialog, int whichButton) {
+            	      EditText Pwd = (EditText)PromptView.findViewById(R.id.pwd_edit);
+            	      Cursor TmpCursor = NotesCursor;
+    			      TmpCursor.moveToPosition(NoteIndex);
+    			      // Check password
+    			      if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).equals(Pwd.getText().toString()) )
+    			    	  SetTagHelper();
+    			      else
+    				      showDialog(PwdErr_Dlg);
+    			      // Clear input
+    			      Pwd.setText(ProjectConst.EmptyStr);
+              }
+              })
+              .setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+                  public void onClick(DialogInterface dialog, int whichButton) {
+                	  EditText Pwd = (EditText)PromptView.findViewById(R.id.pwd_edit);
+                	  // Clear input
+    			      Pwd.setText(ProjectConst.EmptyStr);
+              }
+              })
+              .create();
+	}
+	
 	// 
 	private Dialog BuildNoteHasLockDialog(Context AppContext, int Title, int Msg) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(AppContext);
@@ -642,15 +748,17 @@ public class NotePadPlus extends Activity {
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
 		case Del_Prompt_Dlg:
-			return BuildDelPromptDialog(NotePadPlus.this, R.string.delnote_title);
+			 return BuildDelPromptDialog(NotePadPlus.this, R.string.delnote_title);
 		case About_Dlg:
-			return HelperFunctions.BuildAltertDialog(NotePadPlus.this, R.string.about_title, R.string.about_content);
+			 return HelperFunctions.BuildAltertDialog(NotePadPlus.this, R.string.about_title, R.string.about_content);
 		case NoteHasLock_Dlg:
-			return BuildNoteHasLockDialog(NotePadPlus.this, R.string.note_lock_dlg_title, R.string.notehaslock_msg);
+			 return BuildNoteHasLockDialog(NotePadPlus.this, R.string.note_lock_dlg_title, R.string.notehaslock_msg);
 		case DelNote_PwdPrompt_Dlg:
 			 return BuildDelNotePromptPwdDlg(NotePadPlus.this, R.string.pwdprompt_title, R.string.pwdprompt_tip);
 		case EidtNote_PwdPrompt_Dlg:
 			 return BuildEditNotePromptPwdDlg(NotePadPlus.this, R.string.pwdprompt_title, R.string.pwdprompt_tip);
+		case SetTag_PwdPrompt_Dlg:
+			 return BuildSetTagPromptPwdDlg(NotePadPlus.this, R.string.pwdprompt_title, R.string.pwdprompt_tip);
 		case PwdErr_Dlg:
 			 return HelperFunctions.BuildAltertDialog(NotePadPlus.this, R.string.pwderr_title, R.string.orignalpwd_err_prompt);
 		case ViewStyle_Dlg:
@@ -690,12 +798,11 @@ public class NotePadPlus extends Activity {
 				getWindow().setAttributes(attrs);   
 				//getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 			}
-			
+			Main.setBackgroundColor(AppSettings.BgClr);
 			NotesDb.SetOrderBy(NoteDbAdapter.OrderByArray[Integer.parseInt(AppSettings.OrderBy)]);
 			RefreshListView();		    	
 		}
 		
-			
 		if( requestCode == ACTIVITY_SET_TAGCLR || requestCode == ACTIVITY_EDIT || requestCode == ACTIVITY_CREATE ) 
 		    RefreshListView();
 		

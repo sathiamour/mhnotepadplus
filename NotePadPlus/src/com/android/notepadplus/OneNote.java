@@ -27,6 +27,8 @@ public class OneNote {
 	public static final String KEY_RINGMUSIC = "ringmusic";
 	public static final String KEY_NOTIFY_RINGTIME = "notify_ringtime";
 	public static final String KEY_PWD = "pwd";
+	public static final String KEY_RANK = "rank";
+	public static final String KEY_INDEX = "index";
 	
 	/** Date parameter key */
 	//public static final String KEY_YEAR = "Year";
@@ -61,6 +63,7 @@ public class OneNote {
 	public String Use_NotifyTime;
 	public String DelNoteExp;
 	public String RingMusic;
+	public String Password;
 	public int NoteRowId;
 	public int TagImgIdx;
 	public int ItemBgIdx;
@@ -94,6 +97,7 @@ public class OneNote {
 		   NotifyDura = DbNote.getInt(DbNote.getColumnIndexOrThrow(OneNote.KEY_NOTIFYDURA));
 		   NotifyMethod = DbNote.getInt(DbNote.getColumnIndexOrThrow(KEY_NOTIFYMETHOD));
 		   RingMusic = DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_RINGMUSIC));
+		   Password = DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_PWD));
 	}
 	
 	public OneNote(Bundle Parameters)

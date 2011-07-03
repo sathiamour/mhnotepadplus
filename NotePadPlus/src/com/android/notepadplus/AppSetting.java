@@ -19,11 +19,12 @@ class AppSetting
     public static final String Key_PrefFontSize = "FontSize_Key";
     public static final String Key_PrefOrderBy = "OrderBy_Key";
     public static final String Key_PrefBgClr = "BgClr_Key";
+    public static final String Key_PrefItemHeight="ItemHeight_Key";
 	// Value for keys
 	public static final String ViewStyle_List = "List";
 	public static final String ViewStyle_Grid = "Grid";
 	public static final int[] FontSizeArray = {15,25,35};
-	
+	public static final float[] ItemHeightFactor={1.0f, 1.4f, 1.8f};
 
 	// App setting holder
 	public String ViewStyle;
@@ -31,6 +32,7 @@ class AppSetting
 	public boolean IsFullScreen;
 	public String FontSize;
 	public String OrderBy;
+	public String ItemHeight;
 	public int BgClr;
 	public static int ScreenOrient;
 	
@@ -63,8 +65,9 @@ class AppSetting
 		SharedPreferences Settings = PreferenceManager.getDefaultSharedPreferences(AppContext);   
 		IsFullScreen = Settings.getBoolean(Key_PrefFullScreen, false);   
 		FontSize = Settings.getString(Key_PrefFontSize, "1");   
-		OrderBy = Settings.getString(Key_PrefOrderBy,"1");
+		OrderBy = Settings.getString(Key_PrefOrderBy, "1");
 		BgClr = Settings.getInt(Key_PrefBgClr, Color.WHITE);
+		ItemHeight = Settings.getString(Key_PrefItemHeight, "1");
 	}
 	
 	public boolean IsListView()

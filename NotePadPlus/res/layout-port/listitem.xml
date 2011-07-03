@@ -5,15 +5,15 @@
       xmlns:android="http://schemas.android.com/apk/res/android" 
       android:layout_height="wrap_content">  
    
-  <TextView  android:layout_height="wrap_content"
+  <TextView  android:id = "@+id/NoteTag1"
+             android:layout_height="wrap_content"
              android:layout_width="wrap_content"
              android:background="#ffb3daf4"
              android:textColor = "#ff000000"
              android:textSize="25dip" 
-             android:text="1"
-             android:id = "@+id/NoteTag1"/>
+             android:text="1"/>
              
-    <TextView  android:id = "@+id/NoteTag2"
+   <TextView  android:id = "@+id/NoteTag2"
                android:layout_height="wrap_content"
                android:layout_width="wrap_content"
                android:layout_below="@+id/NoteTag1"  
@@ -21,7 +21,11 @@
                android:textColor="#ff000000"
                android:textSize="15dip" 
                android:text="1" />
-             
+   <RelativeLayout android:id="@+id/ListSubItem"   
+      android:layout_width="wrap_content"   
+      xmlns:android="http://schemas.android.com/apk/res/android" 
+      android:layout_height="wrap_content"
+      android:layout_toRightOf="@+id/NoteTag1">        
   <TextView   
       android:id="@+id/NoteTitle"  
       android:text="NoteTitle"   
@@ -31,9 +35,9 @@
       android:layout_width="wrap_content" 
       android:layout_toRightOf="@+id/NoteTag1"  
       android:paddingLeft="4dip"  
-      android:background="#ffb3daf4"
       android:textColor = "#ff000000"
       android:gravity="center_vertical"
+      android:background="#00ffffff"
       />  
 
              
@@ -48,7 +52,7 @@
       android:layout_below="@+id/NoteTitle"  
       android:paddingLeft="4dip"
       android:textSize="15dip"   
-      android:background="#ffb3daf4"
+      android:background="#00ffffff"
       android:textColor="#ff000000"
       android:gravity="center_vertical"
       />  
@@ -57,15 +61,24 @@
              android:layout_above="@+id/NoteCreatedTime" 
              android:layout_height="fill_parent"
              android:layout_width="wrap_content"
-             android:gravity="center_vertical"
-             android:src="@android:drawable/ic_popup_reminder"/>
+             android:layout_gravity="center_vertical"
+             android:src="@drawable/ic_dialog_time"/>
              
-       <ImageView android:id="@+id/NoteLockImg" 
+     <ImageView android:id="@+id/NoteLockImg" 
              android:layout_toRightOf="@+id/NoteRingImg"
              android:layout_above="@+id/NoteCreatedTime" 
              android:layout_height="fill_parent"
              android:layout_width="wrap_content"
-             android:paddingRight="4dip"
-             android:gravity="center_vertical"
+             android:layout_gravity="center_vertical"
              android:src="@android:drawable/ic_lock_lock"/>
+             
+      <CheckBox android:id="@+id/Rank"
+            android:layout_toRightOf="@+id/NoteLockImg"
+             android:layout_above="@+id/NoteCreatedTime" 
+            android:focusable="false"
+            style="?android:attr/starStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center_vertical"/>
+      </RelativeLayout> 
   </RelativeLayout> 

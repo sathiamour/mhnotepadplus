@@ -7,6 +7,7 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -17,13 +18,13 @@ public class NotifyAlarmReceiver extends BroadcastReceiver {
 	private int NoteRowId = ProjectConst.NegativeOne;
 	private int NotifyMethodIdx = ProjectConst.NegativeOne;
 	
+	
 	@Override
 	public void onReceive(Context context, Intent arg1) {
 		Bundle Parameters = arg1.getExtras();
-		if( Alarms.ALARM_KILL_ACTION.equals(arg1.getAction()) ) {
-			
+		if( Alarms.ALARM_KILL_ACTION.equals(arg1.getAction()) ) 
 			return;
-		}
+		
 		if( Parameters != null )
 		{   
 			// Get parameters
@@ -77,11 +78,20 @@ public class NotifyAlarmReceiver extends BroadcastReceiver {
 		notification.ledOnMS = 300;  
 
 		// Set parameters
-		Intent EditNoteIntent = new Intent(context, EditNoteActivity.class);
-		EditNoteIntent.putExtra(OneNote.KEY_ROWID, NoteRowId);
-		EditNoteIntent.putExtra(EditNoteActivity.KEY_SOURCE, Alarms.ALARM_ALERT_ACTION);
+		Intent ActivityIntent;
+		NoteDbAdapter NotesDb = new NoteDbAdapter(context);
+		NotesDb.open();
+    	// Check orignal password
+		Cursor Note = NotesDb.GetOneNote(NoteRowId);
+		Log.d("log","pwd "+Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_PWD)));
+		if( Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_PWD)).length() > 0 )
+            ActivityIntent = new Intent(context, NotificationPwdDlgActivity.class);
+		else ActivityIntent = new Intent(context, EditNoteActivity.class);
+		ActivityIntent.putExtra(OneNote.KEY_ROWID, NoteRowId);
+		ActivityIntent.putExtra(EditNoteActivity.KEY_SOURCE, Alarms.ALARM_ALERT_ACTION);
+		NotesDb.close();
 		// Show notification
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, EditNoteIntent, 0);
+		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, ActivityIntent, 0);
 		notification.setLatestEventInfo(context, context.getText(R.string.app_name), Title, contentIntent);
 		// Cancel the same one
 		notificationManager.cancel(NoteRowId);

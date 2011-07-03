@@ -20,6 +20,7 @@ public class Alarms
 	private static long NextAlertTime = Long.MAX_VALUE;
 	private static String RingMusic = ProjectConst.EmptyStr;
 	private static int NotifyMethodIdx = ProjectConst.NegativeOne;
+	
     // Action
 	public static String ALARM_ALERT_ACTION = "com.android.notepadplus.NotifyALARM_ALERT";
 	public static String ALARM_KILL_ACTION = "com.android.notepadplus.NotifyALARM_KILL";
@@ -162,7 +163,7 @@ public class Alarms
 	        	 NextAlertTime = NotifyTime.getTimeInMillis();
 	             NoteTitle = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_TITLE));
 	             RingMusic = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_RINGMUSIC));
-	             NotifyMethodIdx = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_NOTIFYMETHOD));	             
+	             NotifyMethodIdx = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_NOTIFYMETHOD));
 	         }else if( NextAlertTime == NotifyTime.getTimeInMillis() )
 	        	 Notes.addElement(TmpRowId);
 	    }

@@ -11,16 +11,19 @@ import android.util.Log;
 import android.view.WindowManager;
 
 public class SysSettingActivity extends PreferenceActivity 
-       implements OnPreferenceChangeListener, OnPreferenceClickListener, ColorPickerDialog.OnColorChangedListener
+       implements OnPreferenceChangeListener, OnPreferenceClickListener
 {
 	private String FullScreenDispKey;
 	private String FontSizeKey;
 	private String OrderByKey;
 	private String BgClrKey;
+	private String ItemHeightKey;
 	private CheckBoxPreference FullScreenDispPref;
 	private ListPreference FontSizePref;
 	private ListPreference OrderByPref;
+	private ListPreference ItemHeightPref;
 	private Preference BgClr;
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -30,10 +33,13 @@ public class SysSettingActivity extends PreferenceActivity
 		FontSizeKey = getString(R.string.pref_fontsize_key);
 		OrderByKey = getString(R.string.pref_orderby_key);
 		BgClrKey = getString(R.string.pref_bgclr_key);
+		ItemHeightKey = getString(R.string.pref_itemheight_key);
 		FullScreenDispPref = (CheckBoxPreference)findPreference(FullScreenDispKey);
 		FontSizePref = (ListPreference)findPreference(FontSizeKey);
 		OrderByPref = (ListPreference)findPreference(OrderByKey);
+		ItemHeightPref = (ListPreference)findPreference(ItemHeightKey);
 		BgClr = (Preference)findPreference(BgClrKey);
+
 		// Register listener
 		FullScreenDispPref.setOnPreferenceChangeListener(this);
 		FullScreenDispPref.setOnPreferenceClickListener(this);
@@ -41,6 +47,8 @@ public class SysSettingActivity extends PreferenceActivity
 		FontSizePref.setOnPreferenceClickListener(this);
 		OrderByPref.setOnPreferenceChangeListener(this);
 		OrderByPref.setOnPreferenceClickListener(this);
+		ItemHeightPref.setOnPreferenceChangeListener(this);
+		ItemHeightPref.setOnPreferenceClickListener(this);
 		BgClr.setOnPreferenceChangeListener(this);
 		BgClr.setOnPreferenceClickListener(this);
 		
@@ -48,7 +56,9 @@ public class SysSettingActivity extends PreferenceActivity
 		String[] FontSizeArray = getResources().getStringArray(R.array.fontsize);
 		FontSizePref.setSummary(FontSizeArray[Integer.parseInt(NotePadPlus.AppSettings.FontSize)]);
 		String[] OrderByArray = getResources().getStringArray(R.array.orderby);
-		OrderByPref.setSummary(OrderByArray[Integer.parseInt(NotePadPlus.AppSettings.OrderBy)]);	
+		OrderByPref.setSummary(OrderByArray[Integer.parseInt(NotePadPlus.AppSettings.OrderBy)]);
+		String[] ItemHeightArray = getResources().getStringArray(R.array.itemheight);
+		ItemHeightPref.setSummary(ItemHeightArray[Integer.parseInt(NotePadPlus.AppSettings.ItemHeight)]);
 	}
 
 	@Override
@@ -76,14 +86,14 @@ public class SysSettingActivity extends PreferenceActivity
 			String[] OrderByArray = getResources().getStringArray(R.array.orderby);
 		    Pref.setSummary(OrderByArray[Integer.parseInt(NewVal.toString())]);
 		    NotePadPlus.AppSettings.OrderBy = NewVal.toString();
+		}else if( Pref.getKey().equals(ItemHeightKey) ) {
+			String[] ItemHeightArray = getResources().getStringArray(R.array.itemheight);
+			ItemHeightPref.setSummary(ItemHeightArray[Integer.parseInt(NewVal.toString())]);
+			NotePadPlus.AppSettings.ItemHeight = NewVal.toString();
 		}else
 			return false;
 		return true;
 	}
-
-    public void colorChanged(int BgClr) {
-    	NotePadPlus.AppSettings.BgClr = BgClr;
-    }
     
 	@Override
 	public boolean onPreferenceClick(Preference Pref) {
