@@ -19,23 +19,6 @@
                             android:layout_height="wrap_content"
                             android:scrollHorizontally="true" />
     </LinearLayout>
-    <LinearLayout android:orientation="horizontal"
-                  android:layout_width="fill_parent"
-                  android:layout_height="wrap_content">
-                 
-                  <Button android:id="@+id/endtime" 
-                          android:text="@string/endtime"  
-                          android:layout_width="wrap_content" 
-                          android:layout_height="wrap_content"
-                          android:layout_gravity="center"/>
-                  <TextView android:id="@+id/endtime_text2" 
-                                    android:layout_width="fill_parent" 
-                                    android:layout_height="fill_parent"
-                                    android:gravity="center"
-                                    android:textColor="#ffff0000"
-                                    android:text="@string/noendtime"/>
-                  
-    </LinearLayout>
     
      <LinearLayout android:orientation="horizontal"
                    android:layout_width="fill_parent"
