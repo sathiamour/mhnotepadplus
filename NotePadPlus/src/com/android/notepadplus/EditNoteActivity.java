@@ -27,16 +27,14 @@ import android.app.Dialog;
 public class EditNoteActivity extends Activity {
 	
 	/** Request code */
-	private static final int ACTIVITY_SET_ENDDATE = 0;
-	private static final int ACTIVITY_SET_NOTIFYTIME = 1;
-	private static final int ACTIVITY_SET_TAGCLR = 2;
+	private static final int ACTIVITY_SET_NOTIFYTIME = 0;
+	private static final int ACTIVITY_SET_TAGCLR = 1;
 	
 	/** Source from notepadplus or notifyalarmreceiver's notification */
 	public static final String KEY_SOURCE = "source";
 	// Views
 	private EditText NoteTitleCtrl = null;
 	private EditText NoteBodyCtrl = null;
-	private TextView EndTimeLabel = null;
 	private TextView NotifyTimeLabel = null;
 	private Button ChgTagClrBtn = null;
 	
@@ -113,9 +111,6 @@ public class EditNoteActivity extends Activity {
 			if( EditOneNote.NoteBody != null )
 				NoteBodyCtrl.setText(EditOneNote.NoteBody);
 
-			if( EditOneNote.Use_EndTime.equals(ProjectConst.Yes) )
-				EndTimeLabel.setText(HelperFunctions.FormatCalendar2ReadablePrefixStr(EditOneNote.EndTime));
-
 			if( EditOneNote.Use_NotifyTime.equals(ProjectConst.Yes) )
 				NotifyTimeLabel.setText(HelperFunctions.FormatCalendar2ReadableStr(EditOneNote.NotifyTime));
 			
@@ -170,16 +165,7 @@ public class EditNoteActivity extends Activity {
     		 showDialog(ProjectConst.Check_NoteTitle_Dlg);
     		 return;
     	 }
-         // Check end date & notify date    	 
-    	 if( EditOneNote.Use_EndTime.equals(ProjectConst.Yes)&&EditOneNote.Use_NotifyTime.equals(ProjectConst.Yes) )
-    	 {
-    		 // If the notify date is later than end date, prompt to user
-    		 if( HelperFunctions.CmpDatePrefix(EditOneNote.EndTime, EditOneNote.NotifyTime)<0 )
-    		 {
-    			 showDialog(ProjectConst.Check_NotifyEndDate_Dlg);
-    			 return;
-    		 }
-    	 }
+
     	 // Save it to original file
     	 HelperFunctions.WriteTextFile(EditNoteActivity.this, EditOneNote.NoteBody, EditOneNote.NoteFilePath);
     	 // Update database record
@@ -236,12 +222,8 @@ public class EditNoteActivity extends Activity {
 		switch (id) {
 		   case ProjectConst.Check_NoteTitle_Dlg:
 			    return HelperFunctions.BuildAltertDialog(EditNoteActivity.this, R.string.prompt_title, R.string.notetitle_empty_tip);
-		   case ProjectConst.Check_EndDate_Dlg:
-			    return HelperFunctions.BuildAltertDialog(EditNoteActivity.this, R.string.prompt_title, R.string.enddate_expire_tip);
 		   case ProjectConst.Check_NotifyDate_Dlg:
 			    return HelperFunctions.BuildAltertDialog(EditNoteActivity.this, R.string.prompt_title, R.string.notifydate_expire_tip);
-		   case ProjectConst.Check_NotifyEndDate_Dlg:
-			    return HelperFunctions.BuildAltertDialog(EditNoteActivity.this, R.string.prompt_title, R.string.enddate_pre_notifydate_tip);
 		}
 		return null;
 	}
@@ -298,22 +280,7 @@ public class EditNoteActivity extends Activity {
 	// Handler return code
 	@Override 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if( requestCode == ACTIVITY_SET_ENDDATE ) { 
-			if( resultCode == RESULT_OK ) { 
-				Bundle Result = data.getExtras();
-				if( Result.isEmpty() )
-				{
-					EditOneNote.Use_EndTime = ProjectConst.No;
-					EditOneNote.DelNoteExp = ProjectConst.No;
-					EndTimeLabel.setText(R.string.noendtime);					
-				} else {
-					EditOneNote.Use_EndTime = ProjectConst.Yes;
-					EditOneNote.DelNoteExp = Result.getString(OneNote.KEY_DELNOTE_EXP);
-					EditOneNote.EndTime = HelperFunctions.String2Calenar(Result.getString(OneNote.KEY_ENDTIME));				
-				    EndTimeLabel.setText(HelperFunctions.FormatCalendar2ReadablePrefixStr(EditOneNote.EndTime));
-				}
-			}
-	    } else if( requestCode == ACTIVITY_SET_NOTIFYTIME ) {
+        if( requestCode == ACTIVITY_SET_NOTIFYTIME ) {
 	    	if( resultCode == RESULT_OK ) {
 	    		Bundle Result = data.getExtras();
 	    		if( Result.isEmpty() )

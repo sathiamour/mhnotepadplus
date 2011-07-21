@@ -526,38 +526,13 @@ public class NotePadPlus extends Activity {
 			Intent OneNoteData = new Intent(NotePadPlus.this, EditNoteActivity.class);
 			OneNoteData.putExtra(EditNoteActivity.KEY_SOURCE, Action_Edit_Note);
 			OneNoteData.putExtra(OneNote.KEY_ROWID, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
-			OneNoteData.putExtra(OneNote.KEY_TITLE, Note
-					.getString(Note
-							.getColumnIndexOrThrow(OneNote.KEY_TITLE)));
-			OneNoteData.putExtra(OneNote.KEY_PATH, Note
-					.getString(Note
-							.getColumnIndexOrThrow(OneNote.KEY_PATH)));
-			OneNoteData.putExtra(OneNote.KEY_ENDTIME, Note
-					.getString(Note
-							.getColumnIndexOrThrow(OneNote.KEY_ENDTIME)));
-			OneNoteData.putExtra(OneNote.KEY_USE_ENDTIME, Note
-					.getString(Note
-							.getColumnIndexOrThrow(OneNote.KEY_USE_ENDTIME)));
-			OneNoteData.putExtra(OneNote.KEY_NOTIFYTIME, Note
-					.getString(Note
-							.getColumnIndexOrThrow(OneNote.KEY_NOTIFYTIME)));
-			OneNoteData
-					.putExtra(
-							OneNote.KEY_USE_NOTIFYTIME,
-							Note
-									.getString(Note
-											.getColumnIndexOrThrow(OneNote.KEY_USE_NOTIFYTIME)));
-			OneNoteData.putExtra(OneNote.KEY_DELNOTE_EXP, Note
-					.getString(Note
-							.getColumnIndexOrThrow(OneNote.KEY_DELNOTE_EXP)));
-			OneNoteData.putExtra(OneNote.KEY_TAGIMG_ID, Note
-					.getInt(Note
-							.getColumnIndexOrThrow(OneNote.KEY_TAGIMG_ID)));
-			OneNoteData.putExtra(OneNote.KEY_BGCLR, Note.getInt(Note
-					.getColumnIndexOrThrow(OneNote.KEY_BGCLR)));
-			OneNoteData.putExtra(OneNote.KEY_NOTIFYDURA, Note
-					.getInt(Note
-							.getColumnIndexOrThrow(OneNote.KEY_NOTIFYDURA)));
+			OneNoteData.putExtra(OneNote.KEY_TITLE, Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_TITLE)));
+			OneNoteData.putExtra(OneNote.KEY_PATH, Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_PATH)));
+			OneNoteData.putExtra(OneNote.KEY_NOTIFYTIME, Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_NOTIFYTIME)));
+			OneNoteData.putExtra(OneNote.KEY_USE_NOTIFYTIME, Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_USE_NOTIFYTIME)));
+			OneNoteData.putExtra(OneNote.KEY_TAGIMG_ID, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_TAGIMG_ID)));
+			OneNoteData.putExtra(OneNote.KEY_BGCLR, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_BGCLR)));
+			OneNoteData.putExtra(OneNote.KEY_NOTIFYDURA, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_NOTIFYDURA)));
 			OneNoteData.putExtra(OneNote.KEY_NOTIFYMETHOD, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_NOTIFYMETHOD)));
 			OneNoteData.putExtra(OneNote.KEY_RINGMUSIC, Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_RINGMUSIC)));
 		    OneNoteData.putExtra(OneNote.KEY_WIDGETID, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_WIDGETID)));

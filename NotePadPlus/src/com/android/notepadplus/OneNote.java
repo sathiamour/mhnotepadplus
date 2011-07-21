@@ -15,11 +15,8 @@ public class OneNote {
 	public static final String KEY_CREATED = "created_time";
 	public static final String KEY_UPDATED = "updated_time";
 	public static final String KEY_PATH = "path";
-	public static final String KEY_ENDTIME = "end_time";
 	public static final String KEY_NOTIFYTIME = "notify_time";
-	public static final String KEY_USE_ENDTIME = "use_endtime";
 	public static final String KEY_USE_NOTIFYTIME = "use_notifytime";
-	public static final String KEY_DELNOTE_EXP = "delnoteexp";
 	public static final String KEY_TAGIMG_ID = "tagimg_id";
 	public static final String KEY_BGCLR = "bgclr";
 	public static final String KEY_NOTIFYDURA = "notifydura";
@@ -58,9 +55,7 @@ public class OneNote {
 	public String NoteTitle;
 	public String NoteBody;
 	public String NoteFilePath;
-	public Calendar EndTime;
 	public Calendar NotifyTime;
-	public String Use_EndTime;
 	public String Use_NotifyTime;
 	public String DelNoteExp;
 	public String RingMusic;
@@ -75,9 +70,7 @@ public class OneNote {
 	public OneNote(){
 		   GenerateImgIdx();
 		   
-		   EndTime = Calendar.getInstance();
 		   NotifyTime = Calendar.getInstance();
-		   Use_EndTime = ProjectConst.No; 
 		   Use_NotifyTime = ProjectConst.No;
 		   DelNoteExp = ProjectConst.No;
 		   RingMusic = ProjectConst.EmptyStr;
@@ -90,11 +83,8 @@ public class OneNote {
 		   NoteRowId = DbNote.getInt(DbNote.getColumnIndexOrThrow(KEY_ROWID));
 		   NoteTitle = DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_TITLE));
 		   NoteFilePath = DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_PATH));
-		   EndTime = HelperFunctions.String2Calenar(DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_ENDTIME)));
-		   Use_EndTime = DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_USE_ENDTIME));
 		   NotifyTime = HelperFunctions.String2Calenar(DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_NOTIFYTIME)));
 		   Use_NotifyTime = DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_USE_NOTIFYTIME));
-		   DelNoteExp = DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_DELNOTE_EXP));
 		   TagImgIdx = DbNote.getInt(DbNote.getColumnIndexOrThrow(KEY_TAGIMG_ID));
 		   ItemBgIdx = DbNote.getInt(DbNote.getColumnIndexOrThrow(KEY_BGCLR));
 		   NotifyDura = DbNote.getInt(DbNote.getColumnIndexOrThrow(OneNote.KEY_NOTIFYDURA));
@@ -109,11 +99,8 @@ public class OneNote {
 		   NoteTitle = Parameters.getString(OneNote.KEY_TITLE);
 		   NoteFilePath = Parameters.getString(OneNote.KEY_PATH);
 		   NoteRowId = Parameters.getInt(OneNote.KEY_ROWID);
-		   EndTime = HelperFunctions.String2Calenar(Parameters.getString(OneNote.KEY_ENDTIME));
 		   NotifyTime = HelperFunctions.String2Calenar(Parameters.getString(OneNote.KEY_NOTIFYTIME));
-		   Use_EndTime = Parameters.getString(OneNote.KEY_USE_ENDTIME);
 		   Use_NotifyTime = Parameters.getString(OneNote.KEY_USE_NOTIFYTIME);
-		   DelNoteExp = Parameters.getString(OneNote.KEY_DELNOTE_EXP);
 		   TagImgIdx = Parameters.getInt(OneNote.KEY_TAGIMG_ID); 
 		   ItemBgIdx = Parameters.getInt(OneNote.KEY_BGCLR); 
 		   NotifyDura = Parameters.getInt(OneNote.KEY_NOTIFYDURA);

@@ -18,8 +18,8 @@ public class NoteDbAdapter {
     // Note database table create sql
 	private static final String DATABASE_CREATE = "create table diary (_id integer primary key autoincrement, "
 			+ "title text not null, path text not null, created_time text not null, "
-			+ "updated_time text not null,end_time text not null, use_endtime text not null," 
-			+ "notify_time text not null, use_notifytime text not null, delnoteexp text not null, "
+			+ "updated_time text not null," 
+			+ "notify_time text not null, use_notifytime text not null, "
 			+ "tagimg_id integer not null, bgclr integer not null, "
 			+ "ringmusic text not null,notifydura integer not null, "
 			+ "notifymethod integer not null, notify_ringtime text not null, "
@@ -27,7 +27,7 @@ public class NoteDbAdapter {
     // Database name & table name & database version
 	private static final String DATABASE_NAME = "database";
 	private static final String DATABASE_TABLE = "diary";
-	private static final int DATABASE_VERSION = 18;
+	private static final int DATABASE_VERSION = 19;
 	// Order by options
 	private static String OrderBy;
 	public static final String OrderByCreatedTime = "_id desc";
@@ -84,11 +84,8 @@ public class NoteDbAdapter {
 		InitialValues.put(OneNote.KEY_PATH, Note.NoteFilePath);
 		InitialValues.put(OneNote.KEY_CREATED, HelperFunctions.FormatCalendar2ReadableStr(Calendar.getInstance()));
 		InitialValues.put(OneNote.KEY_UPDATED, HelperFunctions.Calendar2String(Calendar.getInstance()));
-		InitialValues.put(OneNote.KEY_ENDTIME, HelperFunctions.Calendar2String(Note.EndTime));
-		InitialValues.put(OneNote.KEY_USE_ENDTIME, Note.Use_EndTime);
 		InitialValues.put(OneNote.KEY_NOTIFYTIME, HelperFunctions.Calendar2String(Note.NotifyTime));
 		InitialValues.put(OneNote.KEY_USE_NOTIFYTIME, Note.Use_NotifyTime);
-		InitialValues.put(OneNote.KEY_DELNOTE_EXP, Note.DelNoteExp);
 		InitialValues.put(OneNote.KEY_TAGIMG_ID, Note.TagImgIdx);
 		InitialValues.put(OneNote.KEY_BGCLR, Note.ItemBgIdx);
 		InitialValues.put(OneNote.KEY_RINGMUSIC, Note.RingMusic);
@@ -111,8 +108,8 @@ public class NoteDbAdapter {
         /** Order by created date descending order */
 		return mDb.query(DATABASE_TABLE, 
 				         new String[] { OneNote.KEY_ROWID, OneNote.KEY_TITLE, OneNote.KEY_PATH, OneNote.KEY_UPDATED,
-				                        OneNote.KEY_CREATED, OneNote.KEY_ENDTIME, OneNote.KEY_USE_ENDTIME, 
-				                        OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME, OneNote.KEY_DELNOTE_EXP,
+				                        OneNote.KEY_CREATED,  
+				                        OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME,
 				                        OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, OneNote.KEY_RINGMUSIC,
 				                        OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD, OneNote.KEY_PWD, 
 				                        OneNote.KEY_RANK, OneNote.KEY_WIDGETID}, 
@@ -123,8 +120,8 @@ public class NoteDbAdapter {
 	{
 		return mDb.query(DATABASE_TABLE, 
 		         new String[] { OneNote.KEY_ROWID, OneNote.KEY_TITLE, OneNote.KEY_PATH, OneNote.KEY_UPDATED,
-		                        OneNote.KEY_CREATED, OneNote.KEY_ENDTIME, OneNote.KEY_USE_ENDTIME, 
-		                        OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME, OneNote.KEY_DELNOTE_EXP,
+		                        OneNote.KEY_CREATED, 
+		                        OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME,
 		                        OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, OneNote.KEY_RINGMUSIC,
 		                        OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD, OneNote.KEY_PWD, 
 		                        OneNote.KEY_RANK, OneNote.KEY_WIDGETID}, 
@@ -134,8 +131,8 @@ public class NoteDbAdapter {
 	public Cursor GetNotesByConditionByOrder(String Condition, String UserOrderBy){
 		return mDb.query(DATABASE_TABLE, 
 				         new String[] { OneNote.KEY_ROWID, OneNote.KEY_TITLE, OneNote.KEY_PATH, 
-				                        OneNote.KEY_CREATED, OneNote.KEY_ENDTIME, OneNote.KEY_USE_ENDTIME, 
-				                        OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME, OneNote.KEY_DELNOTE_EXP,
+				                        OneNote.KEY_CREATED, 
+				                        OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME,
 				                        OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, OneNote.KEY_RINGMUSIC,
 				                        OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD, OneNote.KEY_NOTIFY_RINGTIME,
 				                        OneNote.KEY_PWD},
@@ -154,8 +151,8 @@ public class NoteDbAdapter {
 
 		Cursor mCursor = mDb.query(true, DATABASE_TABLE, 
 				                         new String[] { OneNote.KEY_ROWID, OneNote.KEY_TITLE, OneNote.KEY_PATH, 
-                                                        OneNote.KEY_CREATED, OneNote.KEY_ENDTIME, OneNote.KEY_USE_ENDTIME, 
-                                                        OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME, OneNote.KEY_DELNOTE_EXP,
+                                                        OneNote.KEY_CREATED,
+                                                        OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME,
                                                         OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, OneNote.KEY_NOTIFY_RINGTIME,
                                                         OneNote.KEY_RINGMUSIC, OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD,
                                                         OneNote.KEY_PWD, OneNote.KEY_RANK, OneNote.KEY_WIDGETID}, 
@@ -171,11 +168,8 @@ public class NoteDbAdapter {
 		UpdateArgs.put(OneNote.KEY_TITLE, Note.NoteTitle);
 		UpdateArgs.put(OneNote.KEY_PATH, Note.NoteFilePath);
 		UpdateArgs.put(OneNote.KEY_UPDATED, HelperFunctions.Calendar2String(Calendar.getInstance()));
-		UpdateArgs.put(OneNote.KEY_ENDTIME, HelperFunctions.Calendar2String(Note.EndTime));
-		UpdateArgs.put(OneNote.KEY_USE_ENDTIME, Note.Use_EndTime);
 		UpdateArgs.put(OneNote.KEY_NOTIFYTIME, HelperFunctions.Calendar2String(Note.NotifyTime));
 		UpdateArgs.put(OneNote.KEY_USE_NOTIFYTIME, Note.Use_NotifyTime);
-		UpdateArgs.put(OneNote.KEY_DELNOTE_EXP, Note.DelNoteExp);
 		UpdateArgs.put(OneNote.KEY_TAGIMG_ID, Note.TagImgIdx);
 		UpdateArgs.put(OneNote.KEY_BGCLR, Note.ItemBgIdx);
 		UpdateArgs.put(OneNote.KEY_NOTIFYDURA, Note.NotifyDura);
