@@ -54,11 +54,11 @@ public class SysSettingActivity extends PreferenceActivity
 		
 		// Initialize summary
 		String[] FontSizeArray = getResources().getStringArray(R.array.fontsize);
-		FontSizePref.setSummary(FontSizeArray[Integer.parseInt(NotePadPlus.AppSettings.FontSize)]);
+		FontSizePref.setSummary(FontSizeArray[Integer.parseInt(NotePadPlus.SysSettings.FontSize)]);
 		String[] OrderByArray = getResources().getStringArray(R.array.orderby);
-		OrderByPref.setSummary(OrderByArray[Integer.parseInt(NotePadPlus.AppSettings.OrderBy)]);
+		OrderByPref.setSummary(OrderByArray[Integer.parseInt(NotePadPlus.SysSettings.OrderBy)]);
 		String[] ItemHeightArray = getResources().getStringArray(R.array.itemheight);
-		ItemHeightPref.setSummary(ItemHeightArray[Integer.parseInt(NotePadPlus.AppSettings.ItemHeight)]);
+		ItemHeightPref.setSummary(ItemHeightArray[Integer.parseInt(NotePadPlus.SysSettings.ItemHeight)]);
 	}
 
 	@Override
@@ -71,25 +71,25 @@ public class SysSettingActivity extends PreferenceActivity
  			    attrs.flags |= WindowManager.LayoutParams.FLAG_FULLSCREEN;   
 			    getWindow().setAttributes(attrs);   
 			    getWindow().addFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS); 
-			    NotePadPlus.AppSettings.IsFullScreen = true;
+			    NotePadPlus.SysSettings.IsFullScreen = true;
 			} else {
 				attrs.flags &= (~WindowManager.LayoutParams.FLAG_FULLSCREEN);   
 				getWindow().setAttributes(attrs);   
 				getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-				NotePadPlus.AppSettings.IsFullScreen = false;
+				NotePadPlus.SysSettings.IsFullScreen = false;
 			}
 		} else if( Pref.getKey().equals(FontSizeKey) ) {
 			String[] FontSizeArray = getResources().getStringArray(R.array.fontsize);
 		    Pref.setSummary(FontSizeArray[Integer.parseInt(NewVal.toString())]);
-		    NotePadPlus.AppSettings.FontSize = NewVal.toString();
+		    NotePadPlus.SysSettings.FontSize = NewVal.toString();
 		} else if( Pref.getKey().equals(OrderByKey) ) {
 			String[] OrderByArray = getResources().getStringArray(R.array.orderby);
 		    Pref.setSummary(OrderByArray[Integer.parseInt(NewVal.toString())]);
-		    NotePadPlus.AppSettings.OrderBy = NewVal.toString();
+		    NotePadPlus.SysSettings.OrderBy = NewVal.toString();
 		}else if( Pref.getKey().equals(ItemHeightKey) ) {
 			String[] ItemHeightArray = getResources().getStringArray(R.array.itemheight);
 			ItemHeightPref.setSummary(ItemHeightArray[Integer.parseInt(NewVal.toString())]);
-			NotePadPlus.AppSettings.ItemHeight = NewVal.toString();
+			NotePadPlus.SysSettings.ItemHeight = NewVal.toString();
 		}else
 			return false;
 		return true;

@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.text.SimpleDateFormat;
@@ -11,17 +12,23 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
-import android.view.View;
 import android.content.Context;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -145,7 +152,7 @@ public class HelperFunctions{
     public static int ScreenOrient(Context context)
     {   
  	     DisplayMetrics dm = context.getApplicationContext().getResources().getDisplayMetrics();  
-
+         Log.d("log","the height & width is "+dm.heightPixels+" width is "+dm.widthPixels);
  	     int landscape = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;//∫·∆¡æ≤Ã¨≥£¡ø   
  	     int portrait = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;// ˙∆¡≥£¡ø   
   	     return dm.widthPixels<dm.heightPixels?portrait:landscape;//≈–∂œ
@@ -154,25 +161,22 @@ public class HelperFunctions{
 	// Refresh widget note list
 	public static void RefreshWidgetNoteList(Context ActivityContext, Cursor Notes)
 	{     
+		  Log.d("log","In RefreshWidgetNoteList to refresh main widget. The AppProviderId is "+NotePadWidgetProvider.AppProviderId);
 		  // Just return, if haven't get our widget provider's id
-		  if( NotePadWidgetProvider.AppProviderId == 0 ) return;
+		  // if( NotePadWidgetProvider.AppProviderId == 0 ) return;
 		  
-		  Log.d("log","RefreshWidgetNoteList AppProviderId is"+NotePadWidgetProvider.AppProviderId);
-		  AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(ActivityContext);  
-		  RemoteViews widgetViews;
+		  
+		  AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(ActivityContext);
+		  RemoteViews widgetViews = new RemoteViews(ActivityContext.getPackageName(), R.layout.widgetview4x2);
 		  int Slot = 0;
-		  if( ScreenOrient(ActivityContext) == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT ){
+		  if( ScreenOrient(ActivityContext) == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT )
+		  {
 		  	  Slot = NotePadWidgetProvider.Widget_Show_Portrait_Slot;
-		   	  widgetViews = new RemoteViews(ActivityContext.getPackageName(), R.layout.widgetmain);
-		   	  //appWidgetManager.getAppWidgetInfo(NotePadWidgetProvider.AppProviderId).minWidth = NotePadWidgetProvider.Portrait_MinWidth;
-		  } else {
+		  	  Log.d("log","it is portrait");
+		  } else
 		   	  Slot = NotePadWidgetProvider.Widget_Show_Landscape_Slot;
-		   	  widgetViews = new RemoteViews(ActivityContext.getPackageName(), R.layout.widgetmain);
-		   	  //appWidgetManager.getAppWidgetInfo(NotePadWidgetProvider.AppProviderId).minWidth = NotePadWidgetProvider.Landscape_MinWidth;
-		  }
 
 	      int NoteTitleViews[] = {R.id.note1, R.id.note2, R.id.note3, R.id.note4, R.id.note5};
-	      int NoteClockViews[] = {R.id.clock1, R.id.clock2, R.id.clock3, R.id.clock4, R.id.clock5};
 		  int count = Notes.getCount();
 	      for( int i = 0 ;i < Slot; ++i )
 	      {
@@ -180,23 +184,59 @@ public class HelperFunctions{
 	    	   {
 	    		   Notes.moveToPosition(i);
 	               String TmpTitle = Notes.getString(Notes.getColumnIndexOrThrow(OneNote.KEY_TITLE));
-	               String Title = Integer.toString(i+1)+". "+ HelperFunctions.TitleCheck(TmpTitle);
-	               String WetherUseNotifyTime = Notes.getString(Notes.getColumnIndexOrThrow(OneNote.KEY_USE_NOTIFYTIME));
-	               if( WetherUseNotifyTime.equals(ProjectConst.Yes) )
-	        	       widgetViews.setViewVisibility(NoteClockViews[i], View.VISIBLE);
-	               else 
-	        	       widgetViews.setViewVisibility(NoteClockViews[i], View.INVISIBLE);
+	               String Title = Integer.toString(i+1)+". "+ TmpTitle;//HelperFunctions.TitleCheck(TmpTitle);
 	           
 	               widgetViews.setTextViewText(NoteTitleViews[i], Title);
-	           } else {
+	           } else
 	    		   widgetViews.setTextViewText(NoteTitleViews[i], ProjectConst.EmptyStr);
-	    		   widgetViews.setViewVisibility(NoteClockViews[i], View.INVISIBLE);
-	    	   }
 	      }
 	      
+	      // Add pending intent to main activity
+	      Intent showAllNotes = new Intent(ActivityContext, NotePadPlus.class);
+	      showAllNotes.setAction(NotePadWidgetProvider.ACTION_SHOW_ALL_NOTE);
+		  PendingIntent showAllNotesPendingIntent = PendingIntent.getActivity(ActivityContext, 0, showAllNotes, 0);
+		  widgetViews.setOnClickPendingIntent(R.id.widgetboard, showAllNotesPendingIntent);
+
     	  appWidgetManager.updateAppWidget(new ComponentName(ActivityContext, NotePadWidgetProvider.class), widgetViews);		
 	}
  
+    public static void Refresh1x1Widget(Context AppContext, int AppWidgetId, String Title, int RowId, int ClrId, boolean IsLocked)
+    {        
+		   // Create remote views
+		   RemoteViews remoteViews = new RemoteViews(AppContext.getPackageName(), R.layout.widgetview1x1);
+	       remoteViews.setTextViewText(android.R.id.text1, Title);
+	       remoteViews.setImageViewBitmap(android.R.id.background, HelperFunctions.GetAlpha1x1Bg(AppContext, ClrId));
+		
+	       AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(AppContext); 
+	       
+	       Intent ActivityIntent;
+		    if( IsLocked ){
+		    	ActivityIntent = new Intent(AppContext, NotificationPwdDlgActivity.class);
+		    	remoteViews.setViewVisibility(R.id.widget1x1_lock, View.VISIBLE);
+		    } else {
+		    	ActivityIntent = new Intent(AppContext, EditNoteActivity.class);
+		    	remoteViews.setViewVisibility(R.id.widget1x1_lock, View.GONE);
+		    }
+		    ActivityIntent.putExtra(OneNote.KEY_ROWID, RowId);
+		    ActivityIntent.putExtra(EditNoteActivity.KEY_SOURCE, NotePad1X1WidgetHelper.EDIT_WIDGET_ACTION);
+			PendingIntent EditNotePendingIntent = PendingIntent.getActivity(AppContext, AppWidgetId, ActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+			remoteViews.setOnClickPendingIntent(android.R.id.background, EditNotePendingIntent);
+			
+	        appWidgetManager.updateAppWidget(AppWidgetId, remoteViews);		   
+    }
+    
+	public static Bitmap GetAlpha1x1Bg(Context AppCtx, int BgClrId){
+	    InputStream is = AppCtx.getResources().openRawResource(R.drawable.bg_note_1x1);
+	    Bitmap Src = BitmapFactory.decodeStream(is);
+	    Bitmap AlphaBg = Src.extractAlpha();
+	    Paint p = new Paint();
+        p.setColor(NotePadPlus.ItemBgClr[BgClrId]);
+        Bitmap Bg = Bitmap.createBitmap(75, 75, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(Bg);
+        canvas.drawBitmap(AlphaBg, 0, 0, p);
+        return Bg;
+	}
+	
 	// Read note
 	public static String ReadTextFile(Context context, String path){
 		FileInputStream fileInStream = null;

@@ -3,10 +3,12 @@ package com.android.notepadplus;
 import java.util.Calendar;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.preference.PreferenceManager;
 
 public class NoteDbAdapter {
 
@@ -21,11 +23,11 @@ public class NoteDbAdapter {
 			+ "tagimg_id integer not null, bgclr integer not null, "
 			+ "ringmusic text not null,notifydura integer not null, "
 			+ "notifymethod integer not null, notify_ringtime text not null, "
-			+ "pwd text, rank integer not null)";
+			+ "pwd text, rank integer not null, widgetid integer not null)";
     // Database name & table name & database version
 	private static final String DATABASE_NAME = "database";
 	private static final String DATABASE_TABLE = "diary";
-	private static final int DATABASE_VERSION = 15;
+	private static final int DATABASE_VERSION = 18;
 	// Order by options
 	private static String OrderBy;
 	public static final String OrderByCreatedTime = "_id desc";
@@ -57,13 +59,18 @@ public class NoteDbAdapter {
 		}
 	}
 
-	public NoteDbAdapter(Context ctx) {
-		this.mCtx = ctx;
+	public NoteDbAdapter(Context Ctx) {
+		this.mCtx = Ctx;
+		
 	}
 
 	public NoteDbAdapter open() throws SQLException {
 		mDbHelper = new DatabaseHelper(mCtx);
 		mDb = mDbHelper.getWritableDatabase();
+		// Read order by
+		SharedPreferences PrefSettings = PreferenceManager.getDefaultSharedPreferences(mCtx);   
+		String OrderByIdx = PrefSettings.getString(AppSetting.Key_PrefOrderBy, AppSetting.OrderByUpdatedTime);
+		OrderBy = OrderByArray[Integer.parseInt(OrderByIdx)];
 		return this;
 	}
 
@@ -90,6 +97,7 @@ public class NoteDbAdapter {
 		InitialValues.put(OneNote.KEY_NOTIFY_RINGTIME, HelperFunctions.Calendar2String(Note.NotifyTime));
 		InitialValues.put(OneNote.KEY_PWD, ProjectConst.EmptyStr);
 		InitialValues.put(OneNote.KEY_RANK, ProjectConst.Zero);
+		InitialValues.put(OneNote.KEY_WIDGETID, ProjectConst.Zero);
 		
 		return mDb.insert(DATABASE_TABLE, null, InitialValues);
 	}
@@ -106,11 +114,24 @@ public class NoteDbAdapter {
 				                        OneNote.KEY_CREATED, OneNote.KEY_ENDTIME, OneNote.KEY_USE_ENDTIME, 
 				                        OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME, OneNote.KEY_DELNOTE_EXP,
 				                        OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, OneNote.KEY_RINGMUSIC,
-				                        OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD, OneNote.KEY_PWD, OneNote.KEY_RANK}, 
+				                        OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD, OneNote.KEY_PWD, 
+				                        OneNote.KEY_RANK, OneNote.KEY_WIDGETID}, 
 				         null, null, null, null, OrderBy);
 	}
 
-	public Cursor GetNotesByCondition(String Condition, String UserOrderBy){
+	public Cursor GetNotesByCondition(String Condition)
+	{
+		return mDb.query(DATABASE_TABLE, 
+		         new String[] { OneNote.KEY_ROWID, OneNote.KEY_TITLE, OneNote.KEY_PATH, OneNote.KEY_UPDATED,
+		                        OneNote.KEY_CREATED, OneNote.KEY_ENDTIME, OneNote.KEY_USE_ENDTIME, 
+		                        OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME, OneNote.KEY_DELNOTE_EXP,
+		                        OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, OneNote.KEY_RINGMUSIC,
+		                        OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD, OneNote.KEY_PWD, 
+		                        OneNote.KEY_RANK, OneNote.KEY_WIDGETID}, 
+		                        Condition, null, null, null, OrderBy);
+	}
+	
+	public Cursor GetNotesByConditionByOrder(String Condition, String UserOrderBy){
 		return mDb.query(DATABASE_TABLE, 
 				         new String[] { OneNote.KEY_ROWID, OneNote.KEY_TITLE, OneNote.KEY_PATH, 
 				                        OneNote.KEY_CREATED, OneNote.KEY_ENDTIME, OneNote.KEY_USE_ENDTIME, 
@@ -120,6 +141,15 @@ public class NoteDbAdapter {
 				                        OneNote.KEY_PWD},
 				                        Condition, null, null, null, UserOrderBy);
 	}
+	
+	public Cursor GetWidgetData(){
+		return mDb.query(DATABASE_TABLE, 
+		         new String[] { OneNote.KEY_ROWID, OneNote.KEY_TITLE, 
+		                        OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, 
+		                        OneNote.KEY_WIDGETID, OneNote.KEY_PWD},
+		                        OneNote.KEY_WIDGETID+"!=0", null, null, null, null);
+	}
+	
 	public Cursor GetOneNote(int RowId) throws SQLException {
 
 		Cursor mCursor = mDb.query(true, DATABASE_TABLE, 
@@ -128,7 +158,7 @@ public class NoteDbAdapter {
                                                         OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME, OneNote.KEY_DELNOTE_EXP,
                                                         OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, OneNote.KEY_NOTIFY_RINGTIME,
                                                         OneNote.KEY_RINGMUSIC, OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD,
-                                                        OneNote.KEY_PWD, OneNote.KEY_RANK}, 
+                                                        OneNote.KEY_PWD, OneNote.KEY_RANK, OneNote.KEY_WIDGETID}, 
 				                         OneNote.KEY_ROWID + "=" + RowId, null, null, null, null, null);
 		if( mCursor != null )
 			mCursor.moveToFirst();
@@ -192,7 +222,20 @@ public class NoteDbAdapter {
 		return mDb.update(DATABASE_TABLE, Content, OneNote.KEY_ROWID + "=" + RowId, null) > 0;
 	}
 	
-	public void SetOrderBy(String Condition){
+	public boolean SetNoteWidgetID(int RowId, int Id){
+		ContentValues Content = new ContentValues();
+		Content.put(OneNote.KEY_WIDGETID, Id);
+		
+		return mDb.update(DATABASE_TABLE, Content, OneNote.KEY_ROWID + "=" + RowId, null) > 0;
+	}
+	
+	public boolean ClearNoteWidgetID(int WidgetId){
+		ContentValues Content = new ContentValues();
+		Content.put(OneNote.KEY_WIDGETID, ProjectConst.Zero);
+		
+		return mDb.update(DATABASE_TABLE, Content, OneNote.KEY_WIDGETID + "=" + WidgetId, null) > 0;
+	}
+	public static void SetOrderBy(String Condition){
 		OrderBy = Condition;
 	}
 }

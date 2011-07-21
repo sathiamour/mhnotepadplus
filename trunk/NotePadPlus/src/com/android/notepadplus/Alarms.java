@@ -111,7 +111,8 @@ public class Alarms
  	     // Schedule end date check alarm
  	     AlarmManager NextAlarmMng = (AlarmManager)ActivityContext.getSystemService(Context.ALARM_SERVICE);
  	     NextAlarmMng.set(AlarmManager.RTC_WAKEUP, AlertTime, AlertSender);
- 	     Log.d("log", "Alarms: Next alarm is "+RowId+" title is "+NoteTitle);
+ 	     // Log
+ 	     Log.d("log", "Enable alarms: Next alarm is "+RowId+ " and title is "+NoteTitle);
     }
     
     private static void DisableAlter(Context ActivityContext){
@@ -135,7 +136,7 @@ public class Alarms
 		// use_notifytime = Y && notify_ringtime != OneNote.InvalidateNotifyTime
 		// if notify_ringtime = OneNote.InvalidateNotifyTime, means the note does not need notify
 		String Condition = OneNote.KEY_USE_NOTIFYTIME + "='" + ProjectConst.Yes + "' and " + OneNote.KEY_NOTIFY_RINGTIME + "!='" + OneNote.InvalidateNotifyTime+"'";
-	    Cursor NotesCursor = NotesDb.GetNotesByCondition(Condition, OneNote.KEY_NOTIFY_RINGTIME);
+	    Cursor NotesCursor = NotesDb.GetNotesByConditionByOrder(Condition, OneNote.KEY_NOTIFY_RINGTIME);
 	    int Count = NotesCursor.getCount();
 	    Calendar Now = Calendar.getInstance();
 	    Notes.clear();
@@ -146,7 +147,7 @@ public class Alarms
         RingMusic = ProjectConst.EmptyStr;
         NotifyMethodIdx = ProjectConst.NegativeOne;
       
-        Log.d("log", "Alarms: number of alarm " + Count);
+        Log.d("log", "Calculate alarms: number of alarm " + Count);
 	    for( int i = 0; i < Count; ++i )
 	    {
 	    	 NotesCursor.moveToPosition(i);

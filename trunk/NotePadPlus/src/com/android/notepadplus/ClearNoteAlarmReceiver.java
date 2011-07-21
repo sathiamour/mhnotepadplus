@@ -9,7 +9,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.util.Log;
 
 public class ClearNoteAlarmReceiver extends BroadcastReceiver {
 	
@@ -41,8 +40,6 @@ public class ClearNoteAlarmReceiver extends BroadcastReceiver {
 						Path = context.getString(R.string.notefile_path_prefix) + Path;
 						File noteFile = new File(Path);
 						noteFile.delete();
-						
-			    	    Log.d("log","ClearNoteAlarmReceiver: clear "+i+" note");
 					}
 				} 
 	       }

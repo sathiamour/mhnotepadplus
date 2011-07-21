@@ -54,14 +54,12 @@ public class EditNoteActivity extends Activity {
 		setContentView(R.layout.editnote);
 
 		// Initialize & open database
-		EditOneNote = new OneNote();
 		NotesDb = new NoteDbAdapter(this);
 		NotesDb.open();
 		
 		// Get control handler
 		NoteTitleCtrl = (EditText)findViewById(R.id.title_content);
 		NoteBodyCtrl = (EditText)findViewById(R.id.body_content);
-		EndTimeLabel = (TextView)findViewById(R.id.endtime_text2);
 		NotifyTimeLabel = (TextView)findViewById(R.id.notifytime_text2);
 		ChgTagClrBtn = (Button)findViewById(R.id.chgnoteclr);
 		
@@ -71,39 +69,39 @@ public class EditNoteActivity extends Activity {
 			// It is from notification
 			if( Parameters.getString(KEY_SOURCE).equals(Alarms.ALARM_ALERT_ACTION) )
 			{
+				// From notify's notification
 				// Get note's row id
-				EditOneNote.NoteRowId = Parameters.getInt(OneNote.KEY_ROWID);
+				int RowId = Parameters.getInt(OneNote.KEY_ROWID);
 				// We are from notify alarm, so since it has been in edit note activity
 				// Stop playing music service
 				// Stop notify alarm and set next one
 	    	    Intent StopService = new Intent(Alarms.ALARM_NOTIFY_RING);
 		    	stopService(StopService);
-				Alarms.DeleteOneAlarm(this, EditOneNote.NoteRowId);
-				// From notify's notification
-				Cursor Note = NotesDb.GetOneNote(EditOneNote.NoteRowId);
+				Alarms.DeleteOneAlarm(this, RowId);
+				// Initialize the note with database 
+				Cursor Note = NotesDb.GetOneNote(RowId);
 				EditOneNote = new OneNote(Note);
 				// Remove notification on bar
 				NotificationManager notificationManager = (NotificationManager)getSystemService(android.content.Context.NOTIFICATION_SERVICE);
-				notificationManager.cancel(EditOneNote.NoteRowId);
-				// Check password
-				//if( EditOneNote.Password.length() > 0 )
-				//{
-				//    Intent PwdDlgIntent = new Intent(EditNoteActivity.this, PromptPwdDlgActivity.class);
-				//    PwdDlgIntent.putExtra(OneNote.KEY_ROWID, EditOneNote.NoteRowId);
-				//    startActivity(PwdDlgIntent);	
-				//}
-				
+				notificationManager.cancel(RowId);
+				// Read note's content
 				if( EditOneNote.NoteFilePath != null ) 
-					// Read note's content
+					EditOneNote.NoteBody = HelperFunctions.ReadTextFile(this, EditOneNote.NoteFilePath);
+			} else if( Parameters.getString(KEY_SOURCE).equals(NotePad1X1WidgetHelper.EDIT_WIDGET_ACTION) ) {
+				// From one note widget
+				// Initialize the note with database 
+				Cursor Note = NotesDb.GetOneNote(Parameters.getInt(OneNote.KEY_ROWID));
+				EditOneNote = new OneNote(Note);
+				// Read note's content
+				if( EditOneNote.NoteFilePath != null ) 
 					EditOneNote.NoteBody = HelperFunctions.ReadTextFile(this, EditOneNote.NoteFilePath);
 			} else {
-			    // Initialize the note
+			    // Initialize the note with activity parameters
 				EditOneNote = new OneNote(Parameters);
+				// Read note's content
 				if( EditOneNote.NoteFilePath != null ) 
-					// Read note's content
 					EditOneNote.NoteBody = HelperFunctions.ReadTextFile(this, EditOneNote.NoteFilePath);
 			}
-			
 			// Backup the notify time
 			Pre_UseNotifyTime = EditOneNote.Use_NotifyTime;
 			Pre_NotifyTime = EditOneNote.NotifyTime;
@@ -135,26 +133,6 @@ public class EditNoteActivity extends Activity {
 				startActivityForResult(intent, ACTIVITY_SET_TAGCLR);				
     		}
     	});
-		
-		// Change end time button
-		Button EndTimeBtn = (Button)findViewById(R.id.endtime);
-		EndTimeBtn.setOnClickListener(new OnClickListener(){
-		    public void onClick(View v){
-		    	// Set time and start new activity
-		    	Intent intent = new Intent();
-				intent.setClass(EditNoteActivity.this, EndDateActivity.class);
-				// Set time
-				Bundle SelectedTime = new Bundle();
-				SelectedTime.putString(OneNote.KEY_USE_ENDTIME, EditOneNote.Use_EndTime);
-				SelectedTime.putString(OneNote.KEY_DELNOTE_EXP, EditOneNote.DelNoteExp);
-				SelectedTime.putString(OneNote.KEY_ENDTIME, HelperFunctions.Calendar2String(EditOneNote.EndTime));
-				// Pass it to next activity 
-				intent.putExtras(SelectedTime);
-				// Go to next activity(set note's end date activity)
-				startActivityForResult(intent, ACTIVITY_SET_ENDDATE);		    	
-		    }
-		}
-		);
 		
 		// Change notify time button
 		Button NotifyTimeBtn = (Button)findViewById(R.id.notifytime);
@@ -235,9 +213,13 @@ public class EditNoteActivity extends Activity {
     	 
     	 // Refresh widget note list
     	 HelperFunctions.RefreshWidgetNoteList(EditNoteActivity.this, NotesDb.GetAllNotes());
+    	 // Refresh 1x1 widget
+    	 if( EditOneNote.WidgetId != 0 )
+    	     HelperFunctions.Refresh1x1Widget(EditNoteActivity.this, EditOneNote.WidgetId, EditOneNote.NoteTitle, EditOneNote.NoteRowId, EditOneNote.ItemBgIdx, EditOneNote.Password.length()>0);
     	 // Show toast to notify user settings have been saved
  	     Toast.makeText(EditNoteActivity.this, getString(R.string.notesavingtip), Toast.LENGTH_SHORT).show();
          // Return to main activity
+ 	     setResult(RESULT_OK);
     	 finish();
 	}
 	 

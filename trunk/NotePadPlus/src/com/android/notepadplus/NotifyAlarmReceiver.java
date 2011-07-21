@@ -83,7 +83,6 @@ public class NotifyAlarmReceiver extends BroadcastReceiver {
 		NotesDb.open();
     	// Check orignal password
 		Cursor Note = NotesDb.GetOneNote(NoteRowId);
-		Log.d("log","pwd "+Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_PWD)));
 		if( Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_PWD)).length() > 0 )
             ActivityIntent = new Intent(context, NotificationPwdDlgActivity.class);
 		else ActivityIntent = new Intent(context, EditNoteActivity.class);

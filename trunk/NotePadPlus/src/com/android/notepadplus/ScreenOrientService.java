@@ -12,15 +12,15 @@ public class ScreenOrientService extends Service {
 
 	public static final String ScreenOrient_Action = "com.android.notepadplus.ScreenOrient";
 	
-	/** Refresh receiver when end date check finish */
+	/** Do change if it turns from portrait to landscape, or verse */
 	public BroadcastReceiver ScreenOrientReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent arg1) {
 		       if( arg1.getAction().equals(Intent.ACTION_CONFIGURATION_CHANGED) ) {
 					if( AppSetting.ScreenOrient != context.getResources().getConfiguration().orientation )
 					{
-						Log.d("log","ScreenOrientLayout onReceive: AppSetting.ScreenOrient "+AppSetting.ScreenOrient+
-							  "Current "+context.getResources().getConfiguration().orientation);
+						// Log
+						Log.d("log","ScreenOrientLayout onReceive: AppSetting.ScreenOrient "+AppSetting.ScreenOrient+ " Current "+context.getResources().getConfiguration().orientation);
 						AppSetting.ScreenOrient = context.getResources().getConfiguration().orientation;
 						// Open note database 
 						NoteDbAdapter mDbHelper = new NoteDbAdapter(context);
@@ -39,16 +39,16 @@ public class ScreenOrientService extends Service {
 	}
 
 	 @Override
-	 public int onStartCommand(Intent intent, int flags, int startId) {
-		 
-		 this.registerReceiver(ScreenOrientReceiver, new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED));
-		 Log.d("log","onStartCommand");
-		 return START_STICKY;
+	 public int onStartCommand(Intent intent, int flags, int startId) 
+	 {
+		    registerReceiver(ScreenOrientReceiver, new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED));
+		    Log.d("log","ScreenOrientService onStartCommand");
+		    return START_STICKY;
 	 }
 	 
 	 @Override
-	 public void onDestroy() {
-	        this.unregisterReceiver(ScreenOrientReceiver);
-	        Log.d("log","onDestroy");
+	 public void onDestroy() 
+	 {
+	        unregisterReceiver(ScreenOrientReceiver);
 	 }
 }

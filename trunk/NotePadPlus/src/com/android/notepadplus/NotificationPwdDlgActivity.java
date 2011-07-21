@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,23 +17,24 @@ public class NotificationPwdDlgActivity extends Activity {
     
 	/** Dialog id */
 	private static final int OrignalPwdErr_Dlg = 1;
-	
 	// Row id
 	private int NoteRowId = 0;
-	
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.notificationpwd_dlg);
+
         
         // Get passed parameter
-        Bundle Parameters = getIntent().getExtras();
+        final Bundle Parameters = getIntent().getExtras();
 		if( Parameters != null )
 			NoteRowId = Parameters.getInt(OneNote.KEY_ROWID);
 		Log.d("log","in NotificationPwdDlgActivity");
+		
+
         Button Confirm =(Button)findViewById(R.id.chk_pwd_confirm);
-        Confirm.setWidth(NotePadPlus.ScreenWidth/2);
         Confirm.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
     			EditText Pwd_Orignal = (EditText)findViewById(R.id.chk_pwd_edit);
@@ -49,8 +51,7 @@ public class NotificationPwdDlgActivity extends Activity {
 		    		} else {
 				        NotesDb.close();
 				        Intent EditNoteIntent = new Intent(NotificationPwdDlgActivity.this, EditNoteActivity.class);
-				        EditNoteIntent.putExtra(OneNote.KEY_ROWID, NoteRowId);
-				        EditNoteIntent.putExtra(EditNoteActivity.KEY_SOURCE, Alarms.ALARM_ALERT_ACTION);
+				        EditNoteIntent.putExtras(Parameters);
 				        startActivity(EditNoteIntent);
 		    		}
                 }	
@@ -60,12 +61,12 @@ public class NotificationPwdDlgActivity extends Activity {
        	});
         
         Button Cancel=(Button)findViewById(R.id.chk_pwd_cancel);
-        Cancel.setWidth(NotePadPlus.ScreenWidth/2);
         Cancel.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
 		    	finish();				
     		}
     	});
+		
     }
 	
 	@Override
@@ -73,7 +74,7 @@ public class NotificationPwdDlgActivity extends Activity {
 		switch (id) {
             case OrignalPwdErr_Dlg:
             	 return HelperFunctions.BuildAltertDialog(NotificationPwdDlgActivity.this, R.string.pwderr_title, R.string.orignalpwd_err_prompt);
-		}
+  		}
 		
 		return null;
 	}
