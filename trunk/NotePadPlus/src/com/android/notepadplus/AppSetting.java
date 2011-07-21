@@ -101,6 +101,7 @@ class AppSetting
 		// Set value
 		OrderBy = By;
 	}
+	
 	// Init works:
 	// 1. set up clear notes alarm
 	// 2. check screen orient
@@ -111,8 +112,6 @@ class AppSetting
 		Log.d("log", "AppInitJobs: Start screen orient service");
     	// Check screen oriention
     	AppSetting.ScreenOrient = HelperFunctions.ScreenOrient(ActivityContext);
-    	// Setup note clear alarm
-    	Alarms.SetNoteClearAlarm(ActivityContext);
     	// Start screen orient service
 	    Intent ScreenOrient = new Intent(ScreenOrientService.ScreenOrient_Action);
 	    ActivityContext.startService(ScreenOrient);

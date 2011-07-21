@@ -173,18 +173,5 @@ public class Alarms
 	    
 	    return CurRowId;
     }
-    
-    // Set notes' clear alarm
-    public static void SetNoteClearAlarm(Context ActivityContext) {
-       Intent AlarmIntent = new Intent(ClearNoteAlarmReceiver.Clear_Note_Action);
-	   PendingIntent PendingAlarmIntent = PendingIntent.getBroadcast(ActivityContext, 0, AlarmIntent, 0);
-	   Calendar ScheduleTime = Calendar.getInstance();
-	   int TimeLeft = (23-ScheduleTime.get(Calendar.HOUR_OF_DAY))*60 + 60-ScheduleTime.get(Calendar.MINUTE);
-	   ScheduleTime.setTimeInMillis(System.currentTimeMillis());
-	   ScheduleTime.add(Calendar.MINUTE, TimeLeft);
-	   // Schedule end date check alarm
-	   AlarmManager EndDateCheckAlarm = (AlarmManager) ActivityContext.getSystemService(Context.ALARM_SERVICE);
-	   EndDateCheckAlarm.setRepeating(AlarmManager.RTC_WAKEUP, ScheduleTime.getTimeInMillis(), 86400*1000, PendingAlarmIntent);
-    }
 
 }

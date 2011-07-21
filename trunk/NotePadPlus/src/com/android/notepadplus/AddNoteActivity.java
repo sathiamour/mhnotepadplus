@@ -32,7 +32,6 @@ public class AddNoteActivity extends Activity {
 	/** Control */
 	private EditText NoteTitleCtrl = null;
 	private EditText NoteBodyCtrl = null;
-	private TextView EndTimeLabel = null;
 	private TextView NotifyTimeLabel = null;
 	private Button   SelectTagClrBtn = null;
 	
@@ -64,7 +63,6 @@ public class AddNoteActivity extends Activity {
 		NoteTitleCtrl = (EditText)findViewById(R.id.title_content);
 		SelectTagClrBtn = (Button)findViewById(R.id.selnoteclr);
 		NoteBodyCtrl = (EditText)findViewById(R.id.body_content);
-		EndTimeLabel = (TextView)findViewById(R.id.endtime_text);
 		NotifyTimeLabel = (TextView)findViewById(R.id.notfiytime_text);
 		
 		// Randomly select color
@@ -80,26 +78,6 @@ public class AddNoteActivity extends Activity {
     		}
     	});
     	
-		// Set end time for note
-    	AddOneNote.EndTime = Calendar.getInstance(Locale.CHINA);
-		Button EndTimeBtn = (Button)findViewById(R.id.endtime);
-		EndTimeBtn.setOnClickListener(new OnClickListener(){
-		    public void onClick(View v){
-		    	// Set time and start new activity
-		    	Intent intent = new Intent();
-				intent.setClass(AddNoteActivity.this, EndDateActivity.class);
-				// Set time
-				Bundle SelectedTime = new Bundle();
-				SelectedTime.putString(OneNote.KEY_USE_ENDTIME, AddOneNote.Use_EndTime);
-				SelectedTime.putString(OneNote.KEY_DELNOTE_EXP, AddOneNote.DelNoteExp);
-				SelectedTime.putString(OneNote.KEY_ENDTIME, HelperFunctions.Calendar2String(AddOneNote.EndTime));
-				// Pass it to next activity 
-				intent.putExtras(SelectedTime);
-				// Go to next activity(set note's end date activity)
-				startActivityForResult(intent, ACTIVITY_SET_ENDDATE);		      	
-		    }
-		}
-		);
 		
 		// Set notify time for note 
 		AddOneNote.NotifyTime = Calendar.getInstance(Locale.CHINA);
@@ -137,18 +115,8 @@ public class AddNoteActivity extends Activity {
    		    showDialog(ProjectConst.Check_NoteTitle_Dlg);
    		    return;
    	    }
-        // Check end date & notify date
+        // Check notify date
    	    Calendar Now = Calendar.getInstance();
-   	    if( AddOneNote.Use_EndTime.equals(ProjectConst.Yes) )
-   	    {
-   		    // If the end date is expired, prompt to user
-   		    if( HelperFunctions.CmpDatePrefix(AddOneNote.EndTime, Now)<0 )
-   		    {
-   		 	    showDialog(ProjectConst.Check_EndDate_Dlg);
-   		 	    return;
-   		    }
-   	    }
-   	 
    	    if( AddOneNote.Use_NotifyTime.equals(ProjectConst.Yes) )
    	    {
    		    // If the notify date is expired, prompt to user
@@ -159,15 +127,6 @@ public class AddNoteActivity extends Activity {
    		    }
    	    }
    	 
-   	    if( AddOneNote.Use_EndTime.equals(ProjectConst.Yes)&&AddOneNote.Use_NotifyTime.equals(ProjectConst.Yes) )
-   	    {
-   		    // If the notify date is later than end date, prompt to user
-   		    if( HelperFunctions.CmpDatePrefix(AddOneNote.EndTime, AddOneNote.NotifyTime)<0 )
-   		    {
-   			    showDialog(ProjectConst.Check_NotifyEndDate_Dlg);
-   			    return;
-   		    }
-   	    }
    	    // Save it to file
    	    // Get a random file name
    	    AddOneNote.NoteFilePath = UUID.randomUUID().toString()+ ProjectConst.NoteFileExt;
@@ -197,12 +156,8 @@ public class AddNoteActivity extends Activity {
 		switch (id) {
 		   case ProjectConst.Check_NoteTitle_Dlg:
 			    return HelperFunctions.BuildAltertDialog(AddNoteActivity.this, R.string.prompt_title, R.string.notetitle_empty_tip);
-		   case ProjectConst.Check_EndDate_Dlg:
-			    return HelperFunctions.BuildAltertDialog(AddNoteActivity.this, R.string.prompt_title, R.string.enddate_expire_tip);
 		   case ProjectConst.Check_NotifyDate_Dlg:
 			    return HelperFunctions.BuildAltertDialog(AddNoteActivity.this, R.string.prompt_title, R.string.notifydate_expire_tip);
-		   case ProjectConst.Check_NotifyEndDate_Dlg:
-			   return HelperFunctions.BuildAltertDialog(AddNoteActivity.this, R.string.prompt_title, R.string.enddate_pre_notifydate_tip);
 		}
 		return null;
 	}
@@ -256,21 +211,7 @@ public class AddNoteActivity extends Activity {
 	// Handler return code
 	@Override 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-		if( requestCode == ACTIVITY_SET_ENDDATE ) { 
-			if( resultCode == RESULT_OK ) { 
-				Bundle Result = data.getExtras();
-				if( Result.isEmpty() ) {
-					AddOneNote.Use_EndTime = ProjectConst.No;
-					AddOneNote.DelNoteExp = ProjectConst.No;
-					EndTimeLabel.setText(R.string.noendtime);					
-				} else {
-					AddOneNote.Use_EndTime = ProjectConst.Yes;
-					AddOneNote.DelNoteExp = Result.getString(OneNote.KEY_DELNOTE_EXP);
-					AddOneNote.EndTime = HelperFunctions.String2Calenar(Result.getString(OneNote.KEY_ENDTIME));
-				    EndTimeLabel.setText(HelperFunctions.FormatCalendar2ReadablePrefixStr(AddOneNote.EndTime));
-				}
-			}
-	    } else if( requestCode == ACTIVITY_SET_NOTIFYTIME ) {
+        if( requestCode == ACTIVITY_SET_NOTIFYTIME ) {
 	    	if( resultCode == RESULT_OK ) {
 	    		Bundle Result = data.getExtras();
 	    		if( Result.isEmpty() )
