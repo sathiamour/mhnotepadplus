@@ -7,6 +7,7 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,6 +26,7 @@ public class ChgPwdDlgActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.chgpassword_dlg);
         
         // Get passed parameter
@@ -34,22 +36,19 @@ public class ChgPwdDlgActivity extends Activity {
 		Log.d("log","rowid is "+NoteRowId);
 		
         Button Confirm =(Button)findViewById(R.id.chgpwd_confirm);
-        Confirm.setWidth(NotePadPlus.ScreenWidth/2);
-        Log.d("log","setWidth");
         Confirm.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
     			EditText Pwd_Orignal = (EditText)findViewById(R.id.pwd_orignal_edit);
     			EditText Pwd_First = (EditText)findViewById(R.id.chgpwd_first_edit);
 		        EditText Pwd_Second = (EditText)findViewById(R.id.chgpwd_second_edit);
-		        if( Pwd_First== null)
-		        Log.d("log","before Empty check");
+
 		        // Empty check
 		        if( Pwd_First.getText().toString().length() == 0 )
 		        {
 		        	showDialog(PwdNull_Dlg);
 		        	return;
 		        }
-    			Log.d("log","Empty check");
+
 		        // Is same ?
 		        if( !Pwd_First.getText().toString().equals(Pwd_Second.getText().toString())) {
 			        showDialog(PwdErr_Dlg);
@@ -75,7 +74,6 @@ public class ChgPwdDlgActivity extends Activity {
        	});
         
         Button Cancel=(Button)findViewById(R.id.chgpwd_cancel);
-        Cancel.setWidth(NotePadPlus.ScreenWidth/2);
         Cancel.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
 		    	finish();				

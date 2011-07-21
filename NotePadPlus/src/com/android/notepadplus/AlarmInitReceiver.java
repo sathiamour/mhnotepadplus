@@ -17,8 +17,9 @@ public class AlarmInitReceiver extends BroadcastReceiver {
             Log.d("log", "AlarmInitReceiver: FAILURE unable to get content resolver.  Alarms inactive.");
             return;
         }
+        
         if( intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED) ) {
-        	// App Init jobs
+        	// App Init jobs(Start screen oriented service)
         	AppSetting.AppInitJobs(context);
         	// Setup note notify alarm
             Alarms.SetNextAlarm(context);  

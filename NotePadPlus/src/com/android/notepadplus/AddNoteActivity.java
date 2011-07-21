@@ -10,6 +10,8 @@ import com.android.notepadplus.R;
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View.OnClickListener;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -33,6 +35,14 @@ public class AddNoteActivity extends Activity {
 	private TextView EndTimeLabel = null;
 	private TextView NotifyTimeLabel = null;
 	private Button   SelectTagClrBtn = null;
+	
+	/**Menu id */
+	public static final int ITEM0 = Menu.FIRST;
+	public static final int ITEM1 = Menu.FIRST + 1;
+	public static final int ITEM2 = Menu.FIRST + 2;
+	public static final int ITEM3 = Menu.FIRST + 3;
+	public static final int ITEM4 = Menu.FIRST + 4;
+	public static final int ITEM5 = Menu.FIRST + 5;
 	
 	/** Database */
 	private NoteDbAdapter NotesDb = null;
@@ -170,6 +180,7 @@ public class AddNoteActivity extends Activity {
    	    // Refresh widget note list
    	    HelperFunctions.RefreshWidgetNoteList(AddNoteActivity.this, NotesDb.GetAllNotes());
    	    // Return to main activity
+   	    setResult(RESULT_OK);
    	    finish(); 
 	}
 	 
@@ -219,6 +230,28 @@ public class AddNoteActivity extends Activity {
         	
         }
 	} 
+	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Must create one menu
+		menu.add(Menu.NONE, ITEM0, 1, "·ÅÆú").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		menu.add(Menu.NONE, ITEM1, 2, "Í¼Æ¬").setIcon(android.R.drawable.ic_menu_gallery);
+		menu.add(Menu.NONE, ITEM2, 3, "Â¼Òô").setIcon(android.R.drawable.ic_menu_mylocation);
+        return true;
+	}
+	
+
+	@Override 
+	public boolean onOptionsItemSelected(MenuItem item) {  
+           switch(item.getItemId()) 
+           {  
+              case ITEM0:
+            	   setResult(RESULT_CANCELED);
+	               finish();
+	               break;
+           }
+           return false;
+	}
 	
 	// Handler return code
 	@Override 

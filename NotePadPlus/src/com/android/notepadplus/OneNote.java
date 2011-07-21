@@ -28,6 +28,7 @@ public class OneNote {
 	public static final String KEY_NOTIFY_RINGTIME = "notify_ringtime";
 	public static final String KEY_PWD = "pwd";
 	public static final String KEY_RANK = "rank";
+	public static final String KEY_WIDGETID = "widgetid";
 	public static final String KEY_INDEX = "index";
 	
 	/** Date parameter key */
@@ -69,6 +70,7 @@ public class OneNote {
 	public int ItemBgIdx;
 	public int NotifyDura;
 	public int NotifyMethod;
+	public int WidgetId;
 	
 	public OneNote(){
 		   GenerateImgIdx();
@@ -81,6 +83,7 @@ public class OneNote {
 		   RingMusic = ProjectConst.EmptyStr;
 		   NotifyDura = 0;
 		   NotifyMethod = 0;
+		   WidgetId = 0;
 	}
 	
 	public OneNote(Cursor DbNote){
@@ -98,6 +101,7 @@ public class OneNote {
 		   NotifyMethod = DbNote.getInt(DbNote.getColumnIndexOrThrow(KEY_NOTIFYMETHOD));
 		   RingMusic = DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_RINGMUSIC));
 		   Password = DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_PWD));
+		   WidgetId = DbNote.getInt(DbNote.getColumnIndexOrThrow(KEY_WIDGETID));
 	}
 	
 	public OneNote(Bundle Parameters)
@@ -115,6 +119,8 @@ public class OneNote {
 		   NotifyDura = Parameters.getInt(OneNote.KEY_NOTIFYDURA);
 		   NotifyMethod = Parameters.getInt(OneNote.KEY_NOTIFYMETHOD);
 		   RingMusic = Parameters.getString(OneNote.KEY_RINGMUSIC);
+		   Password = Parameters.getString(OneNote.KEY_PWD);
+		   WidgetId = Parameters.getInt(OneNote.KEY_WIDGETID);
 	}
 	
 	public void GenerateImgIdx(){

@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.graphics.Paint.FontMetrics;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -23,9 +24,10 @@ public class NoteItemAdapter extends SimpleAdapter
     private boolean[] IsLock;
     private boolean[] IsNotify;
     private boolean[] IsRank;
-    private float FontHeight;
-    private static int FontSize = 25;
-    private static int TagWidth = 7;
+    private float FontHeight1;
+    private float FontHeight2;
+    private static int FontSize1 = 25;
+    private static int FontSize2 = 15;
     Context AppContext;
 	public NoteItemAdapter(Context context,
 			List<? extends Map<String, ?>> data, int resource, String[] from,
@@ -44,9 +46,12 @@ public class NoteItemAdapter extends SimpleAdapter
 		
 		// Get height of font   
 		Paint textPaint = new Paint(Paint.ANTI_ALIAS_FLAG);   
-		textPaint.setTextSize(FontSize); 
+		textPaint.setTextSize(FontSize1); 
 		FontMetrics fontMetrics = textPaint.getFontMetrics();   
-		FontHeight = fontMetrics.bottom-fontMetrics.top;
+		FontHeight1 = fontMetrics.bottom-fontMetrics.top;
+		textPaint.setTextSize(FontSize2);
+		FontMetrics fontMetrics2 = textPaint.getFontMetrics();   
+		FontHeight2 = fontMetrics2.bottom-fontMetrics2.top; 
 	}
 	
 	@Override
@@ -54,14 +59,13 @@ public class NoteItemAdapter extends SimpleAdapter
 		// TODO Auto-generated method stub
 		View Item = super.getView(position, convertView, parent);
 		
-		TextView Tag1 = (TextView)Item.findViewById(R.id.NoteTag1);
-		TextView Tag2 = (TextView)Item.findViewById(R.id.NoteTag2);
+		View Tag = Item.findViewById(R.id.NoteTag);
 		TextView Title = (TextView)Item.findViewById(R.id.NoteTitle);
-		//TextView Time = (TextView)Item.findViewById(R.id.NoteCreatedTime);
+		TextView Time = (TextView)Item.findViewById(R.id.NoteCreatedTime);
 		ImageView Ring = (ImageView)Item.findViewById(R.id.NoteRingImg);
 		ImageView Lock = (ImageView)Item.findViewById(R.id.NoteLockImg);
 		CheckBox Rank = (CheckBox)Item.findViewById(R.id.Rank);
-		RelativeLayout Sub = (RelativeLayout)Item.findViewById(R.id.ListSubItem);
+		RelativeLayout Sub = (RelativeLayout)Item.findViewById(R.id.ListItem);
 
 		Rank.setChecked(IsRank[position]);
 		Rank.setOnClickListener(new OnClickListener(){
@@ -75,36 +79,27 @@ public class NoteItemAdapter extends SimpleAdapter
 				}
 		});
 		
-		Tag1.setBackgroundColor(TagColor[position]);
-		Tag1.setTextColor(TagColor[position]);
-		Tag2.setBackgroundColor(TagColor[position]);
-		Tag2.setTextColor(TagColor[position]);
-		
-		//Title.setBackgroundColor(ItemBgColor[position]);
-		//Time.setBackgroundColor(ItemBgColor[position]);
-		//Ring.setBackgroundColor(ItemBgColor[position]);
-		//Lock.setBackgroundColor(ItemBgColor[position]);
-		//Rank.setBackgroundColor(ItemBgColor[position]);
-		
-		Title.setTextSize(AppSetting.FontSizeArray[Integer.parseInt(NotePadPlus.AppSettings.FontSize)]);
+		Tag.setBackgroundColor(TagColor[position]);
 
-		Tag1.setWidth(TagWidth);
-		Tag2.setWidth(TagWidth);
-		float ItemHeightFactor = AppSetting.ItemHeightFactor[Integer.parseInt(NotePadPlus.AppSettings.ItemHeight)];
-		Tag1.setHeight((int) (FontHeight*ItemHeightFactor));
-		Title.setHeight((int) (FontHeight*ItemHeightFactor));
-		Title.setWidth(NotePadPlus.ScreenWidth-TagWidth-100);
+
+		Title.setTextSize(AppSetting.FontSizeArray[Integer.parseInt(NotePadPlus.SysSettings.FontSize)]);
+
+		
+		float ItemHeightFactor = AppSetting.ItemHeightFactor[Integer.parseInt(NotePadPlus.SysSettings.ItemHeight)];
+		Title.setHeight((int) (FontHeight1*ItemHeightFactor));
+		//Lock.setMinimumHeight((int) (FontHeight1*ItemHeightFactor));
+		//Ring.setMinimumHeight((int) (FontHeight1*ItemHeightFactor));
+		//Rank.setMinimumHeight((int) (FontHeight1*ItemHeightFactor));
+		Time.setHeight((int)(FontHeight2));
+		Title.setWidth(NotePadPlus.ScreenWidth-110);
+		Tag.setMinimumHeight((int) (FontHeight1*ItemHeightFactor)+(int)(FontHeight2)-4);
 		Sub.setBackgroundColor(ItemBgColor[position]);
-
-
+        
 		if( !IsLock[position] )
 			Lock.setVisibility(View.INVISIBLE);
 
 		if( !IsNotify[position] )
 			Ring.setVisibility(View.INVISIBLE);
-
-		//Ring.setMaxWidth(10);
-		//Lock.setMaxWidth(24);
 		
 		return Item;
 	}

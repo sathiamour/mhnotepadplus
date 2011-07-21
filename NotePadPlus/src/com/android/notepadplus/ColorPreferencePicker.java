@@ -246,7 +246,7 @@ public class ColorPreferencePicker extends DialogPreference {
             editor.putInt(getKey(), mCurrentColor);
             editor.commit();
             callChangeListener(new Integer(mCurrentColor));
-            NotePadPlus.AppSettings.BgClr = mCurrentColor;
+            NotePadPlus.SysSettings.BgClr = mCurrentColor;
         }
     }
 
