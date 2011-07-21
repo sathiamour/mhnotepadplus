@@ -49,15 +49,15 @@
 <string name="notifydismiss_button">取消</string>
 <string name="notifyalarm_title">NotePadPlus日志提醒</string>
 <string name="notesavingtip">日志修改保存成功！</string>
-<string name="input_pwd_tip">请输入密码:</string>
-<string name="input_pwd_again_tip">确认密码:</string>
+<string name="input_pwd_tip">请输入新密码:</string>
+<string name="input_pwd_again_tip">请确认新密码:</string>
 <string name="note_lock_dlg_title">日志加密</string>
 <string name="pwderr_title">密码输入错误</string>
 <string name="pwderr_prompt">两次密码输入不一致！</string>
-<string name="notehaslock_msg">该日志已经被加密码，您可以选择如下操作:</string>
+<string name="notehaslock_msg">日志已被加锁，可作下列操作</string>
 <string name="changenotepwd_title">修改密码</string>
 <string name="orignalpwd_tip">请输入原密码:</string>
-<string name="clearpwd_tip">解除锁定</string>
+<string name="clearpwd_tip">解除密码</string>
 <string name="orignalpwd_err_prompt">原密码输入错误！</string>
 <string name="pwdprompt_title">该日志已经被密码锁定</string>
 <string name="pwdprompt_tip">请输入密码进行进一步操作性</string>
@@ -83,4 +83,12 @@
 <string name="pref_itemheight_defval">1</string>
 <string name="progress_load_msg">日志正在加载中请稍后... ...</string>
 <string name="progress_load_title">日志加载</string>
+<string name="filter_note_byclr_title">根据颜色过滤日志</string>
+<string name="orderby_title">请选择排序规则</string>
+<string name="widgetname_4x2">NotePad窗体部件4X2</string>
+<string name="widgetname_1x1">NotePad窗体部件1X1</string>
+<string name="widget_selnote_title">请选择日志条目</string>
+
+<string name="clrpwd_input_prompt">请输入密码以解除加密:</string>
+<string name="setpwd_title">输入密码锁定日志</string>
 </resources>

@@ -1,5 +1,36 @@
 <resources>
+    <style name="Theme" parent="android:Theme">
+    </style>
+   
    <style name="Theme.menu_dlg" parent="android:style/Theme.Dialog" >
           <item name="android:windowBackground">@drawable/custom_dialog_shape</item>
    </style>
+   
+   
+    <style name="AlertDialogCustom" parent="android:style/AlertDialog">
+
+
+    </style>
+
+   
+   <drawable name="bgclr_green">#ff00ff00</drawable>
+   <drawable name="transparent_background">#00000000</drawable>
+   <style name="Theme.AnimTransparent">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowAnimationStyle">@android:style/Animation.Translucent</item>
+        <item name="android:windowBackground">@drawable/transparent_background</item>
+        <item name="android:colorForeground">#fff</item>
+    </style>
+
+   <style name="Theme.Transparent">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@drawable/transparent_background</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:colorForeground">#fff</item>
+    </style>
+    
+    <style name="StarCheckbox">
+        <item name="android:background">@drawable/btn_star_label_background</item>
+        <item name="android:button">@drawable/btn_star</item>
+    </style>
 </resources>
