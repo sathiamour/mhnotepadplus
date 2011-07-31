@@ -16,7 +16,6 @@ public class NotePadWidgetProvider extends AppWidgetProvider {
 	   
 	   /** Action for two buttons on desktop */
 	   public final static String ACTION_SHOW_ALL_NOTE = "ShowAllNotes";
-	   public final static String ACTION_ADD_NOTE = "AddOneNote";
 	   /** Number of notes to be showed on desktop */
 	   public final static int Widget_Show_Portrait_Slot = 5;
 	   public final static int Widget_Show_Landscape_Slot = 3;

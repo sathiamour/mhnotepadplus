@@ -10,7 +10,7 @@ import android.widget.EditText;
 public class LineEditText extends EditText {   
 	   private Rect mRect;
 	   private Paint mPaint;   
-
+       float HeightFactor;
        public LineEditText(Context context, AttributeSet attrs) {
             super(context, attrs);
             
@@ -18,6 +18,7 @@ public class LineEditText extends EditText {
             mPaint = new Paint();
             mPaint.setStyle(Paint.Style.STROKE);
             mPaint.setColor(0x800000FF);
+            HeightFactor = 1.3f;
        }
         
        @Override
@@ -28,7 +29,7 @@ public class LineEditText extends EditText {
             int SingleHeight = getLineHeight();
             int WholeHeight = getHeight();
             int Toppadding = getTotalPaddingTop();
-            int Count1 = (WholeHeight-Toppadding)/SingleHeight;
+            int Count1 = (int) ((WholeHeight-Toppadding)/SingleHeight*HeightFactor);
             int Count2 = getLineCount();
             int Counter = Math.max(Count1, Count2);
             getLineBounds(0, r);
