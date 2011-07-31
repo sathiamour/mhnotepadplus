@@ -573,7 +573,7 @@ public class NotePadPlus extends Activity {
 		TmpCursor.moveToPosition(Pos);
 		// Check password
 		if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).length() > 0 )
-            showDialog(DelNote_PwdPrompt_Dlg);
+            showDialog(SetTag_PwdPrompt_Dlg);
 		else
 			SetTagHelper();
 	}
@@ -698,7 +698,7 @@ public class NotePadPlus extends Activity {
               .create();
 	}
 	
-	// 
+	// Note has been locked prompt dialog
 	private Dialog BuildNoteHasLockDialog(Context AppContext, int Title, int Msg) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(AppContext);
 		builder.setIcon(R.drawable.alert_dialog_icon);
@@ -740,13 +740,19 @@ public class NotePadPlus extends Activity {
         Builder builder = new AlertDialog.Builder(this);  
         builder.setIcon(R.drawable.ic_dialog_menu_generic);  
         builder.setTitle(Title);  
-        BaseAdapter adapter = new ListItemAdapter(new int[]{R.drawable.ic_menu_listview, R.drawable.ic_menu_gridview},Items);  
+        BaseAdapter adapter = new ListItemAdapter(new int[]{R.drawable.ic_menu_listview, R.drawable.ic_menu_gridview, R.drawable.ic_menu_gridview},Items);  
         DialogInterface.OnClickListener listener =   
             new DialogInterface.OnClickListener() {  
                 @Override  
                 public void onClick(DialogInterface dialogInterface, int which) {  
-                	        SysSettings.ViewStyle = AppSetting.VieweStyleVal[which];
-                    		RefreshListView();
+                	        if( which == 2 )
+                	        {
+                	        	Intent NextActivity = new Intent(NotePadPlus.this, NoteUserDefViewActivity.class);
+                	        	startActivity(NextActivity);
+                	        } else {
+                	           SysSettings.ViewStyle = AppSetting.VieweStyleVal[which];
+                    		   RefreshListView();
+                	        }
                 }  
             };  
         builder.setAdapter(adapter, listener);  

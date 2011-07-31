@@ -4,7 +4,7 @@ public class ProjectConst
 {
 	/** Dialog Identifier */
 	public static final int Check_NoteTitle_Dlg = 0;
-	public static final int Check_NotifyDate_Dlg = Check_NoteTitle_Dlg+1;
+	public static final int Set_NotifyDate_Dlg = Check_NoteTitle_Dlg+1;
 	
 	/** String const */
 	public static final String Yes = "Y";

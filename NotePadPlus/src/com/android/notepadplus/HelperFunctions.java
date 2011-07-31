@@ -25,7 +25,11 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.LinearGradient;
 import android.graphics.Paint;
+import android.graphics.Shader;
+import android.graphics.drawable.BitmapDrawable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -237,6 +241,19 @@ public class HelperFunctions{
         return Bg;
 	}
 	
+	public static BitmapDrawable CreateTitleBarBg(int Width, int Height, int StartClr, int EndClr){
+		Shader mShader = new LinearGradient(0, 0, Width, Height, new int[] {StartClr, EndClr}, null, Shader.TileMode.MIRROR);
+	    Bitmap Bg = Bitmap.createBitmap(Width, Height, Bitmap.Config.ARGB_8888);
+	    Canvas canvas = new Canvas(Bg);
+		Paint p = new Paint();
+        //p.setColor(Color.RED);
+        p.setShader(mShader);
+        canvas.drawPaint(p);
+       
+ 	    BitmapDrawable bd= new BitmapDrawable(Bg); 
+        return bd;
+	    
+	}
 	// Read note
 	public static String ReadTextFile(Context context, String path){
 		FileInputStream fileInStream = null;

@@ -22,12 +22,12 @@ public class NoteDbAdapter {
 			+ "notify_time text not null, use_notifytime text not null, "
 			+ "tagimg_id integer not null, bgclr integer not null, "
 			+ "ringmusic text not null,notifydura integer not null, "
-			+ "notifymethod integer not null, notify_ringtime text not null, "
+			+ "notifymethod integer not null, "
 			+ "pwd text, rank integer not null, widgetid integer not null)";
     // Database name & table name & database version
 	private static final String DATABASE_NAME = "database";
 	private static final String DATABASE_TABLE = "diary";
-	private static final int DATABASE_VERSION = 19;
+	private static final int DATABASE_VERSION = 20;
 	// Order by options
 	private static String OrderBy;
 	public static final String OrderByCreatedTime = "_id desc";
@@ -91,7 +91,6 @@ public class NoteDbAdapter {
 		InitialValues.put(OneNote.KEY_RINGMUSIC, Note.RingMusic);
 		InitialValues.put(OneNote.KEY_NOTIFYDURA, Note.NotifyDura);
 		InitialValues.put(OneNote.KEY_NOTIFYMETHOD, Note.NotifyMethod);
-		InitialValues.put(OneNote.KEY_NOTIFY_RINGTIME, HelperFunctions.Calendar2String(Note.NotifyTime));
 		InitialValues.put(OneNote.KEY_PWD, ProjectConst.EmptyStr);
 		InitialValues.put(OneNote.KEY_RANK, ProjectConst.Zero);
 		InitialValues.put(OneNote.KEY_WIDGETID, ProjectConst.Zero);
@@ -134,7 +133,7 @@ public class NoteDbAdapter {
 				                        OneNote.KEY_CREATED, 
 				                        OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME,
 				                        OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, OneNote.KEY_RINGMUSIC,
-				                        OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD, OneNote.KEY_NOTIFY_RINGTIME,
+				                        OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD,
 				                        OneNote.KEY_PWD},
 				                        Condition, null, null, null, UserOrderBy);
 	}
@@ -153,7 +152,7 @@ public class NoteDbAdapter {
 				                         new String[] { OneNote.KEY_ROWID, OneNote.KEY_TITLE, OneNote.KEY_PATH, 
                                                         OneNote.KEY_CREATED,
                                                         OneNote.KEY_NOTIFYTIME, OneNote.KEY_USE_NOTIFYTIME,
-                                                        OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR, OneNote.KEY_NOTIFY_RINGTIME,
+                                                        OneNote.KEY_TAGIMG_ID, OneNote.KEY_BGCLR,
                                                         OneNote.KEY_RINGMUSIC, OneNote.KEY_NOTIFYDURA, OneNote.KEY_NOTIFYMETHOD,
                                                         OneNote.KEY_PWD, OneNote.KEY_RANK, OneNote.KEY_WIDGETID}, 
 				                         OneNote.KEY_ROWID + "=" + RowId, null, null, null, null, null);
@@ -191,13 +190,13 @@ public class NoteDbAdapter {
 	public boolean UpdateNoteNotifyRingTime(int RowId, Calendar NotifyTime){
 
 		ContentValues Content = new ContentValues();
-		Content.put(OneNote.KEY_NOTIFY_RINGTIME, HelperFunctions.Calendar2String(NotifyTime));
+		Content.put(OneNote.KEY_NOTIFYTIME, HelperFunctions.Calendar2String(NotifyTime));
 		return mDb.update(DATABASE_TABLE, Content, OneNote.KEY_ROWID + "=" + RowId, null) > 0;
 	}
 	
 	public boolean StopNoteNotify(int RowId){
 		ContentValues Content = new ContentValues();
-		Content.put(OneNote.KEY_NOTIFY_RINGTIME, OneNote.InvalidateNotifyTime);
+		Content.put(OneNote.KEY_USE_NOTIFYTIME, ProjectConst.No);
 		
 		return mDb.update(DATABASE_TABLE, Content, OneNote.KEY_ROWID + "=" + RowId, null) > 0;
 	}

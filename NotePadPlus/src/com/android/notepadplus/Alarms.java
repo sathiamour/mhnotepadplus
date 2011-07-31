@@ -71,20 +71,20 @@ public class Alarms
     	NoteDbAdapter NotesDb = new NoteDbAdapter(ActivityContext);
         NotesDb.open();
         Cursor Note = NotesDb.GetOneNote(NoteRowId);
-        String NotifyRingTime = Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_NOTIFY_RINGTIME));
+        String NotifyRingTime = Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_NOTIFYTIME));
+        String Flag = Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_USE_NOTIFYTIME));
         int NotifyDuraIdx = Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_NOTIFYDURA));
+        // If not repeat, stop it
         if( !OneNote.IsRepeat(NotifyDuraIdx) )
-    	    NotesDb.StopNoteNotify(NoteRowId);   // If not repeat, stop it
-        else {
-        	// If it has been stopped, do not turn it on, else set next time
-        	if( !NotifyRingTime.equals(OneNote.InvalidateNotifyTime) ) {
-        		Calendar Time = HelperFunctions.String2Calenar(NotifyRingTime);
-        		Time.add(Calendar.MINUTE, OneNote.GetNotifyDura(NotifyDuraIdx));
-    	        NotesDb.UpdateNoteNotifyRingTime(RowId, Time);
-    	        Log.d("log","Alarms: Next notify time is "+HelperFunctions.Calendar2String(Time));
-        	}
+    	    NotesDb.StopNoteNotify(NoteRowId);   
+        else if( Flag.equals(ProjectConst.Yes) ) {    	
+        	     // If it has been stopped, do not turn it on, else set next time
+        		 Calendar Time = HelperFunctions.String2Calenar(NotifyRingTime);
+        		 Time.add(Calendar.MINUTE, OneNote.GetNotifyDura(NotifyDuraIdx));
+    	         NotesDb.UpdateNoteNotifyRingTime(RowId, Time);
+    	         Log.d("log","Alarms: Next notify time is "+HelperFunctions.Calendar2String(Time));
         }
-        
+                
     	NotesDb.close();
     }
     
@@ -133,10 +133,10 @@ public class Alarms
     	NoteDbAdapter NotesDb = new NoteDbAdapter(ActivityContext);
 		NotesDb.open();
 		
-		// use_notifytime = Y && notify_ringtime != OneNote.InvalidateNotifyTime
-		// if notify_ringtime = OneNote.InvalidateNotifyTime, means the note does not need notify
-		String Condition = OneNote.KEY_USE_NOTIFYTIME + "='" + ProjectConst.Yes + "' and " + OneNote.KEY_NOTIFY_RINGTIME + "!='" + OneNote.InvalidateNotifyTime+"'";
-	    Cursor NotesCursor = NotesDb.GetNotesByConditionByOrder(Condition, OneNote.KEY_NOTIFY_RINGTIME);
+		// use_notifytime = Y 
+		// if use_notifytime = N , means the note does not need notify
+		String Condition = OneNote.KEY_USE_NOTIFYTIME + "='" + ProjectConst.Yes + "'";
+	    Cursor NotesCursor = NotesDb.GetNotesByConditionByOrder(Condition, OneNote.KEY_NOTIFYTIME);
 	    int Count = NotesCursor.getCount();
 	    Calendar Now = Calendar.getInstance();
 	    Notes.clear();
@@ -151,7 +151,7 @@ public class Alarms
 	    for( int i = 0; i < Count; ++i )
 	    {
 	    	 NotesCursor.moveToPosition(i);
-	         Calendar NotifyTime = HelperFunctions.String2Calenar(NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_NOTIFY_RINGTIME)));
+	         Calendar NotifyTime = HelperFunctions.String2Calenar(NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_NOTIFYTIME)));
 	         int TmpRowId = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_ROWID));
 	         NotifyTime.set(Calendar.SECOND, 0);
 	         NotifyTime.set(Calendar.MILLISECOND, 0);

@@ -22,7 +22,6 @@ public class OneNote {
 	public static final String KEY_NOTIFYDURA = "notifydura";
 	public static final String KEY_NOTIFYMETHOD = "notifymethod";
 	public static final String KEY_RINGMUSIC = "ringmusic";
-	public static final String KEY_NOTIFY_RINGTIME = "notify_ringtime";
 	public static final String KEY_PWD = "pwd";
 	public static final String KEY_RANK = "rank";
 	public static final String KEY_WIDGETID = "widgetid";
@@ -38,10 +37,9 @@ public class OneNote {
 	
 	public static final String[] RingTypeStr = {
         "只提醒一次","每5分钟提醒一次",
-        "每10分钟提醒一次","每15分钟提醒一次",
-        "每20分钟提醒一次","每25分钟提醒一次",
-        "每30分钟提醒一次"};
-    public static final int[] NotifyDuraTime = {0,5,10,15,20,25,30};
+        "每10分钟提醒一次", "每20分钟提醒一次", "每30分钟提醒一次",
+        "每天提醒一次", "每周提醒一次"};
+    public static final int[] NotifyDuraTime = {0,5,10,20,30,1440,};
     private static int NotifyDuraOnce = 0;
     public static final String[] NotifyMethodTypeStr = {
 	    "消息栏提醒", "振动和消息栏提醒", "响铃和消息栏提醒", "振动、响铃和消息栏提醒"
@@ -57,7 +55,6 @@ public class OneNote {
 	public String NoteFilePath;
 	public Calendar NotifyTime;
 	public String Use_NotifyTime;
-	public String DelNoteExp;
 	public String RingMusic;
 	public String Password;
 	public int NoteRowId;
@@ -72,7 +69,8 @@ public class OneNote {
 		   
 		   NotifyTime = Calendar.getInstance();
 		   Use_NotifyTime = ProjectConst.No;
-		   DelNoteExp = ProjectConst.No;
+		   NoteBody = ProjectConst.EmptyStr;
+		   NoteTitle = ProjectConst.EmptyStr;
 		   RingMusic = ProjectConst.EmptyStr;
 		   NotifyDura = 0;
 		   NotifyMethod = 0;
