@@ -10,7 +10,7 @@
     <string name="addnote_body">内容</string>
 <string name="nonote_tip">您还没有创建任何日志！</string>
 <string name="confirm">确定</string>
-<string name="notetitle_empty_tip">日志的标题为空，请输入在标题框输入！</string>
+<string name="notetitle_empty_tip">日志的标题为空，请输入！</string>
 <string name="notesave_tip">日志已经被保存！</string>
 <string name="notenotsave_tip">写文件出错，日志无法保存！</string>
 <string name="notetitle_prefix">title:</string>
@@ -91,4 +91,6 @@
 
 <string name="clrpwd_input_prompt">请输入密码以解除加密:</string>
 <string name="setpwd_title">输入密码锁定日志</string>
+<string name="shareby_title">请选择发送对象</string>
+<string name="note_hasdel_prompt">该日志已经被删除</string>
 </resources>
