@@ -9,8 +9,6 @@ import android.os.IBinder;
 import android.util.Log;
 
 public class ScreenOrientService extends Service {
-
-	public static final String ScreenOrient_Action = "com.android.notepadplus.ScreenOrient";
 	
 	/** Do change if it turns from portrait to landscape, or verse */
 	public BroadcastReceiver ScreenOrientReceiver = new BroadcastReceiver() {
@@ -20,7 +18,8 @@ public class ScreenOrientService extends Service {
 					if( AppSetting.ScreenOrient != context.getResources().getConfiguration().orientation )
 					{
 						// Log
-						Log.d("log","ScreenOrientLayout onReceive: AppSetting.ScreenOrient "+AppSetting.ScreenOrient+ " Current "+context.getResources().getConfiguration().orientation);
+						Log.d(ProjectConst.TAG,"ScreenOrientLayout onReceive: AppSetting.ScreenOrient "+AppSetting.ScreenOrient+ " Current "+context.getResources().getConfiguration().orientation);
+						// Get current screen orient
 						AppSetting.ScreenOrient = context.getResources().getConfiguration().orientation;
 						// Open note database 
 						NoteDbAdapter mDbHelper = new NoteDbAdapter(context);
@@ -41,8 +40,8 @@ public class ScreenOrientService extends Service {
 	 @Override
 	 public int onStartCommand(Intent intent, int flags, int startId) 
 	 {
+		    Log.d(ProjectConst.TAG, "ScreenOrientService onStartCommand");
 		    registerReceiver(ScreenOrientReceiver, new IntentFilter(Intent.ACTION_CONFIGURATION_CHANGED));
-		    Log.d("log","ScreenOrientService onStartCommand");
 		    return START_STICKY;
 	 }
 	 

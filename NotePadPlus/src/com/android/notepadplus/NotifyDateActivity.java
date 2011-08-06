@@ -21,7 +21,6 @@ import android.view.View.OnClickListener;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.CheckBox;
 import android.widget.DatePicker;
 import android.widget.Spinner;
 import android.widget.TimePicker;
@@ -32,12 +31,7 @@ import android.widget.AdapterView.OnItemSelectedListener;
 
 public class NotifyDateActivity extends Activity {
 	
-	/** Dialog id */
-	private static final int Date_Picker_Dlg = 1;
-	private static final int Minute_Picker_Dlg = 2;
-
 	/** Date picker controls */
-	private CheckBox WetherUseNotifyTime = null;
 	private Button Date_Picker = null;
 	private Button Minute_Picker = null;
 	private Button RingMusicSel = null;
@@ -61,7 +55,6 @@ public class NotifyDateActivity extends Activity {
         setContentView(R.layout.notifydate_picker);
  
         // Views initialzation
-        WetherUseNotifyTime = (CheckBox)findViewById(R.id.wether_use_notifytime);
         Date_Picker = (Button)findViewById(R.id.notifytime_date_picker);
         Minute_Picker = (Button)findViewById(R.id.notifytime_minute_picker);
         RingTypeSel = (Spinner)findViewById(R.id.RingType);
@@ -78,7 +71,6 @@ public class NotifyDateActivity extends Activity {
 			    NotifyDura = Parameters.getInt(OneNote.KEY_NOTIFYDURA);
 			    NotifyMethod = Parameters.getInt(OneNote.KEY_NOTIFYMETHOD);
 			    RingMusic = Parameters.getString(OneNote.KEY_RINGMUSIC);
-			    WetherUseNotifyTime.setChecked(true);
 			}
 		} 
 		
@@ -149,12 +141,12 @@ public class NotifyDateActivity extends Activity {
 		// Set time and action listener
 		Date_Picker.setOnClickListener(new OnClickListener(){
 			public void onClick(View v){
-				showDialog(Date_Picker_Dlg);
+				showDialog(ProjectConst.Date_Picker_Dlg);
 			}
 		});        
 		Minute_Picker.setOnClickListener(new OnClickListener(){
 			public void onClick(View v){
-				showDialog(Minute_Picker_Dlg);
+				showDialog(ProjectConst.Minute_Picker_Dlg);
 			}
 		});        
         
@@ -164,7 +156,8 @@ public class NotifyDateActivity extends Activity {
     public void onBackPressed(){
     	   // Set return data
    	       Bundle Result = new Bundle();
-   	       if( WetherUseNotifyTime.isChecked() )
+   	       // If the notify time is greater than now, then it is a validate time, record it
+   	       if( HelperFunctions.CmpDatePrefix2(SelectedTime, Calendar.getInstance()) > 0 )
    	       {
    	           Result.putString(OneNote.KEY_NOTIFYTIME, HelperFunctions.Calendar2String(SelectedTime));
    	           Result.putString(OneNote.KEY_RINGMUSIC, RingMusic);
@@ -174,9 +167,9 @@ public class NotifyDateActivity extends Activity {
    	       // Set return code
    	       Intent ReturnBackData = new Intent();
    	       ReturnBackData.putExtras(Result);
-   	       NotifyDateActivity.this.setResult(RESULT_OK, ReturnBackData);
+   	       setResult(RESULT_OK, ReturnBackData);
    	       // Show toast to notify user settings have been saved
-   	       Toast.makeText(NotifyDateActivity.this, getString(R.string.notifysettingsavingtip), Toast.LENGTH_SHORT).show();
+   	       Toast.makeText(this, getString(R.string.notifysettingsavingtip), Toast.LENGTH_SHORT).show();
            // Return to launching activity
    	       finish();
     }
@@ -202,7 +195,7 @@ public class NotifyDateActivity extends Activity {
     @Override
     protected Dialog onCreateDialog(int id){
         switch(id){
-             case Date_Picker_Dlg:
+             case ProjectConst.Date_Picker_Dlg:
                   return new DatePickerDialog(this, 
                 		      new OnDateSetListener() {
                                   @Override
@@ -214,7 +207,7 @@ public class NotifyDateActivity extends Activity {
     			              SelectedTime.get(Calendar.MONTH), 
     			              SelectedTime.get(Calendar.DAY_OF_MONTH));
 
-             case Minute_Picker_Dlg:
+             case ProjectConst.Minute_Picker_Dlg:
             	  return new TimePickerDialog(this, 
             			     new OnTimeSetListener() {
                                  @Override

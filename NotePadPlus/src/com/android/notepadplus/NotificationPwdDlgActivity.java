@@ -14,9 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 
 public class NotificationPwdDlgActivity extends Activity {
-    
-	/** Dialog id */
-	private static final int OrignalPwdErr_Dlg = 1;
 	// Row id
 	private int NoteRowId = 0;
 	
@@ -45,7 +42,7 @@ public class NotificationPwdDlgActivity extends Activity {
 		    		Cursor Note = NotesDb.GetOneNote(NoteRowId);
 		    		if( !Pwd_Orignal.getText().toString().equals(Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_PWD))))
 		    		{
-		    			showDialog(OrignalPwdErr_Dlg);
+		    			showDialog(ProjectConst.OrignalPwdErr_Dlg);
 		    			NotesDb.close();
 		    			return;
 		    		} else {
@@ -72,7 +69,7 @@ public class NotificationPwdDlgActivity extends Activity {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
-            case OrignalPwdErr_Dlg:
+            case ProjectConst.OrignalPwdErr_Dlg:
             	 return HelperFunctions.BuildAltertDialog(NotificationPwdDlgActivity.this, R.string.pwderr_title, R.string.orignalpwd_err_prompt);
   		}
 		

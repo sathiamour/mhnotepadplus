@@ -12,9 +12,6 @@ import android.widget.EditText;
 
 public class ClearPwdDlgActivity extends Activity {
     
-	/** Dialog id */
-	private static final int OrignalPwdErr_Dlg = 1;
-	
 	// Row id
 	private int NoteRowId = 0;
 	
@@ -42,15 +39,16 @@ public class ClearPwdDlgActivity extends Activity {
 		    		Cursor Note = NotesDb.GetOneNote(NoteRowId);
 		    		if( !Pwd_Orignal.getText().toString().equals(Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_PWD))))
 		    		{
-		    			showDialog(OrignalPwdErr_Dlg);
+		    			showDialog(ProjectConst.OrignalPwdErr_Dlg);
 		    			NotesDb.close();
 		    			return;
 		    		}
-		    		// clear note's password
+		    		// Clear note's password
 			        NotesDb.SetNotePwd(NoteRowId, ProjectConst.EmptyStr);
+			        // Close database			    	
 			        NotesDb.close();
                 }	
-    			ClearPwdDlgActivity.this. setResult(RESULT_OK);
+    			setResult(RESULT_OK);
 		        finish();
     		}
        	});
@@ -67,7 +65,7 @@ public class ClearPwdDlgActivity extends Activity {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
-            case OrignalPwdErr_Dlg:
+            case ProjectConst.OrignalPwdErr_Dlg:
             	 return HelperFunctions.BuildAltertDialog(ClearPwdDlgActivity.this, R.string.pwderr_title, R.string.orignalpwd_err_prompt);
 		}
 		

@@ -1,13 +1,13 @@
 package com.android.notepadplus;
 
 
-import java.util.Calendar;
 import java.util.UUID;
 import com.android.notepadplus.R;
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.View.OnClickListener;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,25 +22,14 @@ import android.app.Dialog;
 
 public class AddNoteActivity extends Activity {
 	
-	/** Action id for activity redirection */
-	public static final int ACTIVITY_SET_ENDDATE = 0;
-	public static final int ACTIVITY_SET_NOTIFYTIME = 1;
-	public static final int ACTIVITY_SET_TAGCLR = 2;
-	public static final int ACTIVITY_SET_PWD = 3;
-
 	/** Control */
 	private EditText NoteTitleCtrl = null;
 	private EditText NoteBodyCtrl = null;
 	private TextView NotifyTimeLabel = null;
 	private Button   SelectTagClrBtn = null;
+	private LinearLayout AddPanel;
 	
-	// Menu id
-	public static final int ITEM0 = Menu.FIRST;
-	public static final int ITEM1 = Menu.FIRST + 1;
-	public static final int ITEM2 = Menu.FIRST + 2;
-	public static final int ITEM3 = Menu.FIRST + 3;
-	
-	
+
 	/** Database */
 	private NoteDbAdapter NotesDb = null;
 	
@@ -66,7 +55,7 @@ public class AddNoteActivity extends Activity {
 		SelectTagClrBtn = (Button)findViewById(R.id.selnoteclr);
 		NoteBodyCtrl = (EditText)findViewById(R.id.add_body_content);
 		NotifyTimeLabel = (TextView)findViewById(R.id.notifytime_text);
-		LinearLayout AddPanel = (LinearLayout)findViewById(R.id.addnote_panel);
+		AddPanel = (LinearLayout)findViewById(R.id.addnote_panel);
 		
 		// Get screen resolution
 		DisplayMetrics ScreenMetrics = new DisplayMetrics();
@@ -75,15 +64,42 @@ public class AddNoteActivity extends Activity {
 		ScreenWidth = ScreenMetrics.widthPixels;
 		
 		// Randomly select color
-    	SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.TagImgIdx], PorterDuff.Mode.MULTIPLY);
-    	AddPanel.setBackgroundDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight, NotePadPlus.ItemBgClr[AddOneNote.ItemBgIdx], NotePadPlus.TagClr[AddOneNote.TagImgIdx])); 
+    	SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
+    	AddPanel.setBackgroundDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx])); 
 
+		// Set text changed listener
+		NoteTitleCtrl.addTextChangedListener(new TextWatcher(){  
+	        @Override  
+	        public void beforeTextChanged(CharSequence s, int start, int count, int after){}  
+	  
+	        @Override  
+	        public void onTextChanged(CharSequence s, int start, int before, int count) {  
+	            AddOneNote.NoteTitle = s.toString();
+	        }
+
+			@Override
+			public void afterTextChanged(Editable arg0) {}  
+	    });
+		
+    	NoteBodyCtrl.addTextChangedListener(new TextWatcher(){  	  
+	        @Override  
+	        public void beforeTextChanged(CharSequence s, int start, int count, int after){}  
+	  
+	        @Override  
+	        public void onTextChanged(CharSequence s, int start, int before, int count) {  
+	        	AddOneNote.NoteBody = s.toString();
+	        }
+
+			@Override
+			public void afterTextChanged(Editable arg0) {}     
+	    });
+    	
     	// Set tag color
     	SelectTagClrBtn.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
 		    	Intent intent = new Intent();
 				intent.setClass(AddNoteActivity.this, SetTagClrActivity.class);
-				startActivityForResult(intent, ACTIVITY_SET_TAGCLR);				
+				startActivityForResult(intent, ProjectConst.ACTIVITY_SET_TAGCLR);				
     		}
     	});
 
@@ -111,17 +127,6 @@ public class AddNoteActivity extends Activity {
    		    showDialog(ProjectConst.Check_NoteTitle_Dlg);
    		    return;
    	    }
-        // Check notify date
-   	    Calendar Now = Calendar.getInstance();
-   	    if( AddOneNote.Use_NotifyTime.equals(ProjectConst.Yes) )
-   	    {
-   		    // If the notify date is expired, prompt to user
-   		    if( HelperFunctions.CmpDatePrefix(AddOneNote.NotifyTime, Now)<0 )
-   		    {
-   			    showDialog(ProjectConst.Set_NotifyDate_Dlg);
-   			    return;
-   		    }
-   	    }
    	 
    	    // Save it to file
    	    // Get a random file name
@@ -135,7 +140,12 @@ public class AddNoteActivity extends Activity {
    	    // Refresh widget note list
    	    HelperFunctions.RefreshWidgetNoteList(AddNoteActivity.this, NotesDb.GetAllNotes());
    	    // Return to main activity
-   	    setResult(RESULT_OK);
+        // Set return code
+	    Intent ReturnBackData = new Intent();
+	    ReturnBackData.putExtra(OneNote.KEY_TITLE, AddOneNote.NoteTitle);
+	    ReturnBackData.putExtra(OneNote.KEY_ROWID, AddOneNote.NoteRowId);
+	    ReturnBackData.putExtra(OneNote.KEY_DRAWABLE_ID, AddOneNote.DrawableResIdx);
+	    setResult(RESULT_OK, ReturnBackData);
    	    finish(); 
 	}
 	 
@@ -154,6 +164,9 @@ public class AddNoteActivity extends Activity {
 			    return HelperFunctions.BuildAltertDialog(AddNoteActivity.this, R.string.prompt_title, R.string.notetitle_empty_tip);
 		   case ProjectConst.Set_NotifyDate_Dlg:
 			    return HelperFunctions.BuildAltertDialog(AddNoteActivity.this, R.string.prompt_title, R.string.notifydate_expire_tip);
+		   case ProjectConst.ShareBy_Dlg:
+			    return HelperFunctions.BuildShareByDlg(this, R.string.shareby_title, AddOneNote.NoteTitle, AddOneNote.NoteBody);
+
 		}
 		return null;
 	}
@@ -173,16 +186,16 @@ public class AddNoteActivity extends Activity {
         // Pass it to next activity 
 		intent.putExtras(Parameters);
 		// Go to next activity(set note's notify time activity)
-		startActivityForResult(intent, ACTIVITY_SET_NOTIFYTIME);		
+		startActivityForResult(intent, ProjectConst.ACTIVITY_SET_NOTIFYTIME);		
 	}
 	
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Must create one menu
-		menu.add(Menu.NONE, ITEM0, 1, "放弃").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-		menu.add(Menu.NONE, ITEM1, 2, "提醒").setIcon(R.drawable.ic_menu_reminder);
-		menu.add(Menu.NONE, ITEM2, 3, "锁定").setIcon(R.drawable.ic_menu_lock);
-		menu.add(Menu.NONE, ITEM3, 4, "分享").setIcon(android.R.drawable.ic_menu_share);
+		menu.add(Menu.NONE, ProjectConst.ITEM0, 1, "放弃").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		menu.add(Menu.NONE, ProjectConst.ITEM1, 2, "提醒").setIcon(R.drawable.ic_menu_reminder);
+		menu.add(Menu.NONE, ProjectConst.ITEM2, 3, "锁定").setIcon(R.drawable.ic_menu_lock);
+		menu.add(Menu.NONE, ProjectConst.ITEM3, 4, "分享").setIcon(android.R.drawable.ic_menu_share);
 		//menu.add(Menu.NONE, ITEM1, 2, "图片").setIcon(android.R.drawable.ic_menu_gallery);
 		//menu.add(Menu.NONE, ITEM2, 3, "录音").setIcon(android.R.drawable.ic_menu_mylocation);
         return true;
@@ -193,26 +206,30 @@ public class AddNoteActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {  
            switch(item.getItemId()) 
            {  
-              case ITEM0:
+              case ProjectConst.ITEM0:
             	   setResult(RESULT_CANCELED);
 	               finish();
 	               break;
-              case ITEM1:
+              case ProjectConst.ITEM1:
             	   StartNotifyActivity();
             	   break;
-              case ITEM2:
+              case ProjectConst.ITEM2:
             	   Intent PwdDlgIntent = new Intent(this, PwdDlgActivity.class);
- 			       startActivityForResult(PwdDlgIntent, ACTIVITY_SET_PWD);
+ 			       startActivityForResult(PwdDlgIntent, ProjectConst.ACTIVITY_SET_PWD);
+            	   break;
+              case ProjectConst.ITEM3:
+           	       showDialog(ProjectConst.ShareBy_Dlg);
             	   break;
             
            }
            return false;
 	}
 	
+ 
 	// Handler return code
 	@Override 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if( requestCode == ACTIVITY_SET_NOTIFYTIME ) {
+        if( requestCode == ProjectConst.ACTIVITY_SET_NOTIFYTIME ) {
 	    	if( resultCode == RESULT_OK ) {
 	    		Bundle Result = data.getExtras();
 	    		if( Result.isEmpty() )
@@ -228,12 +245,12 @@ public class AddNoteActivity extends Activity {
 	    		    NotifyTimeLabel.setText(HelperFunctions.FormatCalendar2ReadableStr(AddOneNote.NotifyTime));
 	    		}
 	    	}
-	    } else if ( requestCode == ACTIVITY_SET_TAGCLR && resultCode == RESULT_OK) {
+	    } else if ( requestCode == ProjectConst.ACTIVITY_SET_TAGCLR && resultCode == RESULT_OK) {
 	    	    Bundle SelIdxData = data.getExtras();
-	    	    AddOneNote.TagImgIdx = AddOneNote.ItemBgIdx = SelIdxData.getInt(OneNote.KEY_TAGIMG_ID);
-	    	    SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.TagImgIdx], PorterDuff.Mode.MULTIPLY);
-	    	    NoteBodyCtrl.getBackground().setColorFilter(NotePadPlus.ItemBgClr[AddOneNote.ItemBgIdx], PorterDuff.Mode.MULTIPLY);
-	    } else if( requestCode == ACTIVITY_SET_PWD && resultCode == RESULT_OK )
+	    	    AddOneNote.DrawableResIdx = SelIdxData.getInt(OneNote.KEY_DRAWABLE_ID);
+	    	    SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
+	    	    AddPanel.setBackgroundDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx]));
+	    } else if( requestCode == ProjectConst.ACTIVITY_SET_PWD && resultCode == RESULT_OK )
 	    	    AddOneNote.Password = data.getStringExtra(OneNote.KEY_PWD); 
 	}
 }

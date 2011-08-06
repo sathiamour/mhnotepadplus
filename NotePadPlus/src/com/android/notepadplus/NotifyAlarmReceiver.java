@@ -22,7 +22,7 @@ public class NotifyAlarmReceiver extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent arg1) {
 		Bundle Parameters = arg1.getExtras();
-		if( Alarms.ALARM_KILL_ACTION.equals(arg1.getAction()) ) 
+		if( ProjectConst.ALARM_KILL_ACTION.equals(arg1.getAction()) ) 
 			return;
 		
 		if( Parameters != null )
@@ -41,7 +41,7 @@ public class NotifyAlarmReceiver extends BroadcastReceiver {
 	        
 	        // Play the alarm alert and vibrate the device.
 	        Log.d("log","NotifyAlarmReceiver: Play notify ring of Note NO. "+NoteRowId);
-	        Intent PlayAlarm = new Intent(Alarms.ALARM_NOTIFY_RING);
+	        Intent PlayAlarm = new Intent(ProjectConst.ALARM_NOTIFY_RING);
 	        PlayAlarm.putExtras(Parameters);
 	        context.startService(PlayAlarm);
 	        
@@ -87,7 +87,7 @@ public class NotifyAlarmReceiver extends BroadcastReceiver {
             ActivityIntent = new Intent(context, NotificationPwdDlgActivity.class);
 		else ActivityIntent = new Intent(context, EditNoteActivity.class);
 		ActivityIntent.putExtra(OneNote.KEY_ROWID, NoteRowId);
-		ActivityIntent.putExtra(EditNoteActivity.KEY_SOURCE, Alarms.ALARM_ALERT_ACTION);
+		ActivityIntent.putExtra(EditNoteActivity.KEY_SOURCE, ProjectConst.ALARM_ALERT_ACTION);
 		NotesDb.close();
 		// Show notification
 		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, ActivityIntent, 0);

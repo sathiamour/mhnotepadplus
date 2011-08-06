@@ -13,16 +13,9 @@ import android.widget.Button;
 import android.widget.EditText;
 
 public class ChgPwdDlgActivity extends Activity {
-    
-	/** Dialog id */
-	private static final int PwdErr_Dlg = 1;
-	private static final int OrignalPwdErr_Dlg = PwdErr_Dlg+1;
-	private static final int PwdNull_Dlg = OrignalPwdErr_Dlg+1;
-	
-	// Row id
+    // Row id
 	private int NoteRowId = 0;
-	
-	
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,13 +38,13 @@ public class ChgPwdDlgActivity extends Activity {
 		        // Empty check
 		        if( Pwd_First.getText().toString().length() == 0 )
 		        {
-		        	showDialog(PwdNull_Dlg);
+		        	showDialog(ProjectConst.PwdEmpty_Prompt_Dlg);
 		        	return;
 		        }
 
 		        // Is same ?
 		        if( !Pwd_First.getText().toString().equals(Pwd_Second.getText().toString())) {
-			        showDialog(PwdErr_Dlg);
+			        showDialog(ProjectConst.PwdErr_Dlg);
 			        return;
 		        } else if (NoteRowId != 0 ) {
 		        	NoteDbAdapter NotesDb = new NoteDbAdapter(ChgPwdDlgActivity.this);
@@ -60,7 +53,7 @@ public class ChgPwdDlgActivity extends Activity {
 		    		Cursor Note = NotesDb.GetOneNote(NoteRowId);
 		    		if( !Pwd_Orignal.getText().toString().equals(Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_PWD))))
 		    		{
-		    			showDialog(OrignalPwdErr_Dlg);
+		    			showDialog(ProjectConst.OrignalPwdErr_Dlg);
 		    			NotesDb.close();
 		    			return;
 		    		}
@@ -84,11 +77,11 @@ public class ChgPwdDlgActivity extends Activity {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
-            case PwdErr_Dlg:
+            case ProjectConst.PwdErr_Dlg:
 			     return HelperFunctions.BuildAltertDialog(ChgPwdDlgActivity.this, R.string.pwderr_title, R.string.pwderr_prompt);
-            case OrignalPwdErr_Dlg:
+            case ProjectConst.OrignalPwdErr_Dlg:
             	 return HelperFunctions.BuildAltertDialog(ChgPwdDlgActivity.this, R.string.pwderr_title, R.string.orignalpwd_err_prompt);
-            case PwdNull_Dlg:
+            case ProjectConst.PwdEmpty_Prompt_Dlg:
            	     return HelperFunctions.BuildAltertDialog(ChgPwdDlgActivity.this, R.string.pwderr_title, R.string.pwdnull_prompt);
 		}
 		

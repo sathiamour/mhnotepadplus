@@ -21,7 +21,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-//import com.terry.eBook.R;
 
 public class ColorPreferencePicker extends DialogPreference {
     private int mInitialColor;

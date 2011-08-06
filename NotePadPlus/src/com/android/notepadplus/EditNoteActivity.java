@@ -2,8 +2,6 @@ package com.android.notepadplus;
 
 import java.io.File;
 import java.util.Calendar;
-import java.util.List;
-
 import com.android.notepadplus.R;
 
 
@@ -11,52 +9,28 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.NotificationManager;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View.OnClickListener;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.AbsListView.LayoutParams;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.content.pm.ResolveInfo;
 import android.database.Cursor;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.app.Dialog;
-import android.app.AlertDialog.Builder;
 
 public class EditNoteActivity extends Activity {
-	
-	// Dialog id
-	private static final int Del_Prompt_Dlg = 2;
-	private static final int NoteHasLock_Dlg = 3;
-	private static final int ShareBy_Dlg = 4;
-	/** Request code */
-	private static final int ACTIVITY_SET_NOTIFYTIME = 0;
-	private static final int ACTIVITY_SET_TAGCLR = 1;
-	
-	/**Menu id */
-	public static final int ITEM0 = Menu.FIRST;
-	public static final int ITEM1 = Menu.FIRST + 1;
-	public static final int ITEM2 = Menu.FIRST + 2;
-	public static final int ITEM3 = Menu.FIRST + 3;
-	public static final int ITEM4 = Menu.FIRST + 4;
-	public static final int ITEM5 = Menu.FIRST + 5;
 	
 	/** Source from notepadplus or notifyalarmreceiver's notification */
 	public static final String KEY_SOURCE = "source";
@@ -67,6 +41,7 @@ public class EditNoteActivity extends Activity {
 	private TextView NoteTitleView = null;
 	private Button ChgTagClrBtn = null;
 	private ImageButton   EditBtn = null;
+	private LinearLayout EditPanel;
 	
 	// Activity parameters
 	private OneNote EditOneNote;
@@ -106,13 +81,14 @@ public class EditNoteActivity extends Activity {
 		NotifyTimeLabel = (TextView)findViewById(R.id.notifytime_text);
 		ChgTagClrBtn = (Button)findViewById(R.id.chgnoteclr);
 		EditBtn = (ImageButton)findViewById(R.id.editnotebtn);
-		LinearLayout EditPanel = (LinearLayout)findViewById(R.id.editnote_panel);
+		EditPanel = (LinearLayout)findViewById(R.id.editnote_panel);
 
 		// Get parameters from intent
 		Bundle Parameters = getIntent().getExtras();
 		if( Parameters != null ) {
+			String Source = Parameters.getString(KEY_SOURCE);
 			// It is from notification
-			if( Parameters.getString(KEY_SOURCE).equals(Alarms.ALARM_ALERT_ACTION) )
+			if( Source.equals(ProjectConst.ALARM_ALERT_ACTION) )
 			{
 				// From notify's notification
 				// Get note's row id
@@ -120,7 +96,7 @@ public class EditNoteActivity extends Activity {
 				// We are from notify alarm, so since it has been in edit note activity
 				// Stop playing music service
 				// Stop notify alarm and set next one
-	    	    Intent StopService = new Intent(Alarms.ALARM_NOTIFY_RING);
+	    	    Intent StopService = new Intent(ProjectConst.ALARM_NOTIFY_RING);
 		    	stopService(StopService);
 				Alarms.DeleteOneAlarm(this, RowId);
 				// Initialize the note with database 
@@ -132,7 +108,8 @@ public class EditNoteActivity extends Activity {
 				// Read note's content
 				if( EditOneNote.NoteFilePath != null ) 
 					EditOneNote.NoteBody = HelperFunctions.ReadTextFile(this, EditOneNote.NoteFilePath);
-			} else if( Parameters.getString(KEY_SOURCE).equals(NotePad1X1WidgetHelper.EDIT_WIDGET_ACTION) ) {
+			} else if( Source.equals(ProjectConst.WIDGET1x1_EDIT_ACTION) ||
+					   Source.equals(ProjectConst.USERDEF_EDIT_ACTION) ) {
 				// From one note widget
 				// Initialize the note with database 
 				Cursor Note = NotesDb.GetOneNote(Parameters.getInt(OneNote.KEY_ROWID));
@@ -142,6 +119,8 @@ public class EditNoteActivity extends Activity {
 				    // Read note's content
 				    if( EditOneNote.NoteFilePath != null ) 
 					    EditOneNote.NoteBody = HelperFunctions.ReadTextFile(this, EditOneNote.NoteFilePath);
+				    // if it is from user def view, to get postion index in parent layout
+				    EditOneNote.PosIdx = Parameters.getInt(OneNote.KEY_INDEX);
 				} else {
 					IsDeleted = true;
 					EditOneNote = new OneNote();
@@ -168,14 +147,46 @@ public class EditNoteActivity extends Activity {
 				NotifyTimeLabel.setText(HelperFunctions.FormatCalendar2ReadableStr(EditOneNote.NotifyTime));
 		}
 
-		EditPanel.setBackgroundDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight,  NotePadPlus.ItemBgClr[EditOneNote.ItemBgIdx], NotePadPlus.TagClr[EditOneNote.TagImgIdx]));
+		EditPanel.setBackgroundDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight,  NotePadPlus.ItemBgClr[EditOneNote.DrawableResIdx], NotePadPlus.TagClr[EditOneNote.DrawableResIdx]));
+		
+		// Set text changed listener
+		NoteTitleCtrl.addTextChangedListener(new TextWatcher(){  
+			  
+	        @Override  
+	        public void beforeTextChanged(CharSequence s, int start, int count, int after){}  
+	  
+	        @Override  
+	        public void onTextChanged(CharSequence s, int start, int before, int count) {  
+	            Log.d(ProjectConst.TAG,"[TextWatcher][onTextChanged]"+s);  
+	            EditOneNote.NoteTitle = s.toString();
+	        }
+
+			@Override
+			public void afterTextChanged(Editable arg0) {}  
+	          
+	    });
+		
+		NoteBodyCtrl.addTextChangedListener(new TextWatcher(){  
+			  
+	        @Override  
+	        public void beforeTextChanged(CharSequence s, int start, int count, int after){}  
+	  
+	        @Override  
+	        public void onTextChanged(CharSequence s, int start, int before, int count) {  
+	            EditOneNote.NoteBody = s.toString();
+	        }
+
+			@Override
+			public void afterTextChanged(Editable arg0) {}  
+	          
+	    });
 		
 		// Show tag color change activity
 		ChgTagClrBtn.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
 		    	Intent intent = new Intent();
 				intent.setClass(EditNoteActivity.this, SetTagClrActivity.class);
-				startActivityForResult(intent, ACTIVITY_SET_TAGCLR);				
+				startActivityForResult(intent, ProjectConst.ACTIVITY_SET_TAGCLR);				
     		}
     	});
 
@@ -220,13 +231,13 @@ public class EditNoteActivity extends Activity {
         	 // From Y(use notify) to N(don't use notify), User cancels alarm
     		 if( EditOneNote.Use_NotifyTime.equals(ProjectConst.No) )
     		 {
-    		     Log.d("log","EditNoteActivity: delete alarm");
+    		     Log.d(ProjectConst.TAG,"EditNoteActivity: delete alarm");
     		     Alarms.DeleteOneAlarm(EditNoteActivity.this, EditOneNote.NoteRowId);
     		 }
     		// From N(don't use notify) to Y(use notify), add one alarm
     		 if( EditOneNote.Use_NotifyTime.equals(ProjectConst.Yes) )
     		 {
-    			 Log.d("log","EditNoteActivity: add alarm");
+    			 Log.d(ProjectConst.TAG,"EditNoteActivity: add alarm");
     			 NotesDb.UpdateNoteNotifyRingTime(EditOneNote.NoteRowId, EditOneNote.NotifyTime);
         		 Alarms.AddOneAlarm(EditNoteActivity.this);
     		 }
@@ -234,7 +245,7 @@ public class EditNoteActivity extends Activity {
     		 // User changes the notify time
     		 if( EditOneNote.Use_NotifyTime.equals(ProjectConst.Yes) && HelperFunctions.CmpDatePrefix2(Pre_NotifyTime, EditOneNote.NotifyTime) != 0 )
     		 { 
-        		 Log.d("log","EditNoteActivity: update alarm");
+        		 Log.d(ProjectConst.TAG,"EditNoteActivity: update alarm");
     		     NotesDb.UpdateNoteNotifyRingTime(EditOneNote.NoteRowId, EditOneNote.NotifyTime);
                  Alarms.UpdateOneAlarm(EditNoteActivity.this, EditOneNote.NoteRowId);
     	     }
@@ -244,12 +255,16 @@ public class EditNoteActivity extends Activity {
     	 HelperFunctions.RefreshWidgetNoteList(EditNoteActivity.this, NotesDb.GetAllNotes());
     	 // Refresh 1x1 widget
     	 if( EditOneNote.WidgetId != 0 )
-    	     HelperFunctions.Refresh1x1Widget(EditNoteActivity.this, EditOneNote.WidgetId, EditOneNote.NoteTitle, EditOneNote.NoteRowId, EditOneNote.ItemBgIdx, EditOneNote.Password.length()>0);
+    	     HelperFunctions.Refresh1x1Widget(EditNoteActivity.this, EditOneNote.WidgetId, EditOneNote.NoteTitle, EditOneNote.NoteRowId, EditOneNote.DrawableResIdx, EditOneNote.Password.length()>0);
     	 // Show toast to notify user settings have been saved
  	     Toast.makeText(EditNoteActivity.this, getString(R.string.notesavingtip), Toast.LENGTH_SHORT).show();
          // Return to main activity
- 	     setResult(RESULT_OK);
-    	 finish();
+ 	     Intent ReturnBackData = new Intent();
+	     ReturnBackData.putExtra(OneNote.KEY_TITLE, EditOneNote.NoteTitle);
+	     ReturnBackData.putExtra(OneNote.KEY_INDEX, EditOneNote.PosIdx);
+	     ReturnBackData.putExtra(OneNote.KEY_DRAWABLE_ID, EditOneNote.DrawableResIdx);
+	     setResult(RESULT_OK, ReturnBackData);
+   	     finish(); 
 	}
 	 
 	/** When the activity is destroyed, close database*/
@@ -263,12 +278,12 @@ public class EditNoteActivity extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Must create one menu
-		menu.add(Menu.NONE, ITEM0, 1, "放弃").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
-		menu.add(Menu.NONE, ITEM1, 2, "提醒").setIcon(R.drawable.ic_menu_reminder).setEnabled(!IsDeleted);
-		menu.add(Menu.NONE, ITEM2, 3, "删除").setIcon(android.R.drawable.ic_menu_delete).setEnabled(!IsDeleted);
-		menu.add(Menu.NONE, ITEM3, 4, "锁定").setIcon(R.drawable.ic_menu_lock).setEnabled(!IsDeleted);
-		menu.add(Menu.NONE, ITEM4, 5, "编辑").setIcon(android.R.drawable.ic_menu_edit).setEnabled(!IsDeleted);
-		menu.add(Menu.NONE, ITEM5, 6, "分享").setIcon(android.R.drawable.ic_menu_share).setEnabled(!IsDeleted);
+		menu.add(Menu.NONE, ProjectConst.ITEM0, 1, "放弃").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
+		menu.add(Menu.NONE, ProjectConst.ITEM1, 2, "提醒").setIcon(R.drawable.ic_menu_reminder).setEnabled(!IsDeleted);
+		menu.add(Menu.NONE, ProjectConst.ITEM2, 3, "删除").setIcon(android.R.drawable.ic_menu_delete).setEnabled(!IsDeleted);
+		menu.add(Menu.NONE, ProjectConst.ITEM3, 4, "锁定").setIcon(R.drawable.ic_menu_lock).setEnabled(!IsDeleted);
+		menu.add(Menu.NONE, ProjectConst.ITEM4, 5, "编辑").setIcon(android.R.drawable.ic_menu_edit).setEnabled(!IsDeleted);
+		menu.add(Menu.NONE, ProjectConst.ITEM5, 6, "分享").setIcon(android.R.drawable.ic_menu_share).setEnabled(!IsDeleted);
         return true;
 	}
 	
@@ -277,31 +292,30 @@ public class EditNoteActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {  
            switch(item.getItemId()) 
            {  
-              case ITEM0:
+              case ProjectConst.ITEM0:
             	   setResult(RESULT_CANCELED);
 	               finish();
 	               break;
-              case ITEM1:
+              case ProjectConst.ITEM1:
             	   StartNotifyActivity();
             	   break;
-              case ITEM2:
-            	   showDialog(Del_Prompt_Dlg);
+              case ProjectConst.ITEM2:
+            	   showDialog(ProjectConst.DelNote_Prompt_Dlg);
             	   break;
-              case ITEM3:
+              case ProjectConst.ITEM3:
       			   if( EditOneNote.Password.length() == 0 )
       			   {
       			       Intent PwdDlgIntent = new Intent(this, PwdDlgActivity.class);
       			       PwdDlgIntent.putExtra(OneNote.KEY_ROWID, EditOneNote.NoteRowId);
-      			       startActivity(PwdDlgIntent);
+      			       startActivityForResult(PwdDlgIntent, ProjectConst.ACTIVITY_SET_PWD);
                    } else
-      			       showDialog(NoteHasLock_Dlg);
+      			       showDialog(ProjectConst.NoteHasLock_Dlg);
             	   break;
-              case ITEM4:
+              case ProjectConst.ITEM4:
             	   StartEditMode();
             	   break;
-              case ITEM5:
-            	   showDialog(ShareBy_Dlg);
-            	   //SendEmail("", "");
+              case ProjectConst.ITEM5:
+            	   showDialog(ProjectConst.ShareBy_Dlg);
             	   break;
            }
            return false;
@@ -314,41 +328,16 @@ public class EditNoteActivity extends Activity {
 			    return HelperFunctions.BuildAltertDialog(EditNoteActivity.this, R.string.prompt_title, R.string.notetitle_empty_tip);
 		   case ProjectConst.Set_NotifyDate_Dlg:
 			    return HelperFunctions.BuildAltertDialog(EditNoteActivity.this, R.string.prompt_title, R.string.notifydate_expire_tip);
-		   case Del_Prompt_Dlg:
+		   case ProjectConst.DelNote_Prompt_Dlg:
 				return BuildDelPromptDialog(EditNoteActivity.this, R.string.delnote_title);
-		   case NoteHasLock_Dlg:
+		   case ProjectConst.NoteHasLock_Dlg:
 		        return BuildNoteHasLockDialog(EditNoteActivity.this, R.string.note_lock_dlg_title, R.string.notehaslock_msg);
-		   case ShareBy_Dlg:
-			    return BuildShareByDlg(this, R.string.shareby_title);
+		   case ProjectConst.ShareBy_Dlg:
+			    return HelperFunctions.BuildShareByDlg(this, R.string.shareby_title, EditOneNote.NoteTitle, EditOneNote.NoteBody);
 		}
 		return null;
 	}
 	
-	private Dialog BuildShareByDlg(Context AppContext, int Title)
-	{
-        Builder builder = new AlertDialog.Builder(this);  
-        builder.setIcon(R.drawable.ic_dialog_menu_generic);  
-        builder.setTitle(Title);  
-        final BaseAdapter adapter = new ListItemAdapter();  
-        DialogInterface.OnClickListener listener =   
-            new DialogInterface.OnClickListener() {  
-                @Override  
-                public void onClick(DialogInterface dialogInterface, int which) { 
-                	ListItemAdapter Adapter = (ListItemAdapter)adapter;
-                	Intent intent = new Intent();
-                	
-                    intent.setAction(Intent.ACTION_SEND);
-                	intent.setComponent(new ComponentName(Adapter.mApps.get(which).activityInfo.packageName, Adapter.mApps.get(which).activityInfo.name));
-                    intent.putExtra(Intent.EXTRA_SUBJECT, EditOneNote.NoteTitle);
-                    intent.putExtra(Intent.EXTRA_TEXT, EditOneNote.NoteBody);
-                    intent.setType("text/plain");
-                    
-                	startActivity(intent); 
-                }  
-            };  
-        builder.setAdapter(adapter, listener);  
-        return builder.create();  
-	}
 	
 	// Go to edit mode
 	private void StartEditMode()
@@ -361,7 +350,7 @@ public class EditNoteActivity extends Activity {
 	    NoteBodyCtrl.setFocusable(true);
 	    NoteBodyCtrl.setFocusableInTouchMode(true);  
 	    NoteBodyCtrl.requestFocus();
-	    ChgTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[EditOneNote.TagImgIdx], PorterDuff.Mode.MULTIPLY);
+	    ChgTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[EditOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
 	}
 	
 	// Turn to set notify time activity
@@ -380,7 +369,7 @@ public class EditNoteActivity extends Activity {
         // Pass it to next activity 
 		intent.putExtras(Parameters);
 		// Go to next activity(set note's notify time activity)
-		startActivityForResult(intent, ACTIVITY_SET_NOTIFYTIME);	
+		startActivityForResult(intent, ProjectConst.ACTIVITY_SET_NOTIFYTIME);	
 	}
 	
 	// Build a dialog to prompt user we want to delete the assigned note
@@ -431,7 +420,7 @@ public class EditNoteActivity extends Activity {
 					public void onClick(DialogInterface dialog, int whichButton) {
 						   Intent ClrPwdDlgIntent = new Intent(EditNoteActivity.this, ClearPwdDlgActivity.class);
 						   ClrPwdDlgIntent.putExtra(OneNote.KEY_ROWID, EditOneNote.NoteRowId);
-						   startActivity(ClrPwdDlgIntent);
+						   startActivityForResult(ClrPwdDlgIntent, ProjectConst.ACTIVITY_CLR_PWD);
 					}
 				});
 
@@ -444,93 +433,36 @@ public class EditNoteActivity extends Activity {
 		return builder.create();
 	}
 	
-	
-	
 	// Handler return code
 	@Override 
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if( requestCode == ACTIVITY_SET_NOTIFYTIME ) {
-	    	if( resultCode == RESULT_OK ) {
-	    		Bundle Result = data.getExtras();
-	    		if( Result.isEmpty() )
-	    		{
-	    			EditOneNote.Use_NotifyTime = ProjectConst.No;
-	    			NotifyTimeLabel.setText(R.string.nonotifytime);
-	    		} else {
-	    			EditOneNote.Use_NotifyTime = ProjectConst.Yes;
-	    			EditOneNote.NotifyMethod = Result.getInt(OneNote.KEY_NOTIFYMETHOD);
-	    			EditOneNote.NotifyDura = Result.getInt(OneNote.KEY_NOTIFYDURA);
-	    			EditOneNote.RingMusic = Result.getString(OneNote.KEY_RINGMUSIC);
-	    			EditOneNote.NotifyTime = HelperFunctions.String2Calenar(Result.getString(OneNote.KEY_NOTIFYTIME));
-	    			EditOneNote.NotifyTime.set(Calendar.SECOND, 0);
-	    			EditOneNote.NotifyTime.set(Calendar.MILLISECOND, 0);
-	    		    NotifyTimeLabel.setText(HelperFunctions.FormatCalendar2ReadableStr(EditOneNote.NotifyTime));
-	    		}
+        if( requestCode == ProjectConst.ACTIVITY_SET_NOTIFYTIME && resultCode == RESULT_OK ) {
+	    	Bundle Result = data.getExtras();
+	    	if( Result.isEmpty() )
+	    	{
+	    		EditOneNote.Use_NotifyTime = ProjectConst.No;
+	    		NotifyTimeLabel.setText(ProjectConst.EmptyStr);
+	    	} else {
+	    		EditOneNote.Use_NotifyTime = ProjectConst.Yes;
+	    		EditOneNote.NotifyMethod = Result.getInt(OneNote.KEY_NOTIFYMETHOD);
+	    		EditOneNote.NotifyDura = Result.getInt(OneNote.KEY_NOTIFYDURA);
+	    		EditOneNote.RingMusic = Result.getString(OneNote.KEY_RINGMUSIC);
+	    		EditOneNote.NotifyTime = HelperFunctions.String2Calenar(Result.getString(OneNote.KEY_NOTIFYTIME));
+	    		EditOneNote.NotifyTime.set(Calendar.SECOND, 0);
+	    		EditOneNote.NotifyTime.set(Calendar.MILLISECOND, 0);
+	    	    NotifyTimeLabel.setText(HelperFunctions.FormatCalendar2ReadableStr(EditOneNote.NotifyTime));
 	    	}
-	    } else if ( requestCode == ACTIVITY_SET_TAGCLR ) {
-	    	if( resultCode == RESULT_OK ) {
-	    	    Bundle SelIdxData = data.getExtras();
-	    	    EditOneNote.TagImgIdx = EditOneNote.ItemBgIdx = SelIdxData.getInt(OneNote.KEY_TAGIMG_ID);
-	    	    ChgTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[EditOneNote.TagImgIdx], PorterDuff.Mode.MULTIPLY);
-	    	    NoteBodyCtrl.getBackground().setColorFilter(NotePadPlus.ItemBgClr[EditOneNote.ItemBgIdx], PorterDuff.Mode.MULTIPLY);
-	    	}
+	    } else if ( requestCode == ProjectConst.ACTIVITY_SET_TAGCLR && resultCode == RESULT_OK ) {
+	       	    Bundle SelIdxData = data.getExtras();
+	    	    EditOneNote.DrawableResIdx = SelIdxData.getInt(OneNote.KEY_DRAWABLE_ID);
+	    	    ChgTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[EditOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
+	    	    EditPanel.setBackgroundDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight,  NotePadPlus.ItemBgClr[EditOneNote.DrawableResIdx], NotePadPlus.TagClr[EditOneNote.DrawableResIdx]));
+	    } else if( requestCode == ProjectConst.ACTIVITY_SET_PWD && resultCode == RESULT_OK  ) {
+	    	    EditOneNote.Password = data.getStringExtra(OneNote.KEY_PWD);
+	    } else if( requestCode == ProjectConst.ACTIVITY_CLR_PWD && resultCode == RESULT_OK ) {
+	    	    EditOneNote.Password = ProjectConst.EmptyStr;
 	    }
 	}
 	
-	class ListItemAdapter extends BaseAdapter {  
-	      
-		  public List<ResolveInfo> mApps;
-		  ListItemAdapter(){
-				Intent IntentType = new Intent(Intent.ACTION_SEND);
-				IntentType.setType("text/plain");  
-		        mApps = getPackageManager().queryIntentActivities(IntentType, PackageManager.GET_ACTIVITIES);
-		  }
-	      @Override  
-	      public int getCount() {  
-	             return mApps.size();  
-	      }  
-	  
-	      @Override  
-	      public Object getItem(int position) {  
-	            return null;  
-	      }  
-	  
-	      @Override  
-	      public long getItemId(int position) {  
-	            return position;  
-	      }  
-	  
-	      @Override  
-	      public View getView(int position, View contentView, ViewGroup parent) {  
-	    	    LinearLayout Item = new LinearLayout(EditNoteActivity.this);
-	            AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);  
-	    	    Item.setLayoutParams(layoutParams);
-	            TextView textView = new TextView(EditNoteActivity.this);  
-
-	            ResolveInfo info  = mApps.get(position) ;
-	            String text = info.loadLabel(getPackageManager()).toString();
-	            textView.setText(text);  
-
-	            //设置字体大小  
-	            textView.setTextSize(24);  
-	            //设置水平方向上居中  
-	            textView.setGravity(android.view.Gravity.CENTER_VERTICAL);  
-	            textView.setMinHeight(60);  
-	            textView.setPadding(5, 0, 0, 0);
-	            //设置文字颜色  
-	            textView.setTextColor(Color.BLACK);  
-	            
-	            // Set app icon
-	            ImageView Tag = new ImageView(EditNoteActivity.this);
-	            Tag.setImageDrawable(info.activityInfo.loadIcon(getPackageManager()));
-	            Tag.setScaleType(ImageView.ScaleType.FIT_CENTER);
-	            Tag.setMinimumHeight(60);
-                 
-	            // Add icon & name
-	            Item.addView(Tag);
-	            Item.addView(textView);
-
-	            return Item;  
-	      }	          
-	}  
+	
 }

@@ -17,14 +17,15 @@ public class OneNote {
 	public static final String KEY_PATH = "path";
 	public static final String KEY_NOTIFYTIME = "notify_time";
 	public static final String KEY_USE_NOTIFYTIME = "use_notifytime";
-	public static final String KEY_TAGIMG_ID = "tagimg_id";
-	public static final String KEY_BGCLR = "bgclr";
+	public static final String KEY_DRAWABLE_ID = "drawableid";
 	public static final String KEY_NOTIFYDURA = "notifydura";
 	public static final String KEY_NOTIFYMETHOD = "notifymethod";
 	public static final String KEY_RINGMUSIC = "ringmusic";
 	public static final String KEY_PWD = "pwd";
 	public static final String KEY_RANK = "rank";
 	public static final String KEY_WIDGETID = "widgetid";
+	public static final String KEY_LEFTX = "leftx";
+	public static final String KEY_LEFTY = "lefty";
 	public static final String KEY_INDEX = "index";
 	
 	/** Date parameter key */
@@ -39,7 +40,7 @@ public class OneNote {
         "只提醒一次","每5分钟提醒一次",
         "每10分钟提醒一次", "每20分钟提醒一次", "每30分钟提醒一次",
         "每天提醒一次", "每周提醒一次"};
-    public static final int[] NotifyDuraTime = {0,5,10,20,30,1440,};
+    public static final int[] NotifyDuraTime = {0,5,10,20,30,1440};
     private static int NotifyDuraOnce = 0;
     public static final String[] NotifyMethodTypeStr = {
 	    "消息栏提醒", "振动和消息栏提醒", "响铃和消息栏提醒", "振动、响铃和消息栏提醒"
@@ -58,23 +59,24 @@ public class OneNote {
 	public String RingMusic;
 	public String Password;
 	public int NoteRowId;
-	public int TagImgIdx;
-	public int ItemBgIdx;
+	public int DrawableResIdx;
 	public int NotifyDura;
 	public int NotifyMethod;
 	public int WidgetId;
+	public int PosIdx;
 	
 	public OneNote(){
-		   GenerateImgIdx();
+		   GenerateDrawableIdx();
 		   
 		   NotifyTime = Calendar.getInstance();
 		   Use_NotifyTime = ProjectConst.No;
 		   NoteBody = ProjectConst.EmptyStr;
 		   NoteTitle = ProjectConst.EmptyStr;
 		   RingMusic = ProjectConst.EmptyStr;
-		   NotifyDura = 0;
-		   NotifyMethod = 0;
-		   WidgetId = 0;
+		   PosIdx = ProjectConst.NegativeOne;
+		   NotifyDura = ProjectConst.Zero;
+		   NotifyMethod = 3;
+		   WidgetId = ProjectConst.Zero;
 	}
 	
 	public OneNote(Cursor DbNote){
@@ -83,8 +85,7 @@ public class OneNote {
 		   NoteFilePath = DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_PATH));
 		   NotifyTime = HelperFunctions.String2Calenar(DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_NOTIFYTIME)));
 		   Use_NotifyTime = DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_USE_NOTIFYTIME));
-		   TagImgIdx = DbNote.getInt(DbNote.getColumnIndexOrThrow(KEY_TAGIMG_ID));
-		   ItemBgIdx = DbNote.getInt(DbNote.getColumnIndexOrThrow(KEY_BGCLR));
+		   DrawableResIdx = DbNote.getInt(DbNote.getColumnIndexOrThrow(KEY_DRAWABLE_ID));
 		   NotifyDura = DbNote.getInt(DbNote.getColumnIndexOrThrow(OneNote.KEY_NOTIFYDURA));
 		   NotifyMethod = DbNote.getInt(DbNote.getColumnIndexOrThrow(KEY_NOTIFYMETHOD));
 		   RingMusic = DbNote.getString(DbNote.getColumnIndexOrThrow(KEY_RINGMUSIC));
@@ -99,8 +100,7 @@ public class OneNote {
 		   NoteRowId = Parameters.getInt(OneNote.KEY_ROWID);
 		   NotifyTime = HelperFunctions.String2Calenar(Parameters.getString(OneNote.KEY_NOTIFYTIME));
 		   Use_NotifyTime = Parameters.getString(OneNote.KEY_USE_NOTIFYTIME);
-		   TagImgIdx = Parameters.getInt(OneNote.KEY_TAGIMG_ID); 
-		   ItemBgIdx = Parameters.getInt(OneNote.KEY_BGCLR); 
+		   DrawableResIdx = Parameters.getInt(OneNote.KEY_DRAWABLE_ID);  
 		   NotifyDura = Parameters.getInt(OneNote.KEY_NOTIFYDURA);
 		   NotifyMethod = Parameters.getInt(OneNote.KEY_NOTIFYMETHOD);
 		   RingMusic = Parameters.getString(OneNote.KEY_RINGMUSIC);
@@ -108,10 +108,9 @@ public class OneNote {
 		   WidgetId = Parameters.getInt(OneNote.KEY_WIDGETID);
 	}
 	
-	public void GenerateImgIdx(){
+	public void GenerateDrawableIdx(){
 		   Random Rand = new Random();
- 	       TagImgIdx = Rand.nextInt(NotePadPlus.ClrNum);
- 	       ItemBgIdx = TagImgIdx;
+		   DrawableResIdx = Rand.nextInt(NotePadPlus.ClrNum);
 	}
 	
 	public static boolean IsVibrate(int MethodIdx){

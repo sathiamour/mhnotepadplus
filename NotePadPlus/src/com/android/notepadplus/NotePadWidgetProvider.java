@@ -9,13 +9,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
-import android.util.Log;
 import android.widget.RemoteViews;
 
 public class NotePadWidgetProvider extends AppWidgetProvider {
-	   
-	   /** Action for two buttons on desktop */
-	   public final static String ACTION_SHOW_ALL_NOTE = "ShowAllNotes";
 	   /** Number of notes to be showed on desktop */
 	   public final static int Widget_Show_Portrait_Slot = 5;
 	   public final static int Widget_Show_Landscape_Slot = 3;
@@ -27,8 +23,7 @@ public class NotePadWidgetProvider extends AppWidgetProvider {
        @Override
        public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
        {
-    	      Log.d("log","NotePadWidgetProvider onUpdate, size is "+appWidgetIds.length+ " the first one is "+appWidgetIds[0]);
-    	      // Open note database 
+              // Open note database 
    		      mDbHelper = new NoteDbAdapter(context);
 		      mDbHelper.open();       
 		      
@@ -59,7 +54,7 @@ public class NotePadWidgetProvider extends AppWidgetProvider {
 		      
               // Add pending intent to main activity
 		      Intent showAllNotes = new Intent(context, NotePadPlus.class);
-		      showAllNotes.setAction(ACTION_SHOW_ALL_NOTE);
+		      showAllNotes.setAction(ProjectConst.WIDGET4x2_SHOWALL_ACTION);
 			  PendingIntent showAllNotesPendingIntent = PendingIntent.getActivity(context, 0, showAllNotes, 0);
 			  remoteViews.setOnClickPendingIntent(R.id.widgetboard, showAllNotesPendingIntent);
 			  			

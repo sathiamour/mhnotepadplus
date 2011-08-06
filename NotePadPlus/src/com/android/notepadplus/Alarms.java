@@ -21,17 +21,14 @@ public class Alarms
 	private static String RingMusic = ProjectConst.EmptyStr;
 	private static int NotifyMethodIdx = ProjectConst.NegativeOne;
 	
-    // Action
-	public static String ALARM_ALERT_ACTION = "com.android.notepadplus.NotifyALARM_ALERT";
-	public static String ALARM_KILL_ACTION = "com.android.notepadplus.NotifyALARM_KILL";
-	public static String ALARM_NOTIFY_RING = "com.android.notepadplus.NotifyRing";
+
     // Notes with same notify time
 	public static Vector<Integer> Notes = new Vector<Integer>(); 
 	
     public static void AddOneAlarm(Context ActivityContext){
  
     	 int CurRowId = CalculateNextAlarm(ActivityContext);
-    	 Log.d("log", "Alarms: AddOneAlarm, CurRowId "+CurRowId+" RowId  "+RowId);
+    	 Log.d(ProjectConst.TAG, "Alarms: AddOneAlarm, CurRowId "+CurRowId+" RowId  "+RowId);
     	 // We find one and current one is not the previous one
     	 if( CurRowId != RowId && CurRowId != ProjectConst.NegativeOne ) 
     	 {
@@ -101,7 +98,7 @@ public class Alarms
     
     private static void EnableAlert(Context ActivityContext, long AlertTime)
     {
-    	 Intent AlertIntent = new Intent(ALARM_ALERT_ACTION);
+    	 Intent AlertIntent = new Intent(ProjectConst.ALARM_ALERT_ACTION);
     	 AlertIntent.putExtra(OneNote.KEY_ROWID, RowId);
     	 AlertIntent.putExtra(OneNote.KEY_TITLE, NoteTitle);
     	 AlertIntent.putExtra(OneNote.KEY_RINGMUSIC, RingMusic);
@@ -116,7 +113,7 @@ public class Alarms
     }
     
     private static void DisableAlter(Context ActivityContext){
-    	 Intent AlertIntent = new Intent(ALARM_ALERT_ACTION);
+    	 Intent AlertIntent = new Intent(ProjectConst.ALARM_ALERT_ACTION);
     	 AlertIntent.putExtra(OneNote.KEY_ROWID, RowId);
     	 AlertIntent.putExtra(OneNote.KEY_TITLE, NoteTitle);
     	 AlertIntent.putExtra(OneNote.KEY_RINGMUSIC, RingMusic);

@@ -20,11 +20,16 @@ class AppSetting
     public static final String Key_PrefOrderBy = "OrderBy_Key";
     public static final String Key_PrefBgClr = "BgClr_Key";
     public static final String Key_PrefItemHeight="ItemHeight_Key";
-	// Value for keys
+	
+    // Value for keys
+    // View style
 	public static final String ViewStyle_List = "List";
 	public static final String ViewStyle_Grid = "Grid";
-	public static final String[] VieweStyleVal = {ViewStyle_List, ViewStyle_Grid};
+	public static final String ViewStyle_UserDef = "UserDef";
+	public static final String[] VieweStyleVal = {ViewStyle_List, ViewStyle_Grid, ViewStyle_UserDef};
+	// Font size( dip )
 	public static final int[] FontSizeArray = {15,25,35};
+	// Item height factor( factor*font size = item height)
 	public static final float[] ItemHeightFactor={1.0f, 1.4f, 1.8f};
 	// Order by
 	public static final String OrderByCreatedTime = "0";
@@ -87,6 +92,11 @@ class AppSetting
 	    return ViewStyle.compareTo(ViewStyle_List)==0;
 	}
 
+	public boolean IsGridView()
+	{
+		return ViewStyle.compareTo(ViewStyle_Grid)==0;
+	}
+	
 	public boolean IsFullScreen()
 	{
 		return IsFullScreen;		
@@ -109,11 +119,11 @@ class AppSetting
 	public static void AppInitJobs(Context ActivityContext)
 	{
 		// Log
-		Log.d("log", "AppInitJobs: Start screen orient service");
+		Log.d(ProjectConst.TAG, "AppInitJobs: Start screen orient service");
     	// Check screen oriention
     	AppSetting.ScreenOrient = HelperFunctions.ScreenOrient(ActivityContext);
     	// Start screen orient service
-	    Intent ScreenOrient = new Intent(ScreenOrientService.ScreenOrient_Action);
+	    Intent ScreenOrient = new Intent(ProjectConst.SERVICE_SCREENORIENT_ACTION);
 	    ActivityContext.startService(ScreenOrient);
 	}
 }
