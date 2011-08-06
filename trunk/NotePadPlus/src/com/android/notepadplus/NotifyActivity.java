@@ -28,7 +28,7 @@ public class NotifyActivity extends Activity {
 			DismissBtn.setOnClickListener(new OnClickListener(){
     		     public void onClick(View v){
     		    	    // Stop playing music service
-    		    	    Intent StopService = new Intent(Alarms.ALARM_ALERT_ACTION);
+    		    	    Intent StopService = new Intent(ProjectConst.ALARM_ALERT_ACTION);
     			    	stopService(StopService);
     			    	
     			    	Alarms.DisableDbNoteAlarm(NotifyActivity.this, RowId);

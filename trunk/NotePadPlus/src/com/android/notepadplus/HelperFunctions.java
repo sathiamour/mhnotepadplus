@@ -16,6 +16,7 @@ import android.content.Context;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.PendingIntent;
+import android.app.AlertDialog.Builder;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
 import android.content.DialogInterface;
@@ -25,7 +26,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Shader;
@@ -33,6 +33,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
+import android.widget.BaseAdapter;
 import android.widget.RemoteViews;
 import android.widget.Toast;
 
@@ -156,7 +157,7 @@ public class HelperFunctions{
     public static int ScreenOrient(Context context)
     {   
  	     DisplayMetrics dm = context.getApplicationContext().getResources().getDisplayMetrics();  
-         Log.d("log","the height & width is "+dm.heightPixels+" width is "+dm.widthPixels);
+         Log.d(ProjectConst.TAG,"the height & width is "+dm.heightPixels+" width is "+dm.widthPixels);
  	     int landscape = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;//∫·∆¡æ≤Ã¨≥£¡ø   
  	     int portrait = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;// ˙∆¡≥£¡ø   
   	     return dm.widthPixels<dm.heightPixels?portrait:landscape;//≈–∂œ
@@ -176,7 +177,7 @@ public class HelperFunctions{
 		  if( ScreenOrient(ActivityContext) == ActivityInfo.SCREEN_ORIENTATION_PORTRAIT )
 		  {
 		  	  Slot = NotePadWidgetProvider.Widget_Show_Portrait_Slot;
-		  	  Log.d("log","it is portrait");
+		  	  Log.d(ProjectConst.TAG,"it is portrait");
 		  } else
 		   	  Slot = NotePadWidgetProvider.Widget_Show_Landscape_Slot;
 
@@ -197,7 +198,7 @@ public class HelperFunctions{
 	      
 	      // Add pending intent to main activity
 	      Intent showAllNotes = new Intent(ActivityContext, NotePadPlus.class);
-	      showAllNotes.setAction(NotePadWidgetProvider.ACTION_SHOW_ALL_NOTE);
+	      showAllNotes.setAction(ProjectConst.WIDGET4x2_SHOWALL_ACTION);
 		  PendingIntent showAllNotesPendingIntent = PendingIntent.getActivity(ActivityContext, 0, showAllNotes, 0);
 		  widgetViews.setOnClickPendingIntent(R.id.widgetboard, showAllNotesPendingIntent);
 
@@ -222,7 +223,7 @@ public class HelperFunctions{
 		    	remoteViews.setViewVisibility(R.id.widget1x1_lock, View.GONE);
 		    }
 		    ActivityIntent.putExtra(OneNote.KEY_ROWID, RowId);
-		    ActivityIntent.putExtra(EditNoteActivity.KEY_SOURCE, NotePad1X1WidgetHelper.EDIT_WIDGET_ACTION);
+		    ActivityIntent.putExtra(EditNoteActivity.KEY_SOURCE, ProjectConst.WIDGET1x1_EDIT_ACTION);
 			PendingIntent EditNotePendingIntent = PendingIntent.getActivity(AppContext, AppWidgetId, ActivityIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 			remoteViews.setOnClickPendingIntent(android.R.id.background, EditNotePendingIntent);
 			
@@ -254,6 +255,33 @@ public class HelperFunctions{
         return bd;
 	    
 	}
+	
+	public static Dialog BuildShareByDlg(final Context AppContext, int Title, final String SharedTitle, final String SharedBody)
+	{
+        Builder builder = new AlertDialog.Builder(AppContext);  
+        builder.setIcon(R.drawable.ic_dialog_menu_generic);  
+        builder.setTitle(Title);  
+        final BaseAdapter adapter = new ShareByListItemAdapter(AppContext);  
+        DialogInterface.OnClickListener listener =   
+            new DialogInterface.OnClickListener() {  
+                @Override  
+                public void onClick(DialogInterface dialogInterface, int which) { 
+                	ShareByListItemAdapter Adapter = (ShareByListItemAdapter)adapter;
+                	Intent intent = new Intent();
+                	
+                    intent.setAction(Intent.ACTION_SEND);
+                	intent.setComponent(new ComponentName(Adapter.Apps.get(which).activityInfo.packageName, Adapter.Apps.get(which).activityInfo.name));
+                    intent.putExtra(Intent.EXTRA_SUBJECT, SharedTitle);
+                    intent.putExtra(Intent.EXTRA_TEXT, SharedBody);
+                    intent.setType("text/plain");
+                    
+                    AppContext.startActivity(intent); 
+                }  
+            };  
+        builder.setAdapter(adapter, listener);  
+        return builder.create();  
+	}
+	
 	// Read note
 	public static String ReadTextFile(Context context, String path){
 		FileInputStream fileInStream = null;

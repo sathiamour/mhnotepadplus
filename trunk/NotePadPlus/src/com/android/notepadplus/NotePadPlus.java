@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 
+import com.android.notepadplus.NoteUserDefViewActivity.MyOnTouchListener;
+
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -17,7 +19,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -25,66 +27,30 @@ import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.ContextMenu.ContextMenuInfo;
 import android.view.View.OnCreateContextMenuListener;
+import android.view.View.OnTouchListener;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.AnimationSet;
 import android.view.animation.LayoutAnimationController;
 import android.view.animation.TranslateAnimation;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.EditText;
 import android.widget.GridView;
 import android.widget.LinearLayout;
-import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.AbsListView.LayoutParams;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class NotePadPlus extends Activity {
-
-	/** Action */
-	public static final String Action_Edit_Note = "com.android.notepadplus.EditNote";
-	/** Broadcast action */
-	public static final String BROADCAST_REFRESHLIST = "com.android.notepadplus.refreshlist";
-	public static final String BROADCAST_RANKNOTE = "com.android.notepadplus.ranknote";
-	
-	/** Dialog id */
-	private static final int Del_Prompt_Dlg = 1;
-	private static final int About_Dlg = Del_Prompt_Dlg+1;
-	private static final int NoteHasLock_Dlg = About_Dlg+1;
-	private static final int PwdErr_Dlg = NoteHasLock_Dlg+1;
-	private static final int EidtNote_PwdPrompt_Dlg = PwdErr_Dlg+1;
-	private static final int DelNote_PwdPrompt_Dlg = EidtNote_PwdPrompt_Dlg+1;
-	private static final int ViewStyle_Dlg = DelNote_PwdPrompt_Dlg+1;
-	private static final int SetTag_PwdPrompt_Dlg = ViewStyle_Dlg+1;
-	private static final int OrderBySel_Dlg = SetTag_PwdPrompt_Dlg+1;
-
-	/** Action id for activity redirection */
-	public static final int ACTIVITY_CREATE = 0;
-	public static final int ACTIVITY_EDIT = 1;
-	public static final int ACTIVITY_SET_TAGCLR = 2;
-	public static final int ACTIVITY_SET_PWD = 3;
-	public static final int ACTIVITY_CHG_PWD = 4;
-	public static final int ACTIVITY_CLR_PWD = 5;
-	public static final int ACTIVITY_ENTERPWD_EDIT = 6;
-	public static final int ACTIVITY_SETTING = ACTIVITY_ENTERPWD_EDIT+1;
-	public static final int ACTIVITY_FILTER = ACTIVITY_SETTING+1;
-
-	/** Long touch Menu id */
-	public static final int ITEM0 = Menu.FIRST;
-	public static final int ITEM1 = Menu.FIRST + 1;
-	public static final int ITEM2 = Menu.FIRST + 2;
-	public static final int ITEM3 = Menu.FIRST + 3;
-	public static final int ITEM4 = Menu.FIRST + 4;
-	public static final int ITEM5 = Menu.FIRST + 5;
 
 	/** Database helper */
 	private NoteDbAdapter NotesDb;
@@ -98,10 +64,13 @@ public class NotePadPlus extends Activity {
 	public static final int ClrNum = ItemBgClr.length;
 
 	/** Views */
-	private ListView NoteList = null;
-	private LayoutAnimationController ListAnimController = null;
-	private GridView NoteGrid = null;
-	private LinearLayout Main = null;
+	private ListView NoteList;
+	private LayoutAnimationController ListAnimController;
+	private GridView NoteGrid;
+	private LinearLayout Main;
+	private MyRelativeLayout MainLayout;
+	private ArrayList<NotePos> Postions;
+	
 	private int EdgeWidth = 0;
 	private static final int ScreenPadding = 15;
 	private static final int SpacePadding = 10;
@@ -112,8 +81,7 @@ public class NotePadPlus extends Activity {
 	public static AppSetting SysSettings;
 
 	/** Note's index */
-	private static final int ErrNoteIndex = -1;
-	private int NoteIndex = ErrNoteIndex;
+	private int NoteIndex = ProjectConst.NegativeOne;
 
 	/** Refresh receiver when end date check finish */
 	public BroadcastReceiver RefreshReceiver = new BroadcastReceiver() {
@@ -128,9 +96,9 @@ public class NotePadPlus extends Activity {
 	public BroadcastReceiver RankReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			   int Index = intent.getIntExtra(OneNote.KEY_INDEX, ErrNoteIndex);
+			   int Index = intent.getIntExtra(OneNote.KEY_INDEX, ProjectConst.NegativeOne);
 			   int IsCheck = intent.getBooleanExtra(OneNote.KEY_RANK, false)?ProjectConst.One:ProjectConst.Zero;
-			   if( Index != ErrNoteIndex )
+			   if( Index != ProjectConst.NegativeOne )
 			   {
 				   Cursor TmpCursor = NotesCursor;
 				   TmpCursor.moveToPosition(Index);
@@ -174,7 +142,7 @@ public class NotePadPlus extends Activity {
 		NoteGrid = (GridView) findViewById(R.id.notegrid);
 		Main = (LinearLayout)findViewById(R.id.mainview);
 		Main.setBackgroundColor(SysSettings.BgClr);
-		
+
 		// Set notes load progress dialog
 		ProgressDlg = new ProgressDialog(this);  
 		ProgressDlg.setIcon(R.drawable.icon);  
@@ -184,12 +152,15 @@ public class NotePadPlus extends Activity {
 		ProgressDlg.show(); 
         
         LoadNotesProgThread.start();  
-        
+
+
 		// Note database
 		NotesDb = new NoteDbAdapter(this);
+
 		NotesDb.open();
-		NoteDbAdapter.SetOrderBy(NoteDbAdapter.OrderByArray[Integer.parseInt(SysSettings.OrderBy)]);
 		
+		//NoteDbAdapter.SetOrderBy(NoteDbAdapter.OrderByArray[Integer.parseInt(SysSettings.OrderBy)]);
+
 		// Get screen's widht & height
 		DisplayMetrics ScreenMetrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(ScreenMetrics);
@@ -211,11 +182,11 @@ public class NotePadPlus extends Activity {
 			/** When user push the item long time, show menu */
 			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 				   menu.setHeaderTitle("日志编辑菜单");
-				   menu.add(0, ITEM0, 1, "编辑当前日志");
-				   menu.add(0, ITEM1, 2, "删除当前日志");
-				   menu.add(0, ITEM2, 3, "增加新日志");
-				   menu.add(0, ITEM3, 4, "修改日志标签颜色");
-				   menu.add(0, ITEM4, 5, "锁定当前日志");
+				   menu.add(0, ProjectConst.ITEM0, 1, "编辑当前日志");
+				   menu.add(0, ProjectConst.ITEM1, 2, "删除当前日志");
+				   menu.add(0, ProjectConst.ITEM2, 3, "增加新日志");
+				   menu.add(0, ProjectConst.ITEM3, 4, "修改日志标签颜色");
+				   menu.add(0, ProjectConst.ITEM4, 5, "锁定当前日志");
 			}
 		});
 
@@ -238,11 +209,11 @@ public class NotePadPlus extends Activity {
 			@Override
 			public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo menuInfo) {
 			       menu.setHeaderTitle("日志编辑菜单");
-				   menu.add(0, ITEM0, 1, "编辑当前日志");
-				   menu.add(0, ITEM1, 2, "删除当前日志");
-				   menu.add(0, ITEM2, 3, "增加新日志");
-				   menu.add(0, ITEM3, 4, "修改日志标签颜色");
-				   menu.add(0, ITEM4, 5, "锁定当前日志");
+				   menu.add(0, ProjectConst.ITEM0, 1, "编辑当前日志");
+				   menu.add(0, ProjectConst.ITEM1, 2, "删除当前日志");
+				   menu.add(0, ProjectConst.ITEM2, 3, "增加新日志");
+				   menu.add(0, ProjectConst.ITEM3, 4, "修改日志标签颜色");
+				   menu.add(0, ProjectConst.ITEM4, 5, "锁定当前日志");
 			}
 		});
         
@@ -269,6 +240,8 @@ public class NotePadPlus extends Activity {
 		
 		// Notes loading is over
 		NotesIsLoaded = true;  
+		
+		
 	}
 
 	/** When the activity is destroyed, close database */
@@ -294,8 +267,8 @@ public class NotePadPlus extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		registerReceiver(RefreshReceiver, new IntentFilter(BROADCAST_REFRESHLIST));
-		registerReceiver(RankReceiver, new IntentFilter(BROADCAST_RANKNOTE));
+		registerReceiver(RefreshReceiver, new IntentFilter(ProjectConst.BROADCAST_REFRESHLIST_ACTION));
+		registerReceiver(RankReceiver, new IntentFilter(ProjectConst.BROADCAST_RANKNOTE_ACTION));
 	}
 
 	/** Refresh note list from database */
@@ -310,17 +283,31 @@ public class NotePadPlus extends Activity {
 		// Refresh the notes list
 		if (Count > 0) {
 			// Set view's visible
-			findViewById(R.id.nonotetip).setVisibility(View.GONE);
+			
 			if (SysSettings.IsListView()) {
+				// List view
+				setContentView(null);
+				setContentView(R.layout.main);
 				NoteGrid.setVisibility(View.GONE);
+				findViewById(R.id.nonotetip).setVisibility(View.GONE);
 				NoteList.setVisibility(View.VISIBLE);
-				ShowNoteInListView(Count);
-			} else {
+				ShowNoteInListView(Count);   
+			} else if( SysSettings.IsGridView() ){
+				// Grid view
+				setContentView(R.layout.main);
 				NoteList.setVisibility(View.GONE);
+				findViewById(R.id.nonotetip).setVisibility(View.GONE);
 				NoteGrid.setVisibility(View.VISIBLE);
 				ShowNoteInGridView(Count);
+			} else { 
+				Log.d(ProjectConst.TAG," in user def");
+				// User definition mode
+				NoteGrid.setVisibility(View.GONE);
+				NoteList.setVisibility(View.GONE);
+				ShowNoteInUserDefView();	
 			}
 		} else {
+			setContentView(R.layout.main);
 			findViewById(R.id.nonotetip).setVisibility(View.VISIBLE);
 			NoteList.setVisibility(View.GONE);
 			NoteGrid.setVisibility(View.GONE);
@@ -329,7 +316,7 @@ public class NotePadPlus extends Activity {
 
 	private void RefreshListViewByTagClr(int TagId) {
 		// Data
-		String Condition = OneNote.KEY_TAGIMG_ID+"="+Integer.toString(TagId);
+		String Condition = OneNote.KEY_DRAWABLE_ID+"="+Integer.toString(TagId);
 		NotesCursor = NotesDb.GetNotesByCondition(Condition);
 		int Count = NotesCursor.getCount();
 		// Refresh the notes list
@@ -374,8 +361,7 @@ public class NotePadPlus extends Activity {
 			String Pwd = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_PWD));
 			String Use_NotifyTime = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_USE_NOTIFYTIME));
 			Calendar NotifyTime = HelperFunctions.String2Calenar(NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_NOTIFYTIME)));
-			int TagImgIdx = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_TAGIMG_ID));
-			int BgClrIdx = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_BGCLR));
+			int Idx = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_DRAWABLE_ID));
 			int Rank = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_RANK));
             // Create one item
 			HashMap<String, Object> OneNote = new HashMap<String, Object>();
@@ -384,8 +370,8 @@ public class NotePadPlus extends Activity {
 			OneNote.put("Time", Time);
 			Notes.add(OneNote);
 			// Set up parameters
-			BgColor[i] = ItemBgClr[BgClrIdx];
-			TagColor[i] = TagClr[TagImgIdx];
+			BgColor[i] = ItemBgClr[Idx];
+			TagColor[i] = TagClr[Idx];
 			IsLock[i] = Pwd.length() > 0 ;
 			IsNotify[i] = (Use_NotifyTime.equals(ProjectConst.Yes) && HelperFunctions.CmpDatePrefix2(NotifyTime, Calendar.getInstance()) > 0);
 			IsRank[i] = (Rank == 0) ? false: true;
@@ -398,7 +384,7 @@ public class NotePadPlus extends Activity {
 		int[] ItemColor = new int[Count];
 		for (int i = 0; i < Count && NotesCursor.moveToNext(); ++i) {
 			String Title = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_TITLE));
-			int ClrIdx = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_BGCLR));
+			int ClrIdx = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_DRAWABLE_ID));
 
 			HashMap<String, Object> OneNote = new HashMap<String, Object>();
 			// Item
@@ -415,37 +401,66 @@ public class NotePadPlus extends Activity {
 		NoteGrid.setAdapter(GridNoteAdapter);
 	}
 
+	public void ShowNoteInUserDefView() {
+		// Main layout
+		MainLayout = new MyRelativeLayout(this);
+        RelativeLayout.LayoutParams layoutParams = new RelativeLayout.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.FILL_PARENT);  
+        MainLayout.setLayoutParams(layoutParams);
+        MainLayout.setBackgroundColor(NotePadPlus.SysSettings.BgClr);
+        
+        LayoutInflater factory = LayoutInflater.from(this);
+        int Count = NotesCursor.getCount();
+        Postions = new ArrayList<NotePos>();
+        for( int i = 0; i < Count && NotesCursor.moveToNext(); ++i )
+    	{
+       	     String Title =  NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_TITLE));
+      	     int ClrId = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_DRAWABLE_ID));
+      	     int RowId = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_ROWID));
+      	     int LeftX =  NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_LEFTX));
+      	     int LeftY =  NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_LEFTY));
+      	     
+    		 TextView Text = (TextView)factory.inflate(R.layout.userdefitem, null);
+             Text.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.GetAlpha1x1Bg(this, ClrId)));
+             Text.setOnTouchListener(new MyOnTouchListener(Text, RowId, i, ScreenWidth, ScreenHeight));
+             Text.setText(Title);
+             
+             Postions.add(new NotePos(RowId, LeftX, LeftY));
+             MainLayout.addView(Text);
+    	}   
+        
+        MainLayout.SetChildPos(Postions);
+        setContentView(MainLayout);
+	}
+       
 	/** Menu click callback */
 	@Override
 	public boolean onContextItemSelected(MenuItem Item) {
-		AdapterView.AdapterContextMenuInfo Info = (AdapterView.AdapterContextMenuInfo) Item
-				.getMenuInfo();
+		AdapterView.AdapterContextMenuInfo Info = (AdapterView.AdapterContextMenuInfo) Item.getMenuInfo();
 		NoteIndex = (int) Info.id;
 		switch (Item.getItemId()) {
-		case ITEM0:
+		case ProjectConst.ITEM0:
 			 OnClickEditNote(NoteIndex);
 			 return true;
-		case ITEM1:
-			 showDialog(Del_Prompt_Dlg);
+		case ProjectConst.ITEM1:
+			 showDialog(ProjectConst.DelNote_Prompt_Dlg);
 			 return true;
-		case ITEM2:
+		case ProjectConst.ITEM2:
 			 actionClickAddNote();
 			 return true;
-		case ITEM3: 
+		case ProjectConst.ITEM3: 
 			 OnClickSetTag(NoteIndex);
 			 return true;
 		
-		case ITEM4: {
-			Cursor TmpCursor = NotesCursor;
-			TmpCursor.moveToPosition(NoteIndex);
-			String Pwd = TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD));
+		case ProjectConst.ITEM4: {
+			NotesCursor.moveToPosition(NoteIndex);
+			String Pwd = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_PWD));
 
 			if( Pwd.length() == 0 ) {
 			    Intent PwdDlgIntent = new Intent(NotePadPlus.this, PwdDlgActivity.class);
-			    PwdDlgIntent.putExtra(OneNote.KEY_ROWID, TmpCursor.getInt(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
-			    startActivityForResult(PwdDlgIntent, ACTIVITY_SET_PWD);
+			    PwdDlgIntent.putExtra(OneNote.KEY_ROWID, NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
+			    startActivityForResult(PwdDlgIntent, ProjectConst.ACTIVITY_SET_PWD);
             } else
-			    showDialog(NoteHasLock_Dlg);
+			    showDialog(ProjectConst.NoteHasLock_Dlg);
 			return true;
 		}
 
@@ -457,12 +472,12 @@ public class NotePadPlus extends Activity {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Must create one menu
-		menu.add(Menu.NONE, ITEM0, 1, "添加").setIcon(android.R.drawable.ic_menu_add);
-		menu.add(Menu.NONE, ITEM1, 2, "排序").setIcon(AppSetting.OrderByIcon[Integer.parseInt(SysSettings.OrderBy)]);
-		menu.add(Menu.NONE, ITEM2, 3, "设置").setIcon(android.R.drawable.ic_menu_manage);
-		menu.add(Menu.NONE, ITEM3, 4, "视图").setIcon(android.R.drawable.ic_menu_sort_by_size);
-		menu.add(Menu.NONE, ITEM4, 5, "颜色").setIcon(android.R.drawable.ic_menu_view);
-		menu.add(Menu.NONE, ITEM5, 6, "关于").setIcon(android.R.drawable.ic_menu_info_details);
+		menu.add(Menu.NONE, ProjectConst.ITEM0, 1, "添加").setIcon(android.R.drawable.ic_menu_add);
+		menu.add(Menu.NONE, ProjectConst.ITEM1, 2, "排序").setIcon(AppSetting.OrderByIcon[Integer.parseInt(SysSettings.OrderBy)]);
+		menu.add(Menu.NONE, ProjectConst.ITEM2, 3, "设置").setIcon(android.R.drawable.ic_menu_manage);
+		menu.add(Menu.NONE, ProjectConst.ITEM3, 4, "视图").setIcon(android.R.drawable.ic_menu_sort_by_size);
+		menu.add(Menu.NONE, ProjectConst.ITEM4, 5, "颜色").setIcon(android.R.drawable.ic_menu_view);
+		menu.add(Menu.NONE, ProjectConst.ITEM5, 6, "关于").setIcon(android.R.drawable.ic_menu_info_details);
 		// Hold the menu handler
 		MainMenu = menu;
         return true;
@@ -472,25 +487,25 @@ public class NotePadPlus extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {  
            switch(item.getItemId()) 
            {  
-              case ITEM0:
+              case ProjectConst.ITEM0:
 	               actionClickAddNote();
 	               break;
-              case ITEM1:
-            	   showDialog(OrderBySel_Dlg);
+              case ProjectConst.ITEM1:
+            	   showDialog(ProjectConst.OrderBySel_Dlg);
 	               break;
-              case ITEM2:
-            	   Intent PrefSetting = new Intent(NotePadPlus.this, SysSettingActivity.class);
-            	   startActivityForResult(PrefSetting, ACTIVITY_SETTING);
+              case ProjectConst.ITEM2:
+            	   Intent PrefSetting = new Intent(this, SysSettingActivity.class);
+            	   startActivityForResult(PrefSetting, ProjectConst.ACTIVITY_SETTING);
 	               break;
-              case ITEM3:
-	               showDialog(ViewStyle_Dlg);
+              case ProjectConst.ITEM3:
+	               showDialog(ProjectConst.ViewStyle_Dlg);
 	               break;
-              case ITEM4:
+              case ProjectConst.ITEM4:
             	   Intent FilterNote = new Intent(this, FilterNoteByTagActivity.class);
-            	   startActivityForResult(FilterNote, ACTIVITY_FILTER);
+            	   startActivityForResult(FilterNote, ProjectConst.ACTIVITY_FILTER);
 	               break;
-              case ITEM5:
-	               showDialog(About_Dlg);
+              case ProjectConst.ITEM5:
+	               showDialog(ProjectConst.About_Dlg);
 	               break;
            }
            return false;
@@ -500,7 +515,7 @@ public class NotePadPlus extends Activity {
 	private void actionClickAddNote() {
 
 		Intent i = new Intent(this, AddNoteActivity.class);
-		startActivityForResult(i, ACTIVITY_CREATE);
+		startActivityForResult(i, ProjectConst.ACTIVITY_CREATE);
 	}
 
 	private void OnClickEditNote(int Pos) {
@@ -515,7 +530,7 @@ public class NotePadPlus extends Activity {
 			if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).length() > 0 )
 			{
 				Log.d("log","pwd "+TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)));
-                showDialog(EidtNote_PwdPrompt_Dlg);
+                showDialog(ProjectConst.EidtNote_PwdPrompt_Dlg);
 			}else
 				EditNoteHelper(TmpCursor);
 		}	
@@ -524,21 +539,20 @@ public class NotePadPlus extends Activity {
 	private void EditNoteHelper(Cursor Note)
 	{
 			Intent OneNoteData = new Intent(NotePadPlus.this, EditNoteActivity.class);
-			OneNoteData.putExtra(EditNoteActivity.KEY_SOURCE, Action_Edit_Note);
+			OneNoteData.putExtra(EditNoteActivity.KEY_SOURCE, ProjectConst.MAIN_EDIT_ATION);
 			OneNoteData.putExtra(OneNote.KEY_ROWID, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
 			OneNoteData.putExtra(OneNote.KEY_TITLE, Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_TITLE)));
 			OneNoteData.putExtra(OneNote.KEY_PATH, Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_PATH)));
 			OneNoteData.putExtra(OneNote.KEY_NOTIFYTIME, Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_NOTIFYTIME)));
 			OneNoteData.putExtra(OneNote.KEY_USE_NOTIFYTIME, Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_USE_NOTIFYTIME)));
-			OneNoteData.putExtra(OneNote.KEY_TAGIMG_ID, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_TAGIMG_ID)));
-			OneNoteData.putExtra(OneNote.KEY_BGCLR, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_BGCLR)));
+			OneNoteData.putExtra(OneNote.KEY_DRAWABLE_ID, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_DRAWABLE_ID)));
 			OneNoteData.putExtra(OneNote.KEY_NOTIFYDURA, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_NOTIFYDURA)));
 			OneNoteData.putExtra(OneNote.KEY_NOTIFYMETHOD, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_NOTIFYMETHOD)));
 			OneNoteData.putExtra(OneNote.KEY_RINGMUSIC, Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_RINGMUSIC)));
 		    OneNoteData.putExtra(OneNote.KEY_WIDGETID, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_WIDGETID)));
 		    OneNoteData.putExtra(OneNote.KEY_PWD, Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_PWD)));
 
-			startActivityForResult(OneNoteData, ACTIVITY_EDIT);
+			startActivityForResult(OneNoteData, ProjectConst.ACTIVITY_EDIT);
 	}
 
 	private void OnClickDelNote(int Pos) {
@@ -547,7 +561,7 @@ public class NotePadPlus extends Activity {
 		TmpCursor.moveToPosition(Pos);
 		// Check password
 		if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).length() > 0 )
-            showDialog(DelNote_PwdPrompt_Dlg);
+            showDialog(ProjectConst.DelNote_PwdPrompt_Dlg);
 		else
 			DelNoteHelper(TmpCursor);
 	}
@@ -573,7 +587,7 @@ public class NotePadPlus extends Activity {
 		TmpCursor.moveToPosition(Pos);
 		// Check password
 		if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).length() > 0 )
-            showDialog(SetTag_PwdPrompt_Dlg);
+            showDialog(ProjectConst.SetTag_PwdPrompt_Dlg);
 		else
 			SetTagHelper();
 	}
@@ -581,7 +595,7 @@ public class NotePadPlus extends Activity {
 	private void SetTagHelper(){
 		Intent intent = new Intent();
 		intent.setClass(NotePadPlus.this, SetTagClrActivity.class);
-		startActivityForResult(intent, ACTIVITY_SET_TAGCLR);
+		startActivityForResult(intent, ProjectConst.ACTIVITY_SET_TAGCLR);
 	}
 	
 	// Build a dialog to prompt user we want to delete the assigned note
@@ -621,7 +635,7 @@ public class NotePadPlus extends Activity {
     			      if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).equals(Pwd.getText().toString()) )
     			    	  EditNoteHelper(TmpCursor);
     			      else
-    				      showDialog(PwdErr_Dlg);	
+    				      showDialog(ProjectConst.PwdErr_Dlg);	
     			      // Clear input
     			      Pwd.setText(ProjectConst.EmptyStr);
               }
@@ -652,7 +666,7 @@ public class NotePadPlus extends Activity {
     			      if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).equals(Pwd.getText().toString()) )
     			    	  DelNoteHelper(TmpCursor);
     			      else
-    				      showDialog(PwdErr_Dlg);
+    				      showDialog(ProjectConst.PwdErr_Dlg);
     			      // Clear input
     			      Pwd.setText(ProjectConst.EmptyStr);
               }
@@ -683,7 +697,7 @@ public class NotePadPlus extends Activity {
     			      if( TmpCursor.getString(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_PWD)).equals(Pwd.getText().toString()) )
     			    	  SetTagHelper();
     			      else
-    				      showDialog(PwdErr_Dlg);
+    				      showDialog(ProjectConst.PwdErr_Dlg);
     			      // Clear input
     			      Pwd.setText(ProjectConst.EmptyStr);
               }
@@ -711,7 +725,7 @@ public class NotePadPlus extends Activity {
 						   TmpCursor.moveToPosition(NoteIndex);
 						   Intent ChgPwdDlgIntent = new Intent(NotePadPlus.this, ChgPwdDlgActivity.class);
 						   ChgPwdDlgIntent.putExtra(OneNote.KEY_ROWID, TmpCursor.getInt(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
-						   startActivityForResult(ChgPwdDlgIntent, ACTIVITY_CHG_PWD);
+						   startActivityForResult(ChgPwdDlgIntent, ProjectConst.ACTIVITY_CHG_PWD);
 					}
 				});
 		builder.setCancelable(false);
@@ -722,7 +736,7 @@ public class NotePadPlus extends Activity {
 						   TmpCursor.moveToPosition(NoteIndex);
 						   Intent ClrPwdDlgIntent = new Intent(NotePadPlus.this, ClearPwdDlgActivity.class);
 						   ClrPwdDlgIntent.putExtra(OneNote.KEY_ROWID, TmpCursor.getInt(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
-						   startActivityForResult(ClrPwdDlgIntent, ACTIVITY_CLR_PWD);
+						   startActivityForResult(ClrPwdDlgIntent, ProjectConst.ACTIVITY_CLR_PWD);
 					}
 				});
 
@@ -740,19 +754,19 @@ public class NotePadPlus extends Activity {
         Builder builder = new AlertDialog.Builder(this);  
         builder.setIcon(R.drawable.ic_dialog_menu_generic);  
         builder.setTitle(Title);  
-        BaseAdapter adapter = new ListItemAdapter(new int[]{R.drawable.ic_menu_listview, R.drawable.ic_menu_gridview, R.drawable.ic_menu_gridview},Items);  
+        BaseAdapter adapter = new CommonListItemAdapter(new int[]{R.drawable.ic_menu_listview, R.drawable.ic_menu_gridview, R.drawable.ic_menu_userdef},Items, AppContext);  
         DialogInterface.OnClickListener listener =   
             new DialogInterface.OnClickListener() {  
                 @Override  
                 public void onClick(DialogInterface dialogInterface, int which) {  
-                	        if( which == 2 )
-                	        {
-                	        	Intent NextActivity = new Intent(NotePadPlus.this, NoteUserDefViewActivity.class);
-                	        	startActivity(NextActivity);
-                	        } else {
+                	        //if( which == 2 )
+                	        //{
+                	        //	Intent NextActivity = new Intent(NotePadPlus.this, NoteUserDefViewActivity.class);
+                	        //	startActivityForResult(NextActivity, ProjectConst.ACTIVITY_USERDEF);
+                	        //} else {
                 	           SysSettings.ViewStyle = AppSetting.VieweStyleVal[which];
                     		   RefreshListView();
-                	        }
+                	        //}
                 }  
             };  
         builder.setAdapter(adapter, listener);  
@@ -764,7 +778,7 @@ public class NotePadPlus extends Activity {
         Builder builder = new AlertDialog.Builder(this);  
         builder.setIcon(R.drawable.ic_dialog_menu_generic);  
         builder.setTitle(Title);  
-        BaseAdapter adapter = new ListItemAdapter(AppSetting.OrderByIcon, Items);  
+        BaseAdapter adapter = new CommonListItemAdapter(AppSetting.OrderByIcon, Items, AppContext);  
         DialogInterface.OnClickListener listener =   
             new DialogInterface.OnClickListener() {  
                 @Override  
@@ -783,24 +797,24 @@ public class NotePadPlus extends Activity {
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
-		case Del_Prompt_Dlg:
-			 return BuildDelPromptDialog(NotePadPlus.this, R.string.delnote_title);
-		case About_Dlg:
-			 return HelperFunctions.BuildAltertDialog(NotePadPlus.this, R.string.about_title, R.string.about_content);
-		case NoteHasLock_Dlg:
-			 return BuildNoteHasLockDialog(NotePadPlus.this, R.string.note_lock_dlg_title, R.string.notehaslock_msg);
-		case DelNote_PwdPrompt_Dlg:
-			 return BuildDelNotePromptPwdDlg(NotePadPlus.this, R.string.pwdprompt_title, R.string.pwdprompt_tip);
-		case EidtNote_PwdPrompt_Dlg:
-			 return BuildEditNotePromptPwdDlg(NotePadPlus.this, R.string.pwdprompt_title, R.string.pwdprompt_tip);
-		case SetTag_PwdPrompt_Dlg:
-			 return BuildSetTagPromptPwdDlg(NotePadPlus.this, R.string.pwdprompt_title, R.string.pwdprompt_tip);
-		case PwdErr_Dlg:
-			 return HelperFunctions.BuildAltertDialog(NotePadPlus.this, R.string.pwderr_title, R.string.orignalpwd_err_prompt);
-		case ViewStyle_Dlg:
-			 return BuildSelViewDlg(NotePadPlus.this, R.string.viewstyle_title, R.array.noteviewstyle);
-		case OrderBySel_Dlg:
-			 return BuildOrderByDlg(NotePadPlus.this, R.string.orderby_title, R.array.orderby);
+		case ProjectConst.DelNote_Prompt_Dlg:
+			 return BuildDelPromptDialog(this, R.string.delnote_title);
+		case ProjectConst.About_Dlg:
+			 return HelperFunctions.BuildAltertDialog(this, R.string.about_title, R.string.about_content);
+		case ProjectConst.NoteHasLock_Dlg:
+			 return BuildNoteHasLockDialog(this, R.string.note_lock_dlg_title, R.string.notehaslock_msg);
+		case ProjectConst.DelNote_PwdPrompt_Dlg:
+			 return BuildDelNotePromptPwdDlg(this, R.string.pwdprompt_title, R.string.pwdprompt_tip);
+		case ProjectConst.EidtNote_PwdPrompt_Dlg:
+			 return BuildEditNotePromptPwdDlg(this, R.string.pwdprompt_title, R.string.pwdprompt_tip);
+		case ProjectConst.SetTag_PwdPrompt_Dlg:
+			 return BuildSetTagPromptPwdDlg(this, R.string.pwdprompt_title, R.string.pwdprompt_tip);
+		case ProjectConst.PwdErr_Dlg:
+			 return HelperFunctions.BuildAltertDialog(this, R.string.pwderr_title, R.string.orignalpwd_err_prompt);
+		case ProjectConst.ViewStyle_Dlg:
+			 return BuildSelViewDlg(this, R.string.viewstyle_title, R.array.noteviewstyle);
+		case ProjectConst.OrderBySel_Dlg:
+			 return BuildOrderByDlg(this, R.string.orderby_title, R.array.orderby);
 		}
 		return null;
 	}
@@ -808,22 +822,32 @@ public class NotePadPlus extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
 		super.onActivityResult(requestCode, resultCode, intent);
-		if (requestCode == ACTIVITY_SET_TAGCLR) {
+		if (requestCode == ProjectConst.ACTIVITY_SET_TAGCLR) {
 			if (resultCode == RESULT_OK) {
 				Bundle SelIdxData = intent.getExtras();
-				int TagImgIdx = SelIdxData.getInt(OneNote.KEY_TAGIMG_ID);
-				int BgClrIdx = TagImgIdx;
+				int Idx = SelIdxData.getInt(OneNote.KEY_DRAWABLE_ID);
 				Cursor TmpCursor = NotesCursor;
 				TmpCursor.moveToPosition(NoteIndex);
-				NotesDb.UpdateNoteTagClr(TmpCursor.getInt(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_ROWID)), TagImgIdx, BgClrIdx);
+				NotesDb.UpdateNoteTagClr(TmpCursor.getInt(TmpCursor.getColumnIndexOrThrow(OneNote.KEY_ROWID)), Idx);
 				RefreshListView();	
 			}
-		}else if( requestCode == ACTIVITY_SET_PWD ||  requestCode == ACTIVITY_CLR_PWD ) {
+		}else if( requestCode == ProjectConst.ACTIVITY_SET_PWD ||  requestCode == ProjectConst.ACTIVITY_CLR_PWD ) {
 			if( resultCode == RESULT_OK )
+			{
+				int WidgetId = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_WIDGETID));
+				// Refresh 1x1 widget
+				if( WidgetId !=  ProjectConst.Zero)
+				{
+					String Title = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_TITLE));
+					int RowId = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_ROWID));
+					int Idx = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_DRAWABLE_ID));
+		    	    HelperFunctions.Refresh1x1Widget(this, WidgetId, Title, RowId, Idx, requestCode == ProjectConst.ACTIVITY_SET_PWD);
+				}
 				RefreshListView();
-		}else if( requestCode == ACTIVITY_CHG_PWD && resultCode == RESULT_OK ) // Needn't refresh
+			}
+		}else if( requestCode == ProjectConst.ACTIVITY_CHG_PWD && resultCode == RESULT_OK ) // Needn't refresh
 			NotesCursor = NotesDb.GetAllNotes();
-		else if( requestCode == ACTIVITY_SETTING && resultCode == RESULT_OK ) {
+		else if( requestCode == ProjectConst.ACTIVITY_SETTING && resultCode == RESULT_OK ) {
 			// Set full screen or not
 		    WindowManager.LayoutParams attrs = getWindow().getAttributes();  
 			if( SysSettings.IsFullScreen() ) {
@@ -844,13 +868,14 @@ public class NotePadPlus extends Activity {
 			RefreshListView();	
 			// Refresh widget main board
 			HelperFunctions.RefreshWidgetNoteList(NotePadPlus.this, NotesCursor);
-		} else if( requestCode == ACTIVITY_FILTER && resultCode == RESULT_OK ) {
+		} else if( requestCode == ProjectConst.ACTIVITY_FILTER && resultCode == RESULT_OK ) {
 			Bundle SelIdxData = intent.getExtras();
-			int TagImgIdx = SelIdxData.getInt(OneNote.KEY_TAGIMG_ID);
-			RefreshListViewByTagClr(TagImgIdx);
-		}
+			int Idx = SelIdxData.getInt(OneNote.KEY_DRAWABLE_ID);
+			RefreshListViewByTagClr(Idx);
+		} else if( requestCode == ProjectConst.ACTIVITY_USERDEF && resultCode == RESULT_OK )
+			RefreshListView();
 		
-		if( requestCode == ACTIVITY_EDIT || requestCode == ACTIVITY_CREATE )
+		if( requestCode == ProjectConst.ACTIVITY_EDIT || requestCode == ProjectConst.ACTIVITY_CREATE )
 			if( resultCode == RESULT_OK)
 			{	
 		        RefreshListView();
@@ -858,52 +883,107 @@ public class NotePadPlus extends Activity {
 			}
 	}
 	
-	class ListItemAdapter extends BaseAdapter {  
-	      
-		  private int[] ImgIds;
-		  private int Items;
-		  ListItemAdapter(int[] Img, int ItemRes){
-			     ImgIds = Img;
-			     Items = ItemRes;
-		  }
-	      @Override  
-	      public int getCount() {  
-	             return ImgIds.length;  
-	      }  
-	  
-	      @Override  
-	      public Object getItem(int position) {  
-	            return null;  
-	      }  
-	  
-	      @Override  
-	      public long getItemId(int position) {  
-	            return 0;  
-	      }  
-	  
-	      @Override  
-	      public View getView(int position, View contentView, ViewGroup parent) {  
-	            TextView textView = new TextView(NotePadPlus.this);  
-	            //获得array.xml中的数组资源getStringArray返回的是一个String数组  
-	            String text = getResources().getStringArray(Items)[position];  
-	            textView.setText(text);  
-	            //设置字体大小  
-	            textView.setTextSize(24);  
-	            AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(  
-	                    LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);  
-	            textView.setLayoutParams(layoutParams);  
-	            //设置水平方向上居中  
-	            textView.setGravity(android.view.Gravity.CENTER_VERTICAL);  
-	            textView.setMinHeight(65);  
-	            //设置文字颜色  
-	            textView.setTextColor(Color.BLACK);    
-	            //设置图标在文字的左边  
-	            textView.setCompoundDrawablesWithIntrinsicBounds(ImgIds[position], 0, 0, 0);  
-	            //设置textView的左上右下的padding大小  
-	            textView.setPadding(15, 0, 15, 0);  
-	            //设置文字和图标之间的padding大小  
-	            textView.setCompoundDrawablePadding(15); 
-	            return textView;  
-	      }	          
-	}  
+	class MyOnTouchListener implements OnTouchListener
+	{
+		private View Holder;
+		private int[] temp = new int[] { 0, 0 };
+		private int ClickCount;
+		private long secClick;
+		private long firClick;
+		private int RowId;
+		private boolean IsMove;
+		private int ScreenWidth;
+		private int ScreenHeight;
+	    private int ViewWidth;
+	    private int ViewHeight;
+	    private int PosIdx;
+	    private int LeftX;
+	    private int LeftY;
+		MyOnTouchListener(View Parent, int Id, int Index, int Width, int Height)
+		{
+			   Holder = Parent;
+			   ClickCount = ProjectConst.Zero;
+			   secClick = ProjectConst.Zero;
+			   firClick = ProjectConst.Zero;
+			   ViewWidth = ProjectConst.Zero;
+			   ViewHeight = ProjectConst.Zero;
+			   LeftX = ProjectConst.Zero;
+			   LeftY = ProjectConst.Zero;
+			   RowId = Id;
+			   IsMove = false;
+			   ScreenWidth = Width;
+			   ScreenHeight = Height;
+			   PosIdx = Index;
+		}
+ 
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+               int eventaction = event.getAction();
+
+               int x = (int) event.getRawX();
+               int y = (int) event.getRawY();
+               switch (eventaction) 
+               {
+                    case MotionEvent.ACTION_DOWN: // touch down so check if the
+                         temp[0] = (int) event.getX();
+                         temp[1] = y - v.getTop();
+                         Holder.bringToFront();
+                         ViewWidth = Holder.getMeasuredWidth();
+                         ViewHeight = Holder.getMeasuredHeight();
+                         
+                         ClickCount++;  
+            	         if( ClickCount == 1 )  
+            	             firClick = System.currentTimeMillis();  
+            	         else if ( ClickCount == 2 && !IsMove ){  
+            	             secClick = System.currentTimeMillis();  
+            	             if( secClick - firClick < 500 )
+            	             {  
+            	            	 Intent ActivityIntent = new Intent(Holder.getContext(), EditNoteActivity.class);
+            	         		 ActivityIntent.putExtra(OneNote.KEY_ROWID, RowId);
+            	         		 ActivityIntent.putExtra(OneNote.KEY_INDEX, PosIdx);
+            	         		 ActivityIntent.putExtra(EditNoteActivity.KEY_SOURCE, ProjectConst.USERDEF_EDIT_ACTION);
+            	         		 startActivityForResult(ActivityIntent, ProjectConst.ACTIVITY_EDIT);
+            	             }  
+            	             ClickCount = 0;  
+            	             firClick = 0;  
+            	             secClick = 0;  
+            	                  
+            	          }  
+            	            
+                            break;
+                     case MotionEvent.ACTION_MOVE: // touch drag with the ball
+                    	  IsMove = true; 
+                    	  LeftX = x - temp[0];
+                    	  LeftY = y - temp[1];
+                    	  if( LeftX < 0 ) LeftX = 0;
+                    	  if( LeftY < 0 ) LeftY = 0;
+                    	  
+                    	  int rightX = LeftX + ViewWidth;
+                  	      int rightY = LeftY + ViewHeight;
+                  	      if( rightX > ScreenWidth ) 
+                  	      {
+                  	    	  rightX = ScreenWidth;
+                  	    	  LeftX = rightX - ViewWidth;
+                  	      }
+                  	      if( rightY > ScreenHeight ) 
+                  	      {
+                  	    	  rightY = ScreenHeight;
+                  	    	  LeftY = rightY - ViewHeight;
+                  	      }
+                  	 
+                  	      v.layout(LeftX, LeftY, rightX, rightY);
+                          v.postInvalidate();
+                            
+                          break;
+
+                    case MotionEvent.ACTION_UP:
+                         IsMove = false;
+                         MainLayout.SetChildPos(PosIdx, LeftX, LeftY);
+                         break;
+               }
+
+               return false;
+	   }
+		
+	}
 }

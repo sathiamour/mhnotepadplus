@@ -50,7 +50,7 @@ public class SetTagClrActivity extends Activity {
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {  
                 	   // Set return data
    		    	       Bundle SelIdxData = new Bundle();
-   		    	       SelIdxData.putInt(OneNote.KEY_TAGIMG_ID, position);
+   		    	       SelIdxData.putInt(OneNote.KEY_DRAWABLE_ID, position);
    		    	       Intent ReturnBackIntent = new Intent();
    		    	       ReturnBackIntent.putExtras(SelIdxData);
    		    	       SetTagClrActivity.this.setResult(RESULT_OK, ReturnBackIntent);

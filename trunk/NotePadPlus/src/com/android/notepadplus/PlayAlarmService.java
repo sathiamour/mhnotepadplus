@@ -122,7 +122,7 @@ public class PlayAlarmService extends Service {
 	 private void SendKillBroadcast(int RowId) {
 	        //long millis = System.currentTimeMillis() - StartTime;
 	        //int minutes = (int) Math.round(millis / 60000.0);
-	        Intent AlarmKilled = new Intent(Alarms.ALARM_KILL_ACTION);
+	        Intent AlarmKilled = new Intent(ProjectConst.ALARM_KILL_ACTION);
 	        AlarmKilled.putExtra(OneNote.KEY_ROWID, RowId);
 	        sendBroadcast(AlarmKilled);
 	 }

@@ -72,7 +72,7 @@ public class NoteItemAdapter extends SimpleAdapter
 				@Override          
 				public void onClick(View Star){ 
                     // Tell main activity we have star on note
-				    Intent MainActivity = new Intent(NotePadPlus.BROADCAST_RANKNOTE);
+				    Intent MainActivity = new Intent(ProjectConst.BROADCAST_RANKNOTE_ACTION);
 				    MainActivity.putExtra(OneNote.KEY_INDEX, position);
 				    MainActivity.putExtra(OneNote.KEY_RANK, ((CheckBox)Star).isChecked());
 				    AppContext.sendBroadcast(MainActivity);	
