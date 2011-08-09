@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id = "@+id/mainview"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    
+    	<ListView android:id="@+id/nodelist2"
+                  android:layout_width="fill_parent"
+                  android:layout_height="fill_parent" 
+                  android:divider="#ff000000"
+                  android:dividerHeight="1dip"
+                  android:scrollbars="none"
+                  android:fastScrollEnabled="true"
+                  android:focusable="true" 
+                  android:persistentDrawingCache="animation|scrolling"
+                  />
+        <GridView android:id="@+id/notegrid2"
+                  android:layoutAnimation="@anim/grid_fade"
+	              android:layout_width="fill_parent" 
+	              android:layout_height="fill_parent"
+                  android:numColumns="3"
+                  android:columnWidth="60dp"
+                  android:stretchMode="columnWidth"
+                  android:gravity="center" 
+                  android:scrollbars="none"/>
+          
+  	    <TextView android:id="@+id/nonotetip"
+                  android:layout_width="fill_parent"
+                  android:layout_height="fill_parent"
+                  android:gravity="center_vertical|center_horizontal"
+                  android:textSize="20dip"
+                  android:textColor="#ff555555"
+		          android:text="@string/nonote_tip" />
+    
+</LinearLayout>
