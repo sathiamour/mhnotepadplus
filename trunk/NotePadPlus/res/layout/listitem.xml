@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>  
+ <RelativeLayout   
+      android:id="@+id/ListItem"   
+      android:layout_width="fill_parent"   
+      xmlns:android="http://schemas.android.com/apk/res/android" 
+      android:layout_height="wrap_content">  
+   
+  <View  android:id = "@+id/NoteTag"
+             android:layout_height="fill_parent"
+             android:layout_width="5.0dip"
+             android:layout_marginTop="2.0dip" 
+             android:layout_marginBottom="2.0dip"
+             android:background="#ff000000"
+             android:textColor = "#0000ff00"/>
+             
+   <RelativeLayout android:id="@+id/ListSubItem"   
+      android:layout_width="fill_parent"   
+      xmlns:android="http://schemas.android.com/apk/res/android" 
+      android:layout_height="fill_parent"
+      android:layout_toRightOf="@+id/NoteTag">        
+  <TextView   
+      android:id="@+id/NoteTitle"  
+      android:text="NoteTitle"   
+      android:ellipsize="end" 
+      android:singleLine="true" 
+      android:layout_height="wrap_content"   
+      android:layout_width="wrap_content" 
+      android:layout_toRightOf="@+id/NoteTag"  
+      android:paddingLeft="4dip"  
+      android:textColor = "#ff000000"
+      android:gravity="center_vertical"
+      android:background="#00ffffff"
+      />  
+
+             
+  <TextView   
+      android:id="@+id/NoteCreatedTime" 
+      android:text="NoteCreatedTime"  
+      android:ellipsize="end" 
+      android:singleLine="true"  
+      android:layout_height="wrap_content"   
+      android:layout_width="fill_parent"
+      android:layout_toRightOf="@+id/NoteTag"
+      android:layout_below="@+id/NoteTitle"  
+      android:paddingLeft="4dip"
+      android:textSize="15dip"   
+      android:background="#00ffffff"
+      android:textColor="#ff000000"
+      android:gravity="center_vertical"
+      />  
+     <ImageView android:id="@+id/NoteRingImg" 
+             android:layout_toRightOf="@id/NoteTitle"
+             android:layout_above="@id/NoteCreatedTime" 
+             android:layout_height="fill_parent"
+             android:layout_width="wrap_content"
+
+             android:scaleType="center"
+             android:src="@drawable/ic_dialog_time"/>
+             
+     <ImageView android:id="@+id/NoteLockImg" 
+             android:layout_toRightOf="@id/NoteRingImg"
+             android:layout_above="@id/NoteCreatedTime" 
+             android:layout_alignBaseline="@id/NoteRingImg"
+             android:layout_height="fill_parent"
+             android:layout_width="wrap_content"
+
+             android:scaleType="center"
+             android:src="@drawable/ic_lock_lock"/>
+             
+      <CheckBox android:id="@+id/Rank"
+            android:layout_toRightOf="@id/NoteLockImg"
+            android:layout_above="@id/NoteCreatedTime" 
+            android:focusable="false"
+            style="@style/StarCheckbox"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            
+            android:scaleType="center"
+            android:layout_alignBaseline="@id/NoteRingImg"/>
+      </RelativeLayout> 
+  </RelativeLayout> 

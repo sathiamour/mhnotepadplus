@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	          android:orientation="vertical" 
+	          android:layout_width="fill_parent"
+	          android:layout_height="fill_parent">
+
+    <TextView android:layout_width="fill_parent"  
+              android:layout_height="wrap_content"
+              android:layout_marginTop="10dip"  
+              android:layout_marginBottom="5dip"
+              android:textSize="17dp"
+              android:text="@string/notifytimetip" />
+                             
+    <LinearLayout android:orientation="horizontal" 
+	              android:layout_width="fill_parent"
+	              android:layout_height="wrap_content"
+	              android:gravity="center"
+	              android:layout_marginBottom="5dip">
+	              
+	              <Button android:id="@+id/notifytime_date_picker" 
+	                      android:layout_width="wrap_content"
+	                      android:layout_height="wrap_content"
+	                      android:textSize="17sp" />
+	              <Button android:id="@+id/notifytime_minute_picker"
+	                      android:layout_width="wrap_content"
+	                      android:layout_height="wrap_content"
+	                      android:textSize="17sp" />
+    </LinearLayout>    
+    
+    <TextView android:layout_width="fill_parent"  
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="5dip"
+              android:textSize="17sp"
+              android:text="@string/notifytypetip" />
+              
+    <Spinner  android:id="@+id/RingType"
+              android:prompt="@string/ringtypeprompt"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:textSize="17sp"
+              android:drawSelectorOnTop="true"
+              android:layout_marginBottom="5dip" />
+    
+    <TextView android:layout_width="fill_parent"  
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="5dip"
+              android:textSize="17sp"
+              android:text="@string/notifymusictypetip" />
+              
+    <Button   android:id="@+id/RingMusicType"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:gravity="left"
+              android:textSize="17sp"
+              android:layout_marginBottom="5dip" />
+              
+    <TextView android:layout_width="fill_parent"  
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="5dip"
+              android:textSize="17sp"
+              android:text="@string/notifymethodtype" />
+              
+    <Spinner  android:id="@+id/NotifyMethodType"
+              android:prompt="@string/notifymethodprompt"
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:textSize="17sp"
+              android:drawSelectorOnTop="true"
+              android:layout_marginBottom="5dip" />
+              
+     <LinearLayout android:layout_width = "fill_parent"
+                   android:layout_height = "fill_parent"
+                   android:orientation="horizontal">
+               <Button android:id="@+id/save_notifytime"
+                       android:text="@string/notifytime_confirm"
+                       android:textSize="17sp" 
+                       android:layout_width="wrap_content"  
+                       android:layout_height="wrap_content" 
+                       android:layout_gravity="bottom"
+                       android:layout_weight="1.0" />
+               <Button android:id="@+id/canel_notifytime"
+                       android:text="@string/notifytime_cancel"
+                       android:textSize="17sp" 
+                       android:layout_width="wrap_content"  
+                       android:layout_height="wrap_content" 
+                       android:layout_gravity="bottom"
+                       android:layout_weight="1.0" /> 
+               <Button android:id="@+id/remove_notifytime"
+                       android:text="@string/notifytime_remove"
+                       android:textSize="17sp" 
+                       android:layout_width="wrap_content"  
+                       android:layout_height="wrap_content" 
+                       android:layout_gravity="bottom"
+                       android:layout_weight="1.0" />   
+     </LinearLayout>
+
+</LinearLayout>
