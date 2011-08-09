@@ -5,7 +5,7 @@
     <string name="pref_fontsize_title">显示字体大小</string>
     <string name="pref_disp_title">显示相关</string>
     <string name="hello">Hello World       NotePadPlus!</string>
-    <string name="app_name">NotePadPlus</string>
+    <string name="app_name">HiNotes</string>
     <string name="addnote_title">日志标题</string>
     <string name="addnote_body">内容</string>
 <string name="nonote_tip">您还没有创建任何日志！</string>
@@ -93,4 +93,9 @@
 <string name="setpwd_title">输入密码锁定日志</string>
 <string name="shareby_title">请选择发送对象</string>
 <string name="note_hasdel_prompt">该日志已经被删除</string>
+<string name="addtitle_hint">请输入日志标题</string>
+<string name="notifytime_confirm">完成修改</string>
+<string name="notifytime_cancel">取消修改</string>
+<string name="notifytime_remove">删除闹铃</string>
+<string name="clrnum_prompt_format">%1$d 条记录</string>
 </resources>
