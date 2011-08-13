@@ -9,6 +9,12 @@
         <item>自定义视图</item> 
     </string-array>
 
+    <string-array name="notestyle">
+        <item>文本类型</item>
+        <item>清单类型</item> 
+        <item>涂鸦类型</item>
+    </string-array>
+    
     <string-array name="fontsize">
        <item>小型字体</item>
        <item>中型字体</item>

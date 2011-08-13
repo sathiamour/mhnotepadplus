@@ -17,7 +17,7 @@
     android:layout_marginRight="20dip"
     android:singleLine="true"
     android:ellipsize="end"
-    android:textSize="17dp"
+    android:textSize="17sp"
     android:text="@string/nonote_tip"
     android:textColor="@android:color/black"
     />
@@ -32,7 +32,7 @@
     android:layout_marginRight="20dip"
     android:singleLine="true"
     android:ellipsize="end"
-    android:textSize="17dp"
+    android:textSize="17sp"
     android:textColor="@android:color/black"
     />
   
@@ -45,7 +45,7 @@
     android:layout_marginRight="20dip"
     android:singleLine="true"
     android:ellipsize="end"
-    android:textSize="17dp"
+    android:textSize="17sp"
     android:textColor="@android:color/black"
     />
   

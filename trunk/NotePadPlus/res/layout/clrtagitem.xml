@@ -2,14 +2,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
                 android:layout_width="wrap_content"
                 android:layout_height="fill_parent">
-    
-      
        <Button android:id="@+id/OneTagClr"
                  android:layout_width="fill_parent"
                  android:layout_height="fill_parent"
                  android:textColor="#ff000000"
+                 android:textSize = "14sp"
                  android:ellipsize="marquee"
                  android:gravity="center"
-                 android:focusable = "false"
+                 android:focusable="false"
                  android:clickable="false"/>
 </LinearLayout>
