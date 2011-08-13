@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/parentPanel"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingTop="9dip"
+    android:paddingBottom="3dip"
+    android:paddingLeft="3dip"
+    android:paddingRight="1dip"
+    >
+
+    <LinearLayout android:id="@+id/topPanel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="54dip"
+        android:orientation="vertical">
+        <LinearLayout android:id="@+id/title_template"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="6dip"
+            android:layout_marginBottom="9dip"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip">
+            <ImageView android:id="@+id/icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="top"
+                android:paddingTop="6dip"
+                android:paddingRight="10dip"
+                android:src="@drawable/ic_dialog_menu_generic" />
+            <com.android.internal.widget.DialogTitle android:id="@+id/alertTitle" 
+                style="?android:attr/textAppearanceLarge"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:text="@string/checklist_item_title"
+                android:gravity="center_vertical"
+                android:layout_width="fill_parent" 
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <ImageView android:id="@+id/titleDivider"
+            android:layout_width="fill_parent"
+            android:layout_height="1dip"
+            android:scaleType="fitXY"
+            android:gravity="fill_horizontal"
+            android:src="@drawable/dialog_divider_horizontal_light"
+            android:layout_marginLeft="10dip"
+            android:layout_marginRight="10dip"/>
+    </LinearLayout>
+    <LinearLayout android:id="@+id/contentPanel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:paddingTop="8dip"
+        android:paddingBottom="5dip"
+        android:paddingLeft="2dip"
+        android:paddingRight="2dip"
+        android:orientation="vertical">
+         
+            
+            <EditText android:id="@+id/item_content"
+                      android:height="100dip"
+                      android:layout_width="fill_parent"
+                      android:layout_height="fill_parent"
+                      android:textSize="17sp"
+                      android:gravity="top"
+                      android:textAppearance="?android:attr/textAppearanceMedium" />
+          
+       
+    </LinearLayout>
+    <LinearLayout android:id="@+id/buttonPanel"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="54dip"
+        android:orientation="vertical" >     
+        <LinearLayout 
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingLeft="2dip"
+            android:paddingRight="2dip" >
+            <LinearLayout android:id="@+id/leftSpacer"
+                android:layout_weight="0.25"
+                android:layout_width="0dip"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone" />
+             <Button android:id="@android:id/button1" 
+                android:text="@string/confirm" 
+                android:layout_width="0dip"
+                android:layout_gravity="left"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+            <Button android:id="@android:id/button2" 
+                android:text="@string/cancel" 
+                android:layout_width="0dip"
+                android:layout_gravity="center_horizontal"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+            <Button android:id="@android:id/button3" 
+                android:text="@string/checklist_additem_next" 
+                android:layout_width="0dip"
+                android:layout_gravity="right"
+                android:layout_weight="1"
+                android:layout_height="wrap_content" />
+            <LinearLayout android:id="@+id/rightSpacer"
+                android:layout_width="0dip"
+                android:layout_weight="0.25"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone" />
+        </LinearLayout>
+     </LinearLayout>
+        
+   
+</LinearLayout>
+

@@ -21,7 +21,7 @@
 <string name="delnote_title">确认删除该日志？</string>
 <string name="about_title">关于</string>
 <string name="about_content">版本: 1.0.0     \n作者: 缪华         \n邮箱: miaohua1982@gmail.com</string>
-<string name="notefile_path_prefix">/data/data/com.android.notepadplus/files/</string>
+<string name="notefile_path_prefix">/data/data/com.android.hinotes/files/</string>
 <string name="endtime">结束时间</string>
 <string name="noendtime">无结束时间</string>
 <string name="notifytime">提醒时间</string>
@@ -98,4 +98,11 @@
 <string name="notifytime_cancel">取消修改</string>
 <string name="notifytime_remove">删除闹铃</string>
 <string name="clrnum_prompt_format">%1$d 条记录</string>
+<string name="typesel_title">日志类型</string>
+<string name="checklist_add">添加一条记录</string>
+<string name="checklist_item_title">清单内容</string>
+<string name="checklist_additem_next">下一条</string>
+<string name="checklist_delitem_title">删除</string>
+<string name="item_toolong_prompt">条目长度超过了64个字符，请删除部分！</string>
+<string name="item_empty_prompt">条目为空，请输入！</string>
 </resources>
