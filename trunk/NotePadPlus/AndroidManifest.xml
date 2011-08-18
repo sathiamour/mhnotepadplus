@@ -7,57 +7,47 @@
 	<uses-permission android:name="android.permission.VIBRATE" />
 	<uses-permission android:name="android.permission.WAKE_LOCK" />
 	<uses-permission android:name="android.permission.DEVICE_POWER" />
-	<application android:icon="@drawable/icon" android:label="@string/app_name"
-		android:debuggable="true">
-		<activity android:name=".NotePadPlus" android:label="@string/app_name"
-			android:screenOrientation="portrait">
+	<application android:icon="@drawable/icon" android:label="@string/app_name" android:debuggable="true">
+		<activity android:name=".NotePadPlus" android:label="@string/app_name" android:screenOrientation="portrait" >
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
-				<action android:name="com.android.hinotes.Widget_ShowAllNotes" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
+			<intent-filter>
+				<action android:name="com.android.hinotes.Widget_ShowAllNotes" />
+			</intent-filter>
 		</activity>
-		<activity android:name="com.android.hinotes.AddNoteActivity"
-			android:screenOrientation="portrait">
+		<activity android:name="com.android.hinotes.AddNoteActivity" android:screenOrientation="portrait">
 			<intent-filter>
 				<action android:name="android.intent.action.SEND" />
 				<category android:name="android.intent.category.DEFAULT" />
 				<data android:mimeType="text/plain" />
 			</intent-filter>
 		</activity>
-		<activity android:name=".NoteUserDefViewActivity"
-			android:screenOrientation="portrait" />
-		<activity android:name=".EditNoteActivity"
-			android:screenOrientation="portrait" />
-		<activity android:name=".EndDateActivity"
-			android:screenOrientation="portrait" />
-		<activity android:name=".NotifyDateActivity"
-			android:screenOrientation="portrait" />
-		<activity android:name=".SysSettingActivity"
-			android:screenOrientation="portrait" />
-		<activity android:name=".ColorPreferencePicker"
-			android:screenOrientation="portrait" />
-		<activity android:name=".SetTagClrActivity" android:theme="@android:style/Theme.Translucent"
-			android:screenOrientation="portrait" />
+	    <activity android:name="com.android.hinotes.AddCheckListNoteActivity"  android:screenOrientation="portrait"/>
+	    <activity android:name="com.android.hinotes.EditCheckListNoteActivity"  android:screenOrientation="portrait"/>
+	    
+		<activity android:name="AddItemActivity" android:theme="@android:style/Theme.Dialog"  android:screenOrientation="portrait"/>
+		<activity android:name=".NoteUserDefViewActivity" android:screenOrientation="portrait"/>
+		<activity android:name=".EditNoteActivity" android:screenOrientation="portrait" />
+		<activity android:name=".EndDateActivity"  android:screenOrientation="portrait" />
+		<activity android:name=".NotifyDateActivity" android:screenOrientation="portrait" />
+		<activity android:name=".SysSettingActivity" android:screenOrientation="portrait" />
+		<activity android:name=".ColorPreferencePicker" android:screenOrientation="portrait" />
+		<activity android:name=".SetTagClrActivity" android:theme="@android:style/Theme.Translucent" android:screenOrientation="portrait" />
 		<activity android:name=".ChgPwdDlgActivity" android:label="@string/note_lock_dlg_title"
-			android:theme="@android:style/Theme.Dialog"
-			android:screenOrientation="portrait" />
+			      android:theme="@android:style/Theme.Dialog"  android:screenOrientation="portrait" />
 		<activity android:name=".ClearPwdDlgActivity" android:label="@string/note_lock_clear_title"
-			android:theme="@android:style/Theme.Dialog"
-			android:screenOrientation="portrait" />
+			      android:theme="@android:style/Theme.Dialog" android:screenOrientation="portrait" />
 		<activity android:name=".PwdDlgActivity" android:label="@string/note_lock_clear_title"
-			android:theme="@android:style/Theme.Dialog"
-			android:screenOrientation="portrait" />
-		<activity android:name=".NotificationPwdDlgActivity"
-			android:label="@string/app_name" android:theme="@android:style/Theme.Dialog"
-			android:screenOrientation="portrait" />
-		<activity android:name=".FilterNoteByTagActivity"
-			android:label="@string/filter_note_byclr_title" android:theme="@style/Theme.AnimTransparent"
-			android:screenOrientation="portrait" />
+			      android:theme="@android:style/Theme.Dialog" android:screenOrientation="portrait" />
+		<activity android:name=".NotificationPwdDlgActivity"  android:label="@string/app_name"  
+		          android:theme="@android:style/Theme.Dialog" android:screenOrientation="portrait" />
+		<activity android:name=".FilterNoteByTagActivity" android:label="@string/filter_note_byclr_title" 
+		          android:theme="@style/Theme.AnimTransparent" android:screenOrientation="portrait" />
 
 
-		<activity android:name=".NotifyActivity" android:label="@string/note_notify_title"
-			android:screenOrientation="portrait" />
+		<activity android:name=".NotifyActivity" android:label="@string/note_notify_title" android:screenOrientation="portrait" />
 
 		<receiver android:name=".NotePadWidgetProvider"
 			android:label="@string/widgetname_4x2">
@@ -77,8 +67,7 @@
 				android:resource="@layout/notepad_widget_provider_1x1" />
 		</receiver>
 
-		<activity android:name=".NotePad1X1WidgetHelper"
-			android:theme="@style/Theme.Transparent" android:screenOrientation="portrait">
+		<activity android:name=".NotePad1X1WidgetHelper" android:theme="@style/Theme.Transparent" >
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_CONFIGURE" />
 			</intent-filter>
