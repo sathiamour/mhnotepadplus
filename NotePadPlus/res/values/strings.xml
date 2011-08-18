@@ -5,7 +5,7 @@
     <string name="pref_fontsize_title">显示字体大小</string>
     <string name="pref_disp_title">显示相关</string>
     <string name="hello">Hello World       NotePadPlus!</string>
-    <string name="app_name">HiNotes</string>
+    <string name="app_name">爱荳便签</string>
     <string name="addnote_title">日志标题</string>
     <string name="addnote_body">内容</string>
 <string name="nonote_tip">您还没有创建任何日志！</string>
@@ -85,8 +85,8 @@
 <string name="progress_load_title">日志加载</string>
 <string name="filter_note_byclr_title">根据颜色过滤日志</string>
 <string name="orderby_title">请选择排序规则</string>
-<string name="widgetname_4x2">NotePad窗体部件4X2</string>
-<string name="widgetname_1x1">NotePad窗体部件1X1</string>
+<string name="widgetname_4x2">爱荳便签小部件4x2</string>
+<string name="widgetname_1x1">爱荳便签小部件1x1</string>
 <string name="widget_selnote_title">请选择日志条目</string>
 
 <string name="clrpwd_input_prompt">请输入密码以解除加密:</string>
@@ -105,4 +105,7 @@
 <string name="checklist_delitem_title">删除</string>
 <string name="item_toolong_prompt">条目长度超过了64个字符，请删除部分！</string>
 <string name="item_empty_prompt">条目为空，请输入！</string>
+<string name="sd_fail_prompt">请检查SD卡是否存在！</string>
+<string name="opt_sdfile_err_prompt">操作SD卡文件出错！</string>
+<string name="opt_sdfile_success_prompt">已经保存到文件:%1$s </string>
 </resources>
