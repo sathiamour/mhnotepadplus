@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen android:title="@string/syssetting_title" android:key="@string/syssetting_key"
+  xmlns:android="http://schemas.android.com/apk/res/android">
+    <PreferenceCategory android:title="@string/pref_disp_title">
+        <CheckBoxPreference android:title="@string/pref_fullscreen_option" android:key="@string/pref_fullscreen_key" android:summaryOn="@string/pref_fullscreen_on" android:summaryOff="@string/pref_fullscreen_off" android:enabled="false"/>
+        <ListPreference android:entries="@array/fontsize" android:title="@string/pref_fontsize_title" android:key="@string/pref_fontsize_key" android:summary="@string/pref_fontsize_title" android:defaultValue="@string/pref_fontsize_defval" android:dialogTitle="@string/pref_fontsize_title" android:negativeButtonText="@string/cancel" android:entryValues="@array/fontsizevalue" />
+        <ListPreference android:entries="@array/orderby" android:title="@string/pref_orderby_title" android:key="@string/pref_orderby_key" android:summary="@string/pref_orderby_title" android:defaultValue="@string/pref_orderby_defval" android:dialogTitle="@string/pref_orderby_dlgtitle" android:negativeButtonText="@string/cancel" android:entryValues="@array/orderbyvalue" />
+        <ListPreference android:entries="@array/itemheight" android:title="@string/pref_itemheight_title" android:key="@string/pref_itemheight_key" android:defaultValue="@string/pref_itemheight_defval" android:dialogTitle="@string/pref_itemheight_title" android:negativeButtonText="@string/cancel" android:entryValues="@array/itemheightvalue" />
+        <com.android.hinotes.ColorPreferencePicker android:persistent="true" android:title="@string/pref_bgclr_title" android:key="@string/pref_bgclr_key" android:summary="@string/pref_bgclr_title" android:dialogTitle="@string/pref_bgclr_title" />
+    </PreferenceCategory>
+</PreferenceScreen>
