@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 public class NotePadWidgetProvider extends AppWidgetProvider {
@@ -63,7 +64,10 @@ public class NotePadWidgetProvider extends AppWidgetProvider {
 		      
     	      // App init jobs, if the user uses widget first
 		      if( AppProviderId == 0 )
+		      {
+		    	  Log.d("log","in 4x2 widget provider to call appinit jobs");
 		    	  AppSetting.AppInitJobs(context);
+		      }
     	      AppProviderId = appWidgetIds[0];
        }
        

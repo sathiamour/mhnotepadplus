@@ -38,6 +38,13 @@ public class NotifyAlarmReceiver extends BroadcastReceiver {
 	        // Acquire wake lock, let play notify ring service to get it
 	        // NotifyAlarmWakeLock.acquireCpuWakeLock(context);
 	        Log.d(ProjectConst.TAG,"We have acquired the cpu wake lock");
+	        
+            // Disable this alarm if it does not repeat or set new notify time
+          	Alarms.UpdateDbNoteAlarm(context, NoteRowId);
+          	
+            // Enable the next alert if there is one
+            Alarms.SetNextAlarm(context);
+            
 	        // Play the alarm alert and vibrate the device.
 	        Log.d(ProjectConst.TAG,"NotifyAlarmReceiver: Play notify ring of Note NO. "+NoteRowId);
 	        Intent PlayAlarm = new Intent(ProjectConst.ALARM_NOTIFY_RING);
@@ -53,12 +60,6 @@ public class NotifyAlarmReceiver extends BroadcastReceiver {
                 NotifyDlg.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_NO_USER_ACTION);
                 context.startActivity(NotifyDlg);
 	        }
-            
-            // Disable this alarm if it does not repeat or set new notify time
-          	Alarms.UpdateDbNoteAlarm(context, NoteRowId);
-          	
-            // Enable the next alert if there is one
-            Alarms.SetNextAlarm(context);
 	        
 	        // Show notifyication
 	        ShowNotification(context, NoteRowId, Title);     
