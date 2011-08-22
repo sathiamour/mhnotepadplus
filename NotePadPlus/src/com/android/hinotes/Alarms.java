@@ -78,7 +78,7 @@ public class Alarms
         		 Calendar Time = HelperFunctions.String2Calenar(NotifyRingTime);
         		 Time.add(Calendar.MINUTE, OneNote.GetNotifyDura(NotifyDuraIdx));
     	         NotesDb.UpdateNoteNotifyRingTime(RowId, Time);
-    	         Log.d("log","Alarms: Next notify time is "+HelperFunctions.Calendar2String(Time));
+    	         Log.d("log","Alarms: Next notify time is "+HelperFunctions.Calendar2String(Time)+" row id is"+RowId);
         }
                 
     	NotesDb.close();
@@ -144,6 +144,7 @@ public class Alarms
         NotifyMethodIdx = ProjectConst.NegativeOne;
         
         Log.d("log", "Calculate alarms: number of alarm " + Count);
+        Log.d("log", "Now time is "+ HelperFunctions.FormatCalendar2ReadableStr2(Now));
 	    for( int i = 0; i < Count; ++i )
 	    {
 	    	 NotesCursor.moveToPosition(i);
@@ -153,9 +154,11 @@ public class Alarms
 	         NotifyTime.set(Calendar.MILLISECOND, 0);
 	         
 	         // If notify time has been expired, disable it
-	         if( NotifyTime.getTimeInMillis() < NowInMillis )
+	         if( NotifyTime.getTimeInMillis() < NowInMillis ) {
+	        	 Log.d("log","Stop notify cur is "+HelperFunctions.FormatCalendar2ReadableStr2(Now)
+	        			    +" notifytime is "+HelperFunctions.FormatCalendar2ReadableStr2(NotifyTime));
 	        	 NotesDb.StopNoteNotify(TmpRowId);
-	         else if( NextAlertTime > NotifyTime.getTimeInMillis() ) {
+	         } else if( NextAlertTime > NotifyTime.getTimeInMillis() ) {
 	        	 Log.d("log","notify time is "+HelperFunctions.FormatCalendar2ReadableStr2(NotifyTime)+" millis is "+NotifyTime.getTimeInMillis());
 	        	 CurRowId = TmpRowId;
 	        	 NextAlertTime = NotifyTime.getTimeInMillis();
