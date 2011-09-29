@@ -108,4 +108,9 @@
 <string name="sd_fail_prompt">请检查SD卡是否存在！</string>
 <string name="opt_sdfile_err_prompt">操作SD卡文件出错！</string>
 <string name="opt_sdfile_success_prompt">已经保存到文件:%1$s </string>
+<string name="notifytime_err_title">提醒日期出错</string>
+<string name="notifytime_err_msg">提醒日期比当前时间晚！</string>
+<string name="multimedianote_loadbmp_err">加载图片出错！请检查图片原始文件是否存在，SD是否已经准备好！</string>
+<string name="enlarge_img_err">已经把图片放到最大！</string>
+<string name="lessen_img_err">已经把图片缩到最小！</string>
 </resources>

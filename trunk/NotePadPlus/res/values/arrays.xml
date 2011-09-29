@@ -12,6 +12,7 @@
     <string-array name="notestyle">
         <item>文本类型</item>
         <item>清单类型</item> 
+        <item>多媒体类型</item>
         <item>涂鸦类型</item>
     </string-array>
     
