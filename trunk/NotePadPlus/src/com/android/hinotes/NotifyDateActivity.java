@@ -51,7 +51,7 @@ public class NotifyDateActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.notifydate_picker);
         
-        // Views initialzation
+        // Views initialization
         Date_Picker = (Button)findViewById(R.id.notifytime_date_picker);
         Minute_Picker = (Button)findViewById(R.id.notifytime_minute_picker);
         RingTypeSel = (Spinner)findViewById(R.id.RingType);
@@ -152,8 +152,9 @@ public class NotifyDateActivity extends Activity {
 		Confirm.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-		    	   // Set return data
-		    	   SaveConfigure();
+		    	   // Set return data, if saving fails, just return
+		    	   if( !SaveConfigure() )
+		    		   return;
 		           // Return to launching activity
 		   	       finish();
 		   	}
@@ -180,8 +181,9 @@ public class NotifyDateActivity extends Activity {
     
     @Override 
     public void onBackPressed(){
-    	   // Set return data
-    	   SaveConfigure();
+    	   // Set return data, if saving fails, just return
+    	   if( !SaveConfigure() )
+    		   return;
            // Return to launching activity
    	       finish();
     }
@@ -219,8 +221,8 @@ public class NotifyDateActivity extends Activity {
     			              SelectedTime.get(Calendar.MONTH), 
     			              SelectedTime.get(Calendar.DAY_OF_MONTH));
 
-             case ProjectConst.Minute_Picker_Dlg:
-            	  return new TimePickerDialog(this, 
+              case ProjectConst.Minute_Picker_Dlg:
+            	   return new TimePickerDialog(this, 
             			     new OnTimeSetListener() {
                                  @Override
                                  public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -233,13 +235,21 @@ public class NotifyDateActivity extends Activity {
 
                                  }
                              }, SelectedTime.get(Calendar.HOUR_OF_DAY), SelectedTime.get(Calendar.MINUTE), true);
-               
+            
+              case ProjectConst.NotifyTime_Err_Dlg:
+            	   return HelperFunctions.BuildAltertDialog(this, R.string.notifytime_err_title, R.string.notifytime_err_msg);
         }
         return null;
    }
     
-   private void SaveConfigure()
+   private boolean SaveConfigure()
    {
+	    // The notify time must be greater than now
+	    if( HelperFunctions.CmpDatePrefix2(SelectedTime, Calendar.getInstance()) < 0 )
+	    {
+	    	showDialog(ProjectConst.NotifyTime_Err_Dlg);
+	    	return false;
+	    }
 	    // Set return data
 	    Bundle Result = new Bundle();
 	    // If the notify time is greater than now, then it is a validate time, record it
@@ -256,5 +266,7 @@ public class NotifyDateActivity extends Activity {
 	    setResult(RESULT_OK, ReturnBackData);
 	    // Show toast to notify user settings have been saved
 	    Toast.makeText(this, getString(R.string.notifysettingsavingtip), Toast.LENGTH_SHORT).show();
+	    // Yes, we have saved it
+	    return true;
    }
 }
