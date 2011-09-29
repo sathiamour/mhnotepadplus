@@ -5,6 +5,7 @@
        <Button android:id="@+id/OneTagClr"
                  android:layout_width="fill_parent"
                  android:layout_height="fill_parent"
+                 android:background="@drawable/custom_button_shape"
                  android:textColor="#ff000000"
                  android:textSize = "14sp"
                  android:ellipsize="marquee"
