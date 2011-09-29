@@ -69,8 +69,7 @@ public class PlayAlarmService extends Service {
 		    PhoneVibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);  
 	        // Listen for incoming calls to kill the alarm.
 	        InComingTelManager = (TelephonyManager) getSystemService(Context.TELEPHONY_SERVICE);
-	        InComingTelManager.listen(
-	                mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+	        InComingTelManager.listen(mPhoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
 	        // Acquire wake lock
 	        // NotifyAlarmWakeLock.acquireCpuWakeLock(this);
 	        
@@ -135,7 +134,7 @@ public class PlayAlarmService extends Service {
 	        //    Log.v("AlarmKlaxon.play() " + alarm.id + " alert " + alarm.alert);
 	        //}
 	        
-	        // Check wether it is silent or user does not need ring
+	        // Check whether it is silent or user does not need ring
 	        // If not, play ring music
 	        if( !RingMusic.equals(OneNote.SilentMusicTitle) &&
 	        	OneNote.IsRing(NotifyMethodIdx) ) {
@@ -192,7 +191,7 @@ public class PlayAlarmService extends Service {
 	            }
 	        }
 
-	        /** Start the vibrator after everything is ok with the media player */
+	        /** Start the vibrator after everything is OK with the media player */
 	        if( OneNote.IsVibrate(NotifyMethodIdx) )
 	        	PhoneVibrator.vibrate(VibratePattern, 0);
 	        else
