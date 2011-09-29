@@ -10,6 +10,8 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,6 +30,7 @@ public class AddCheckListNoteActivity extends Activity {
 	
 	// Views
 	private LinearLayout AddPanel;
+	private EditText NoteTitleCtrl;
 	private Button  SelectTagClrBtn;
 	private TextView NotifyTimeLabel;
 	private ListView CheckList;
@@ -56,6 +59,7 @@ public class AddCheckListNoteActivity extends Activity {
 		AddOneNote = new OneNote(OneNote.ListNote);
 		// Views
 		AddPanel = (LinearLayout)findViewById(R.id.addnote_panel);
+		NoteTitleCtrl = (EditText)findViewById(R.id.title_content);
 		SelectTagClrBtn = (Button)findViewById(R.id.selnoteclr);
 		NotifyTimeLabel = (TextView)findViewById(R.id.notifytime_text);
 		CheckList = (ListView)findViewById(R.id.checklist);
@@ -81,7 +85,8 @@ public class AddCheckListNoteActivity extends Activity {
     	SelectTagClrBtn.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
 		    	Intent intent = new Intent();
-				intent.setClass(AddCheckListNoteActivity.this, SetTagClrActivity.class);
+				intent.setClass(AddCheckListNoteActivity.this, SetItemClrActivity.class);
+				intent.putExtra(SetItemClrActivity.Key_ClrType, SetItemClrActivity.Val_ItemType_Tag);
 				startActivityForResult(intent, ProjectConst.ACTIVITY_SET_TAGCLR);				
     		}
     	});
@@ -111,6 +116,20 @@ public class AddCheckListNoteActivity extends Activity {
 				   }						   
 			}
 		});
+    	
+    	// Set text change listener
+    	NoteTitleCtrl.addTextChangedListener(new TextWatcher(){  	  
+	        @Override  
+	        public void beforeTextChanged(CharSequence s, int start, int count, int after){}  
+	  
+	        @Override  
+	        public void onTextChanged(CharSequence s, int start, int before, int count) {  
+	        	   AddOneNote.NoteTitle = s.toString();
+	        }
+
+			@Override
+			public void afterTextChanged(Editable arg0) {}     
+	    });
 	}
 	
 	@Override
@@ -121,7 +140,7 @@ public class AddCheckListNoteActivity extends Activity {
 		case ProjectConst.Check_NoteTitle_Dlg:
 		     return HelperFunctions.BuildAltertDialog(this, R.string.prompt_title, R.string.notetitle_empty_tip);
 	    case ProjectConst.ShareBy_Dlg:
-		     return HelperFunctions.BuildShareByDlg(this, R.string.shareby_title, AddOneNote.NoteTitle, 
+		     return HelperFunctions.BuildTextPlainShareByDlg(this, R.string.shareby_title, AddOneNote.NoteTitle, 
                                                     HelperFunctions.ComposeSharedItems(ItemAdapter.GetItems(), ProjectConst.One, ItemAdapter.getCount()-2));
 
 		}

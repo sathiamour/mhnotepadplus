@@ -42,7 +42,7 @@ public class FilterClrItemAdapter extends SimpleAdapter
  
 		String StrFormat = AppContext.getResources().getString(R.string.clrnum_prompt_format);	    
 		OneTag.setText(String.format(StrFormat, ClrNum[position])); 
-		OneTag.getBackground().setColorFilter(ItemBgColor[position], PorterDuff.Mode.MULTIPLY);
+		OneTag.getBackground().setColorFilter(ItemBgColor[position], PorterDuff.Mode.SRC);
 		return Item;
 	}
 	

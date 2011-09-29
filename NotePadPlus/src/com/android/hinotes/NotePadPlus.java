@@ -16,7 +16,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.database.Cursor;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -76,8 +75,11 @@ public class NotePadPlus extends Activity {
 	private int EdgeWidth = 0;
 	private static final int ScreenPadding = 15;
 	private static final int SpacePadding = 10;
-	public  static int ScreenWidth;
-	public  static int ScreenHeight;
+	public static int ScreenWidthDip;
+	public static int ScreenHeightDip;
+	public static int ScreenWidth;
+	public static int ScreenHeight;
+	public static float ScreenDensity;
 
 	// Application settings
 	public static AppSetting SysSettings;
@@ -142,7 +144,7 @@ public class NotePadPlus extends Activity {
 		// Is in filter mode
 		IsFilterMode = false;
 		
-		// Note dislpay view
+		// Note display view
 		LayoutInflater factory = LayoutInflater.from(this);
 		NoteList = (ListView)factory.inflate(R.layout.notelistview, null);
 		NoteGrid = (GridView)factory.inflate(R.layout.notegridview, null);
@@ -177,12 +179,14 @@ public class NotePadPlus extends Activity {
 		NotesDb = new NoteDbAdapter(this);
 		NotesDb.open();
 
-		// Get screen's widht & height
+		// Get screen's width & height
 		DisplayMetrics ScreenMetrics = new DisplayMetrics();
 		getWindowManager().getDefaultDisplay().getMetrics(ScreenMetrics);
-		ScreenHeight = ScreenMetrics.heightPixels;
-		ScreenWidth = ScreenMetrics.widthPixels;
-		
+		ScreenHeightDip = ScreenMetrics.heightPixels;
+		ScreenWidthDip = ScreenMetrics.widthPixels;
+		ScreenWidth = (int) (ScreenWidthDip*ScreenMetrics.density);
+		ScreenHeight = (int) (ScreenHeightDip*ScreenMetrics.density);
+		ScreenDensity = ScreenMetrics.density;
 
 		// Listview Add listener
 		// List item short click listener
@@ -208,7 +212,7 @@ public class NotePadPlus extends Activity {
 		});
 
 		// GridView
-		EdgeWidth = (Math.min(ScreenHeight, ScreenWidth) - ScreenPadding * 2 - SpacePadding * 2) / 3;
+		EdgeWidth = (Math.min(ScreenHeightDip, ScreenWidthDip) - ScreenPadding * 2 - SpacePadding * 2) / 3;
 		NoteGrid.setPadding(ScreenPadding, ScreenPadding, ScreenPadding, ScreenPadding);
 		NoteGrid.setColumnWidth(EdgeWidth);
 		NoteGrid.setHorizontalSpacing(SpacePadding);
@@ -374,7 +378,6 @@ public class NotePadPlus extends Activity {
 		NoteList.setAdapter(null);
 		ArrayList<HashMap<String, Object>> Notes = new ArrayList<HashMap<String, Object>>();
 		int[] BgColor = new int[Count];
-		int[] TagColor = new int[Count];
 		int[] NoteType = new int[Count];
 		boolean[] IsLock = new boolean[Count];
 		boolean[] IsNotify = new boolean[Count];
@@ -382,7 +385,7 @@ public class NotePadPlus extends Activity {
 		
 		NoteItemAdapter ListItemAdapter = new NoteItemAdapter(this, Notes,
                 R.layout.listitem, new String[] { "NoteTitle", "Time" }, 
-                new int[] { R.id.NoteTitle, R.id.NoteCreatedTime }, BgColor, TagColor, IsLock, IsNotify, IsRank, NoteType);
+                new int[] { R.id.NoteTitle, R.id.NoteCreatedTime }, BgColor, IsLock, IsNotify, IsRank, NoteType);
 
         NoteList.setAdapter(ListItemAdapter);
 		NoteList.setLayoutAnimation(ListAnimController);
@@ -407,7 +410,6 @@ public class NotePadPlus extends Activity {
 			Notes.add(OneNote);
 			// Set up parameters
 			BgColor[i] = ItemBgClr[Idx];
-			TagColor[i] = TagClr[Idx];
 			IsLock[i] = Pwd.length() > 0 ;
 			IsNotify[i] = (Use_NotifyTime.equals(ProjectConst.Yes) && HelperFunctions.CmpDatePrefix2(NotifyTime, Calendar.getInstance()) > 0);
 			IsRank[i] = (Rank == 0) ? false: true;
@@ -471,7 +473,7 @@ public class NotePadPlus extends Activity {
     		 ImgTextView Text = (ImgTextView)factory.inflate(R.layout.userdefitem, null);
              //Text.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.GetAlpha1x1Bg(this, R.drawable.bg_userdef_note, 120, 120, ClrId)));
     		 Text.Initialization(ClrId, Type==OneNote.ListNote, Password.length()>0);
-             Text.setOnTouchListener(new MyOnTouchListener(Text, RowId, i, ScreenWidth, ScreenHeight, Type, Password.length()>0));
+             Text.setOnTouchListener(new MyOnTouchListener(Text, RowId, i, ScreenWidthDip, ScreenHeightDip, Type, Password.length()>0));
              Text.setText(Title);
              
              Positions.add(new NotePos(RowId, LeftX, LeftY));
@@ -584,6 +586,12 @@ public class NotePadPlus extends Activity {
 		startActivityForResult(i, ProjectConst.ACTIVITY_CREATE);
 	}
 	
+	private void AddMultiMediaNote()
+	{
+		Intent i = new Intent(this, AddMultiMediaNoteActivity.class);
+		startActivityForResult(i, ProjectConst.ACTIVITY_CREATE);	
+	}
+	
 	private void AddGraffitiNote()
 	{
 		
@@ -616,7 +624,11 @@ public class NotePadPlus extends Activity {
 				OneNoteData = new Intent(this, EditCheckListNoteActivity.class);
 				OneNoteData.putExtra(ProjectConst.KEY_SOURCE, ProjectConst.MAIN_EDIT_ATION);
 				OneNoteData.putExtra(OneNote.KEY_ROWID, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
-			} else {
+			} else if( Type == OneNote.MultiMediaNote ) {
+				OneNoteData = new Intent(this, EditMultiMediaNoteActivity.class);
+				OneNoteData.putExtra(ProjectConst.KEY_SOURCE, ProjectConst.MAIN_EDIT_ATION);
+				OneNoteData.putExtra(OneNote.KEY_ROWID, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
+	        } else {
 				OneNoteData = new Intent(this, EditNoteActivity.class);
 				OneNoteData.putExtra(ProjectConst.KEY_SOURCE, ProjectConst.MAIN_EDIT_ATION);
 				OneNoteData.putExtra(OneNote.KEY_ROWID, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
@@ -663,7 +675,8 @@ public class NotePadPlus extends Activity {
 	
 	private void SetTagHelper(){
 		Intent intent = new Intent();
-		intent.setClass(NotePadPlus.this, SetTagClrActivity.class);
+		intent.setClass(NotePadPlus.this, SetItemClrActivity.class);
+		intent.putExtra(SetItemClrActivity.Key_ClrType, SetItemClrActivity.Val_ItemType_Bg);
 		startActivityForResult(intent, ProjectConst.ACTIVITY_SET_TAGCLR);
 	}
 	
@@ -870,13 +883,15 @@ public class NotePadPlus extends Activity {
                 public void onClick(DialogInterface dialogInterface, int which) { 
                 	        switch(which)
                 	        {
-                	            case 0:      // add text notes
+                	            case OneNote.TextNote:      // add text notes
                 	            	 AddTextNote();
                 	            	 break;
-                	            case 1:      // add check list notes
+                	            case OneNote.ListNote:      // add check list notes
                 	            	 AddCheckListNote();
                 	            	 break;
-                	            case 2:
+                	            case OneNote.MultiMediaNote:
+                	            	 AddMultiMediaNote();
+                	            case OneNote.ScrawlNote:
                 	            	 AddGraffitiNote();
                 	            	 break;
                 	        }
@@ -908,7 +923,7 @@ public class NotePadPlus extends Activity {
 		case ProjectConst.OrderBySel_Dlg:
 			 return BuildOrderByDlg(this, R.string.orderby_title, R.array.orderby);
 		case ProjectConst.CreateTypeSel_Dlg:
-			 return BuildCreateTypeSelDlg(this, R.string.typesel_title, R.array.notestyle, new int[]{R.drawable.ic_menu_compose, R.drawable.ic_menu_mark, android.R.drawable.ic_menu_mapmode});
+			 return BuildCreateTypeSelDlg(this, R.string.typesel_title, R.array.notestyle, new int[]{R.drawable.ic_item_text, R.drawable.ic_item_list, R.drawable.ic_item_scrawl, R.drawable.ic_item_scrawl});
 		}
 		return null;
 	}
@@ -996,9 +1011,9 @@ public class NotePadPlus extends Activity {
 		int ClrId = intent.getIntExtra(OneNote.KEY_DRAWABLE_ID, ProjectConst.Zero);
 		int Type = intent.getIntExtra(OneNote.KEY_NOTETYPE, ProjectConst.Zero);
 		LayoutInflater factory = LayoutInflater.from(this);
-		TextView Text = (TextView)factory.inflate(R.layout.userdefitem, null);
-        Text.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.GetAlpha1x1Bg(this, R.drawable.bg_userdef_note, 120, 120, ClrId)));
-        Text.setOnTouchListener(new MyOnTouchListener(Text, RowId, Positions.size(), ScreenWidth, ScreenHeight, Type, Pwd.length()>0));
+		ImgTextView Text = (ImgTextView)factory.inflate(R.layout.userdefitem, null);
+        Text.Initialization(ClrId, Type==OneNote.ListNote, Pwd.length()>0);
+        Text.setOnTouchListener(new MyOnTouchListener(Text, RowId, Positions.size(), ScreenWidthDip, ScreenHeightDip, Type, Pwd.length()>0));
         Text.setText(Title);
         Positions.add(new NotePos(RowId, ProjectConst.NegativeOne, ProjectConst.NegativeOne));
         MainLayout.addView(Text);
@@ -1075,8 +1090,10 @@ public class NotePadPlus extends Activity {
             	            		 Intent ActivityIntent = null;
             	            	     if( NoteType == OneNote.ListNote) 
             	            		     ActivityIntent = new Intent(Holder.getContext(), EditCheckListNoteActivity.class);
-            	            	     else
+            	            	     else if( NoteType == OneNote.TextNote )
             	            		     ActivityIntent = new Intent(Holder.getContext(), EditNoteActivity.class);
+            	            	     else if( NoteType == OneNote.MultiMediaNote )
+            	            	    	 ActivityIntent = new Intent(Holder.getContext(), EditMultiMediaNoteActivity.class);
             	            	
             	         		     ActivityIntent.putExtra(OneNote.KEY_ROWID, RowId);
             	         		     ActivityIntent.putExtra(OneNote.KEY_INDEX, PosIdx);

@@ -14,9 +14,13 @@ import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class SetTagClrActivity extends Activity {
+public class SetItemClrActivity extends Activity {
 	
-	/** Pading(in pixel unit) */
+	public static final String Key_ClrType = "ClrType";
+	public static final String Val_ItemType_Tag = "Tag";
+	public static final String Val_ItemType_Bg = "Bg";
+	
+	/** Padding(in pixel unit) */
 	public static final int WidthPadding = 15; 
 	public static final int SpacePadding = 10;
 	
@@ -28,9 +32,17 @@ public class SetTagClrActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settagclr);
         
-        getWindow().setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND,
-                             WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
-        
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
+        // Get parameters
+        int[] Clrs = null;
+        Bundle Parameters = getIntent().getExtras();
+		if( Parameters != null )
+			if( Parameters.getString(Key_ClrType).equals(Val_ItemType_Tag) )
+				Clrs = NotePadPlus.TagClr;
+			else
+				Clrs = NotePadPlus.ItemBgClr;
+		
+        // Screen width & height
         DisplayMetrics ScreenMetrics = new DisplayMetrics();  
         getWindowManager().getDefaultDisplay().getMetrics(ScreenMetrics);   
         int ScreenHeight = ScreenMetrics.heightPixels;   
@@ -65,7 +77,7 @@ public class SetTagClrActivity extends Activity {
 	         // Dummy item
 	         Tags.add(OneTag);
 	         // Set up colors
-	         TagColor[i] = NotePadPlus.TagClr[i];
+	         TagColor[i] = Clrs[i];
 	    }
 	    
 	    TagClrItemAdapter TagAdapter = new TagClrItemAdapter(this, Tags, 

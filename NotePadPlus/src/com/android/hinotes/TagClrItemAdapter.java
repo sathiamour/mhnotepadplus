@@ -35,7 +35,7 @@ public class TagClrItemAdapter extends SimpleAdapter
 		OneTag.setWidth(ItemWidth);
 		OneTag.setHeight(ItemWidth);
 		OneTag.setTextColor(ItemBgColor[position]);
-		OneTag.getBackground().setColorFilter(ItemBgColor[position], PorterDuff.Mode.MULTIPLY);
+		OneTag.getBackground().setColorFilter(ItemBgColor[position], PorterDuff.Mode.SRC);
 		return Item;
 	}
 	
