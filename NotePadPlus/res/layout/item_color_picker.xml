@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout android:orientation="vertical" android:id="@+id/layout" android:background="@android:drawable/alert_light_frame" android:layout_width="300.0dip" android:layout_height="300.0dip" android:layout_centerInParent="true" xmlns:android="http://schemas.android.com/apk/res/android">
+    <LinearLayout android:textColor="#ff000000" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_marginLeft="5.0dip" android:layout_marginTop="5.0dip" android:layout_marginRight="5.0dip" android:layout_weight="1.0">
+        <FrameLayout android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0">
+            <ImageButton android:gravity="center" android:id="@+id/btn1" android:background="@android:drawable/menuitem_background" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+            <TextView  android:gravity="center" android:id="@+id/txt2" android:layout_width="fill_parent" android:layout_height="fill_parent" style="?android:attr/textAppearanceMedium" />
+        </FrameLayout>
+        <FrameLayout android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0">
+            <ImageButton android:gravity="center" android:id="@+id/btn2" android:background="@android:drawable/menuitem_background" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+            <TextView android:gravity="center" android:id="@+id/txt2" android:layout_width="fill_parent" android:layout_height="fill_parent" style="?android:attr/textAppearanceMedium" />
+        </FrameLayout>
+        <FrameLayout android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0">
+            <ImageButton android:gravity="center" android:id="@+id/btn3" android:background="@android:drawable/menuitem_background" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+            <TextView android:gravity="center" android:id="@+id/txt3" android:layout_width="fill_parent" android:layout_height="fill_parent" style="?android:attr/textAppearanceMedium" />
+        </FrameLayout>
+    </LinearLayout>
+    <LinearLayout android:textColor="#ff000000" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_marginLeft="5.0dip" android:layout_marginTop="0.0px" android:layout_marginRight="5.0dip" android:layout_weight="1.0">
+        <FrameLayout android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0">
+            <ImageButton android:gravity="center" android:id="@+id/btn4" android:background="@android:drawable/menuitem_background" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+            <TextView android:gravity="center" android:id="@+id/txt4" android:layout_width="fill_parent" android:layout_height="fill_parent" style="?android:attr/textAppearanceMedium" />
+        </FrameLayout>
+        <FrameLayout android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0">
+            <ImageButton android:gravity="center" android:id="@+id/btn5" android:background="@android:drawable/menuitem_background" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+            <TextView android:gravity="center" android:id="@+id/txt5" android:layout_width="fill_parent" android:layout_height="fill_parent" style="?android:attr/textAppearanceMedium" />
+        </FrameLayout>
+        <FrameLayout android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0">
+            <ImageButton android:gravity="center" android:id="@+id/btn6" android:background="@android:drawable/menuitem_background" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+            <TextView android:gravity="center" android:id="@+id/txt6" android:layout_width="fill_parent" android:layout_height="fill_parent" style="?android:attr/textAppearanceMedium" />
+        </FrameLayout>
+    </LinearLayout>
+    <LinearLayout android:textColor="#ff000000" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_marginLeft="5.0dip" android:layout_marginTop="0.0px" android:layout_marginRight="5.0dip" android:layout_weight="1.0">
+        <FrameLayout android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0">
+            <ImageButton android:gravity="center" android:id="@+id/btn7" android:background="@android:drawable/menuitem_background" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+            <TextView android:gravity="center" android:id="@+id/txt7" android:layout_width="fill_parent" android:layout_height="fill_parent" style="?android:attr/textAppearanceMedium" />
+        </FrameLayout>
+        <FrameLayout android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0">
+            <ImageButton android:gravity="center" android:id="@+id/btn8" android:background="@android:drawable/menuitem_background" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+            <TextView android:gravity="center" android:id="@+id/txt8" android:layout_width="fill_parent" android:layout_height="fill_parent" style="?android:attr/textAppearanceMedium" />
+        </FrameLayout>
+        <FrameLayout android:layout_width="0.0dip" android:layout_height="fill_parent" android:layout_weight="1.0">
+            <ImageButton android:gravity="center" android:id="@+id/btn9" android:background="@android:drawable/menuitem_background" android:layout_width="fill_parent" android:layout_height="fill_parent" />
+            <TextView android:gravity="center" android:id="@+id/txt9" android:layout_width="fill_parent" android:layout_height="fill_parent" style="?android:attr/textAppearanceMedium" />
+        </FrameLayout>
+    </LinearLayout>
+    <View android:id="@+id/bottom" android:layout_width="fill_parent" android:layout_height="0.0dip" android:layout_marginBottom="5.0dip" />
+    <View android:id="@+id/sep" android:background="#88888888" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="1.0dip" />
+    <FrameLayout android:id="@+id/ad" android:visibility="gone" android:layout_width="fill_parent" android:layout_height="wrap_content" />
+</LinearLayout>
