@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+import java.util.Vector;
 
 import android.content.Context;
 import android.app.AlertDialog;
@@ -22,6 +23,7 @@ import android.app.PendingIntent;
 import android.app.AlertDialog.Builder;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -33,6 +35,7 @@ import android.graphics.LinearGradient;
 import android.graphics.Paint;
 import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -43,7 +46,7 @@ import android.widget.Toast;
 
 public class HelperFunctions{
 	
-	/** Max lenght of note title to show in widget */
+	/** Max length of note title to show in widget */
 	public static final int MaxLenOfTitleInListView = 10;
 	private static final String TitlePostfix = "...";
 	
@@ -150,7 +153,7 @@ public class HelperFunctions{
             return Title;
 	}
 	
-	// Check wether target floder exists, if not, create it 
+	// Check whether target folder exists, if not, create it 
 	public static boolean IsExistDir(String Path) {   
         File TargetDir = new File(Path);  
 
@@ -178,7 +181,7 @@ public class HelperFunctions{
 	// Refresh widget note list
 	public static void RefreshWidgetNoteList(Context ActivityContext, Cursor Notes)
 	{     
-		  Log.d("log","In RefreshWidgetNoteList to refresh main widget. The AppProviderId is "+NotePadWidgetProvider.AppProviderId);
+		  Log.d(ProjectConst.TAG,"In RefreshWidgetNoteList to refresh main widget. The AppProviderId is "+NotePadWidgetProvider.AppProviderId);
 		  // Just return, if haven't get our widget provider's id
 		  // if( NotePadWidgetProvider.AppProviderId == 0 ) return;
 		  
@@ -245,6 +248,69 @@ public class HelperFunctions{
 	        appWidgetManager.updateAppWidget(AppWidgetId, remoteViews);		   
     }
     
+    public static Bitmap DecodeBitmapFromUri(Context AppContext, Uri uri, int DefinedW, int DefinedH) throws FileNotFoundException{  
+        ContentResolver cr = AppContext.getContentResolver();  
+        BitmapFactory.Options opts = new BitmapFactory.Options();
+        opts.inJustDecodeBounds = true;
+        Bitmap Target = null;
+        try {
+		    BitmapFactory.decodeStream(cr.openInputStream(uri), null,opts); 
+        }catch (OutOfMemoryError err) {
+			return Target;
+		} 
+        
+        opts.inSampleSize = computeSampleSize(opts, -1, DefinedW*DefinedH);		
+        opts.inJustDecodeBounds = false;
+        
+        try {
+        	Target = BitmapFactory.decodeStream(cr.openInputStream(uri), null, opts); 
+        } catch (OutOfMemoryError err) {
+        	return Target;
+        }
+	 
+	    return Target;
+    }  
+    
+	public static int computeSampleSize(BitmapFactory.Options options, int minSideLength, int maxNumOfPixels) {
+	    int initialSize = computeInitialSampleSize(options, minSideLength, maxNumOfPixels);
+
+	    int roundedSize;
+	    if (initialSize <= 8) {
+	        roundedSize = 1;
+	        while (roundedSize < initialSize) {
+	            roundedSize <<= 1;
+	        }
+	    } else {
+	        roundedSize = (initialSize + 7) / 8 * 8;
+	    }
+
+	    return roundedSize;
+	}
+
+	private static int computeInitialSampleSize(BitmapFactory.Options options, int minSideLength, int maxNumOfPixels) {
+	    double w = options.outWidth;
+	    double h = options.outHeight;
+
+	    int lowerBound = (maxNumOfPixels == -1) ? 1 :
+	            (int) Math.ceil(Math.sqrt(w * h / maxNumOfPixels));
+	    int upperBound = (minSideLength == -1) ? 128 :
+	            (int) Math.min(Math.floor(w / minSideLength),
+	            Math.floor(h / minSideLength));
+
+	    if (upperBound < lowerBound) {
+	        // return the larger one when there is no overlapping zone.
+	        return lowerBound;
+	    }
+
+	    if ((maxNumOfPixels == -1) &&
+	            (minSideLength == -1)) {
+	        return 1;
+	    } else if (minSideLength == -1) {
+	        return lowerBound;
+	    } else {
+	        return upperBound;
+	    }
+	}
 	public static Bitmap GetAlpha1x1Bg(Context AppCtx, int DrawableId, int W, int H, int BgClrId){
 	    InputStream is = AppCtx.getResources().openRawResource(DrawableId);
 	    Bitmap Src = BitmapFactory.decodeStream(is);
@@ -279,12 +345,13 @@ public class HelperFunctions{
 		return Result;
 	}
 	
-	public static Dialog BuildShareByDlg(final Context AppContext, int Title, final String SharedTitle, final String SharedBody)
+	
+	public static Dialog BuildTextPlainShareByDlg(final Context AppContext, int Title, final String SharedTitle, final String SharedBody)
 	{
         Builder builder = new AlertDialog.Builder(AppContext);  
         builder.setIcon(R.drawable.ic_dialog_menu_generic);  
         builder.setTitle(Title);  
-        final BaseAdapter adapter = new ShareByListItemAdapter(AppContext);  
+        final BaseAdapter adapter = new ShareByListItemAdapter(AppContext, Intent.ACTION_SEND, "text/plain");  
         DialogInterface.OnClickListener listener =   
             new DialogInterface.OnClickListener() {  
                 @Override  
@@ -305,8 +372,47 @@ public class HelperFunctions{
         return builder.create();  
 	}
 	
- 
+	public static Dialog BuildMediaShareByDlg(final Context AppContext, int Title, final String SharedTitle, final String SharedBody, final Vector<String> MultiMediaUri)
+	{
+        Builder builder = new AlertDialog.Builder(AppContext);  
+        builder.setIcon(R.drawable.ic_dialog_menu_generic);  
+        builder.setTitle(Title);  
+        final BaseAdapter adapter = new ShareByListItemAdapter(AppContext, Intent.ACTION_SEND_MULTIPLE, "image/*");  
+        DialogInterface.OnClickListener listener =   
+            new DialogInterface.OnClickListener() {  
+                @Override  
+                public void onClick(DialogInterface dialogInterface, int which) { 
+                	ShareByListItemAdapter Adapter = (ShareByListItemAdapter)adapter;
+                	Intent intent = new Intent();
+                	
+                	int Count = MultiMediaUri.size();
+                	 
+                    intent.setAction(Intent.ACTION_SEND_MULTIPLE);
+                	intent.setComponent(new ComponentName(Adapter.Apps.get(which).activityInfo.packageName, Adapter.Apps.get(which).activityInfo.name));
+                    intent.putExtra(Intent.EXTRA_SUBJECT, SharedTitle);               
+                    intent.putExtra(Intent.EXTRA_TEXT, SharedBody);
+                    ArrayList<Uri> AttachList = new ArrayList<Uri>();
+                    for( int i = 0; i < Count; ++i )
+                    	 AttachList.add(Uri.parse(MultiMediaUri.get(i)));
+                    intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, AttachList);
+                    intent.setType("image/*");
+                    
+                    AppContext.startActivity(intent); 
+                }  
+            };  
+        builder.setAdapter(adapter, listener);  
+        return builder.create();  
+	}
 
+	public static String MakeCameraFolder()
+	{
+	    String SDFolder = Environment.getExternalStorageDirectory()+"/dcim/Camera";
+	    if( !IsExistDir(SDFolder) )
+	    	return ProjectConst.EmptyStr;
+	    return SDFolder;
+	}
+	
+ 
 	public static String WriteFile2SD(Context AppContext, String FileName, String Content)
 	{
 		String Info = AppContext.getString(R.string.opt_sdfile_err_prompt);
@@ -448,7 +554,7 @@ public class HelperFunctions{
 			e1.printStackTrace();
 			return;
 		}; 
-		Log.d("log","the path is "+Path);
+		
         try {
 		      for( int i = Start; i <= End; ++i )
 		      {

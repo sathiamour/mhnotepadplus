@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.graphics.Paint.FontMetrics;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -20,7 +19,6 @@ import android.widget.TextView;
 public class NoteItemAdapter extends SimpleAdapter
 {
     private int[] ItemBgColor;
-    private int[] TagColor;
     private int[] NoteType;
     private boolean[] IsLock;
     private boolean[] IsNotify;
@@ -33,7 +31,7 @@ public class NoteItemAdapter extends SimpleAdapter
     Context AppContext;
 	public NoteItemAdapter(Context context,
 			List<? extends Map<String, ?>> data, int resource, String[] from,
-			int[] to, int[] BgClr, int[] TagClr, boolean[] Lock, boolean[] Notify, boolean [] Rank, int[] Type) 
+			int[] to, int[] BgClr, boolean[] Lock, boolean[] Notify, boolean [] Rank, int[] Type) 
 	{
 		super(context, data, resource, from, to);
 		// TODO Auto-generated constructor stub
@@ -41,7 +39,6 @@ public class NoteItemAdapter extends SimpleAdapter
 		AppContext = context;
 		// Array
 		ItemBgColor = BgClr;
-		TagColor = TagClr;
 		NoteType = Type;
 		IsLock = Lock;
 		IsNotify = Notify;
@@ -83,10 +80,9 @@ public class NoteItemAdapter extends SimpleAdapter
 		
 		Tag.setBackgroundColor(ItemBgColor[position]);
 		if( NoteType[position] == OneNote.TextNote )
-			Tag.setImageResource(R.drawable.ic_menu_compose);
+			Tag.setImageResource(R.drawable.ic_item_text);
 		else
-			Tag.setImageResource(R.drawable.ic_menu_agenda);
-
+			Tag.setImageResource(R.drawable.ic_item_list);
 
 		Title.setTextSize(AppSetting.FontSizeArray[Integer.parseInt(NotePadPlus.SysSettings.FontSize)]);
 
@@ -94,7 +90,7 @@ public class NoteItemAdapter extends SimpleAdapter
 		float ItemHeightFactor = AppSetting.ItemHeightFactor[Integer.parseInt(NotePadPlus.SysSettings.ItemHeight)];
 		Title.setHeight((int) (FontHeight1*ItemHeightFactor));
 		Time.setHeight((int)(FontHeight2));
-		Title.setWidth(NotePadPlus.ScreenWidth-110);
+		Title.setWidth(NotePadPlus.ScreenWidthDip-110);
 		Sub.setBackgroundColor(ItemBgColor[position]);
         
 		if( !IsLock[position] )

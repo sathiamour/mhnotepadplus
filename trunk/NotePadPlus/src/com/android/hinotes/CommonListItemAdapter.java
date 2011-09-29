@@ -5,6 +5,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.BaseAdapter;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.AbsListView.LayoutParams;
 
@@ -35,26 +37,34 @@ public class CommonListItemAdapter extends BaseAdapter {
 	  
 	      @Override  
 	      public View getView(int position, View contentView, ViewGroup parent) {  
+
+	    	    LinearLayout Item = new LinearLayout(AppContext);
+	            AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);  
+	    	    Item.setLayoutParams(layoutParams);
 	            TextView textView = new TextView(AppContext);  
-	            //获得array.xml中的数组资源getStringArray返回的是一个String数组  
 	            String text = AppContext.getResources().getStringArray(Items)[position];  
 	            textView.setText(text);  
-	            //设置字体大小  
+
+	            // Set font size  
 	            textView.setTextSize(24);  
-	            AbsListView.LayoutParams layoutParams = new AbsListView.LayoutParams(  
-	                    LayoutParams.FILL_PARENT,LayoutParams.WRAP_CONTENT);  
-	            textView.setLayoutParams(layoutParams);  
-	            //设置水平方向上居中  
+	            // Set layout
 	            textView.setGravity(android.view.Gravity.CENTER_VERTICAL);  
-	            textView.setMinHeight(65);  
-	            //设置文字颜色  
-	            textView.setTextColor(Color.BLACK);    
-	            //设置图标在文字的左边  
-	            textView.setCompoundDrawablesWithIntrinsicBounds(ImgIds[position], 0, 0, 0);  
-	            //设置textView的左上右下的padding大小  
-	            textView.setPadding(15, 0, 15, 0);  
-	            //设置文字和图标之间的padding大小  
-	            textView.setCompoundDrawablePadding(15); 
-	            return textView;  
+	            textView.setMinHeight(60);  
+	            textView.setPadding(5, 0, 0, 0);
+	            // Set font color
+	            textView.setTextColor(Color.BLACK);  
+	            
+	            // Set app icon
+	            ImageView Tag = new ImageView(AppContext);
+	            Tag.setImageResource(ImgIds[position]);
+	            Tag.setScaleType(ImageView.ScaleType.FIT_CENTER);
+	            Tag.setMinimumHeight(60);
+	            Tag.setMinimumWidth(45);
+                 
+	            // Add icon & name
+	            Item.addView(Tag);
+	            Item.addView(textView);
+
+	            return Item;  
 	      }	          
 	}  

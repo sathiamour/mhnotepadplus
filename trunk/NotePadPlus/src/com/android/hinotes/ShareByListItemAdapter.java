@@ -20,9 +20,9 @@ class ShareByListItemAdapter extends BaseAdapter {
 	      
 		  public List<ResolveInfo> Apps;
 		  Context AppContext;
-		  ShareByListItemAdapter(Context AppCtxt){
-				Intent IntentType = new Intent(Intent.ACTION_SEND);
-				IntentType.setType("text/plain");  
+		  ShareByListItemAdapter(Context AppCtxt, String Action, String MediaType){
+				Intent IntentType = new Intent(Action);
+				IntentType.setType(MediaType);  
 				Apps = AppCtxt.getPackageManager().queryIntentActivities(IntentType, PackageManager.GET_ACTIVITIES);
 				AppContext = AppCtxt;
 		  }
@@ -62,11 +62,15 @@ class ShareByListItemAdapter extends BaseAdapter {
 	            // Set font color
 	            textView.setTextColor(Color.BLACK);  
 	            
-	            // Set app icon
+	            // Set application icon
 	            ImageView Tag = new ImageView(AppContext);
-	            Tag.setImageDrawable(info.activityInfo.loadIcon(AppContext.getPackageManager()));
+	            Tag.setImageDrawable(info.activityInfo.applicationInfo.loadIcon(AppContext.getPackageManager()));
 	            Tag.setScaleType(ImageView.ScaleType.FIT_CENTER);
+	            Tag.setPadding(0, 5, 0, 0);
+	            Tag.setAdjustViewBounds(true);
 	            Tag.setMinimumHeight(60);
+	            Tag.setMaxWidth(50);
+	            //Tag.setMaxWidth(35);
                  
 	            // Add icon & name
 	            Item.addView(Tag);

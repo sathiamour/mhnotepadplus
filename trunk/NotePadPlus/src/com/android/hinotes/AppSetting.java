@@ -10,11 +10,12 @@ import android.util.Log;
 class AppSetting
 {
 	// Preferences name
-	public static final String PREFS_NAME = "NotePadPlusSetting";
+	public static final String PREFS_NAME = "HiNotesSetting";
 	
 	// Preference key name
 	public static final String Key_PrefViewStyle = "ViewStyle";
 	public static final String Key_PrefAppCount = "PrefAppCount";
+	public static final String Key_Alarm_RowId = "RowId";
     public static final String Key_PrefFullScreen = "FullScreen_Key";
     public static final String Key_PrefFontSize = "FontSize_Key";
     public static final String Key_PrefOrderBy = "OrderBy_Key";
@@ -40,7 +41,7 @@ class AppSetting
 	public static final int[] OrderByIcon = { R.drawable.ic_menu_created_time, R.drawable.ic_menu_desk_clock,
                                               android.R.drawable.ic_menu_sort_alphabetically, R.drawable.ic_menu_sort_by_color,
                                               R.drawable.ic_menu_sort_by_rank};
-	// App setting holder
+	// Application setting holder
 	public String ViewStyle;
 	public int PrefAppCount;
 	public boolean IsFullScreen;
@@ -50,7 +51,7 @@ class AppSetting
 	public int BgClr;
 	public static int ScreenOrient;
 	
-	// SharedPreference instantance 
+	// SharedPreference instance 
 	private SharedPreferences AppSettings;
 	private SharedPreferences PrefSettings;
 	
@@ -115,6 +116,20 @@ class AppSetting
 		PrefEditor.commit();
 		// Set value
 		OrderBy = By;
+	}
+	
+	public static int GetIntParam(Context AppContext, String KeyName, int DefaultVal)
+	{
+		SharedPreferences Setting = AppContext.getSharedPreferences(PREFS_NAME, 0);
+		return Setting.getInt(KeyName, DefaultVal);
+	}
+	
+	public static boolean PutIntParam(Context AppContext, String KeyName, int Val)
+	{
+		SharedPreferences Setting = AppContext.getSharedPreferences(PREFS_NAME, 0);
+		SharedPreferences.Editor PrefEditor = Setting.edit();        
+		PrefEditor.putInt(KeyName, Val); 
+		return PrefEditor.commit();
 	}
 	
 	// Init works:

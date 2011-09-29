@@ -9,12 +9,13 @@ import android.database.Cursor;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.GridView;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class FilterNoteByTagActivity extends Activity {
-	/** Pading(in pixel unit) */
+	/** Padding(in pixel unit) */
 	public static final int WidthPadding = 15; 
 	public static final int SpacePadding = 10;
 	
@@ -25,6 +26,7 @@ public class FilterNoteByTagActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.settagclr);
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
         
         DisplayMetrics ScreenMetrics = new DisplayMetrics();  
         getWindowManager().getDefaultDisplay().getMetrics(ScreenMetrics);   

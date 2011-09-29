@@ -28,14 +28,14 @@ public class ClearPwdDlgActivity extends Activity {
 			NoteRowId = Parameters.getInt(OneNote.KEY_ROWID);
 
         Button Confirm =(Button)findViewById(R.id.clrpwd_confirm);
-        Confirm.setWidth(NotePadPlus.ScreenWidth/2);
+        Confirm.setWidth(NotePadPlus.ScreenWidthDip/2);
         Confirm.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
     			EditText Pwd_Orignal = (EditText)findViewById(R.id.pwd_edit);
     			if (NoteRowId != 0 ) {
 		        	NoteDbAdapter NotesDb = new NoteDbAdapter(ClearPwdDlgActivity.this);
 		    		NotesDb.open();
-		        	// Check orignal password
+		        	// Check original password
 		    		Cursor Note = NotesDb.GetOneNote(NoteRowId);
 		    		if( !Pwd_Orignal.getText().toString().equals(Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_PWD))))
 		    		{
@@ -54,7 +54,7 @@ public class ClearPwdDlgActivity extends Activity {
        	});
 		
         Button Cancel=(Button)findViewById(R.id.clrpwd_cancel);
-        Cancel.setWidth(NotePadPlus.ScreenWidth/2);
+        Cancel.setWidth(NotePadPlus.ScreenWidthDip/2);
         Cancel.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
 		    	finish();				

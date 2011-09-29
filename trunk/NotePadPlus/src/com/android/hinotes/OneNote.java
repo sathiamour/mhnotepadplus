@@ -51,8 +51,11 @@ public class OneNote {
     private static final String Ring="œÏ¡Â";
     public static final String InvalidateNotifyTime = ProjectConst.InvalidateDate;
     public static final String SilentMusicTitle = "Silent";
+    // Note type
     public static final int TextNote = 0;
     public static final int ListNote = 1;
+    public static final int MultiMediaNote = 2;
+    public static final int ScrawlNote = 3;
 	
 	public String NoteTitle;
 	public String NoteBody;
@@ -77,6 +80,7 @@ public class OneNote {
 		   NoteBody = ProjectConst.EmptyStr;
 		   NoteTitle = ProjectConst.EmptyStr;
 		   RingMusic = ProjectConst.EmptyStr;
+		   Password = ProjectConst.EmptyStr;
 		   PosIdx = ProjectConst.NegativeOne;
 		   NotifyDura = ProjectConst.Zero;
 		   NotifyMethod = 3;

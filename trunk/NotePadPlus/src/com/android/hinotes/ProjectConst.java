@@ -27,6 +27,7 @@ public class ProjectConst
 	public static final int ItemEdit_Dlg = 19;
     public static final int Item_TooLong_Prompt_Dlg = 20;
     public static final int Item_Empty_Prompt_Dlg = 21;
+    public static final int NotifyTime_Err_Dlg = 22;
     
 	/** Action id for activity redirection */
 	public static final int ACTIVITY_CREATE = 0;
@@ -42,6 +43,10 @@ public class ProjectConst
 	public static final int ACTIVITY_SET_NOTIFYTIME = 10;
 	public static final int ACTIVITY_SEL_NOTIFYMUSIC = 11;
 	public static final int ACTIVITY_ADD_ITEM = 12;
+	public static final int ACTIVITY_GET_PICTURE = 13;
+	public static final int ACTIVITY_CROP = 14;
+	public static final int ACTIVITY_EDIT_PIC = 15;
+	public static final int ACTIVITY_CAMERA_CAPTURE = 16;
 
 	/** Bottom Menu id */
 	public static final int ITEM0 = Menu.FIRST;

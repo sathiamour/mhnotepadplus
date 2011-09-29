@@ -181,12 +181,13 @@ public class EditCheckListNoteActivity extends Activity {
 		ChgTagClrBtn.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
 		    	Intent intent = new Intent();
-				intent.setClass(EditCheckListNoteActivity.this, SetTagClrActivity.class);
+				intent.setClass(EditCheckListNoteActivity.this, SetItemClrActivity.class);
+				intent.putExtra(SetItemClrActivity.Key_ClrType, SetItemClrActivity.Val_ItemType_Tag);
 				startActivityForResult(intent, ProjectConst.ACTIVITY_SET_TAGCLR);				
     		}
     	});
 
-		// Eidt button
+		// Edit button
 		EditBtn.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
     			StartEditMode();
@@ -219,7 +220,7 @@ public class EditCheckListNoteActivity extends Activity {
     	 // Update database record
     	 NotesDb.UpdateOneNote(EditOneNote); 
     	 
-    	 // Update the sepcific alarm if user has changed the notify time
+    	 // Update the specific alarm if user has changed the notify time
     	 if( !Pre_UseNotifyTime.equals(EditOneNote.Use_NotifyTime) )
     	 {
         	 // From Y(use notify) to N(don't use notify), User cancels alarm
@@ -329,7 +330,7 @@ public class EditCheckListNoteActivity extends Activity {
 		   case ProjectConst.NoteHasLock_Dlg:
 		        return BuildNoteHasLockDialog(this, R.string.note_lock_dlg_title, R.string.notehaslock_msg);
 		   case ProjectConst.ShareBy_Dlg:
-			    return HelperFunctions.BuildShareByDlg(this, R.string.shareby_title, EditOneNote.NoteTitle, 
+			    return HelperFunctions.BuildTextPlainShareByDlg(this, R.string.shareby_title, EditOneNote.NoteTitle, 
 			    		                               HelperFunctions.ComposeSharedItems(ItemAdapter.GetItems(), ProjectConst.One, ItemAdapter.getCount()-2));
 		}
 		return null;
@@ -360,7 +361,10 @@ public class EditCheckListNoteActivity extends Activity {
 		Parameters.putInt(OneNote.KEY_NOTIFYMETHOD, EditOneNote.NotifyMethod);
 		Parameters.putString(OneNote.KEY_RINGMUSIC, EditOneNote.RingMusic);
 		//Parameters.putString(OneNote.KEY_USE_NOTIFYTIME, EditOneNote.Use_NotifyTime);
-		Parameters.putString(OneNote.KEY_NOTIFYTIME, HelperFunctions.Calendar2String(EditOneNote.NotifyTime));
+		if( EditOneNote.Use_NotifyTime.equals(ProjectConst.Yes) )
+		    Parameters.putString(OneNote.KEY_NOTIFYTIME, HelperFunctions.Calendar2String(EditOneNote.NotifyTime));
+		else
+			Parameters.putString(OneNote.KEY_NOTIFYTIME, HelperFunctions.Calendar2String(Calendar.getInstance()));
         // Pass it to next activity 
 		intent.putExtras(Parameters);
 		// Go to next activity(set note's notify time activity)

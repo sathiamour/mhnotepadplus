@@ -66,27 +66,27 @@ public class AddNoteActivity extends Activity {
     	SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
     	AddPanel.setBackgroundDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx])); 
 
-		// Set text changed listener
-		NoteTitleCtrl.addTextChangedListener(new TextWatcher(){  
-	        @Override  
-	        public void beforeTextChanged(CharSequence s, int start, int count, int after){}  
-	  
-	        @Override  
-	        public void onTextChanged(CharSequence s, int start, int before, int count) {  
-	            AddOneNote.NoteTitle = s.toString();
-	        }
-
-			@Override
-			public void afterTextChanged(Editable arg0) {}  
-	    });
-		
+		// Set text changed listener		
     	NoteBodyCtrl.addTextChangedListener(new TextWatcher(){  	  
 	        @Override  
 	        public void beforeTextChanged(CharSequence s, int start, int count, int after){}  
 	  
 	        @Override  
 	        public void onTextChanged(CharSequence s, int start, int before, int count) {  
-	        	AddOneNote.NoteBody = s.toString();
+	        	   AddOneNote.NoteBody = s.toString();
+	        }
+
+			@Override
+			public void afterTextChanged(Editable arg0) {}     
+	    });
+    	
+    	NoteTitleCtrl.addTextChangedListener(new TextWatcher(){  	  
+	        @Override  
+	        public void beforeTextChanged(CharSequence s, int start, int count, int after){}  
+	  
+	        @Override  
+	        public void onTextChanged(CharSequence s, int start, int before, int count) {  
+	        	   AddOneNote.NoteTitle = s.toString();
 	        }
 
 			@Override
@@ -97,7 +97,8 @@ public class AddNoteActivity extends Activity {
     	SelectTagClrBtn.setOnClickListener(new OnClickListener(){
     		public void onClick(View v){
 		    	Intent intent = new Intent();
-				intent.setClass(AddNoteActivity.this, SetTagClrActivity.class);
+				intent.setClass(AddNoteActivity.this, SetItemClrActivity.class);
+				intent.putExtra(SetItemClrActivity.Key_ClrType, SetItemClrActivity.Val_ItemType_Tag);
 				startActivityForResult(intent, ProjectConst.ACTIVITY_SET_TAGCLR);				
     		}
     	});
@@ -162,11 +163,11 @@ public class AddNoteActivity extends Activity {
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
 		   case ProjectConst.Check_NoteTitle_Dlg:
-			    return HelperFunctions.BuildAltertDialog(AddNoteActivity.this, R.string.prompt_title, R.string.notetitle_empty_tip);
+			    return HelperFunctions.BuildAltertDialog(this, R.string.prompt_title, R.string.notetitle_empty_tip);
 		   case ProjectConst.Set_NotifyDate_Dlg:
-			    return HelperFunctions.BuildAltertDialog(AddNoteActivity.this, R.string.prompt_title, R.string.notifydate_expire_tip);
+			    return HelperFunctions.BuildAltertDialog(this, R.string.prompt_title, R.string.notifydate_expire_tip);
 		   case ProjectConst.ShareBy_Dlg:
-			    return HelperFunctions.BuildShareByDlg(this, R.string.shareby_title, AddOneNote.NoteTitle, AddOneNote.NoteBody);
+			    return HelperFunctions.BuildTextPlainShareByDlg(this, R.string.shareby_title, NoteTitleCtrl.getText().toString().trim(), NoteBodyCtrl.getText().toString().trim());
 
 		}
 		return null;

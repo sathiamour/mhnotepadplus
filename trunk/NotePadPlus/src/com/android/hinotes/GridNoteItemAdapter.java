@@ -5,7 +5,6 @@ import java.util.Map;
 
 import android.content.Context;
 import android.graphics.PorterDuff;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -52,7 +51,7 @@ public class GridNoteItemAdapter extends SimpleAdapter {
             Body.setWidth(EdgeWidth);
             Body.setHeight(EdgeWidth);
             //Body.setBackgroundColor(ItemBodyColor[position]);
-            Body.getBackground().setColorFilter(ItemBodyColor[position], PorterDuff.Mode.MULTIPLY);
+            Body.getBackground().setColorFilter(ItemBodyColor[position], PorterDuff.Mode.SRC);
             
 			return Item;
 		}
