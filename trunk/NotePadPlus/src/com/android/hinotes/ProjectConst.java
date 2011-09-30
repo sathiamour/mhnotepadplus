@@ -47,6 +47,8 @@ public class ProjectConst
 	public static final int ACTIVITY_CROP = 14;
 	public static final int ACTIVITY_EDIT_PIC = 15;
 	public static final int ACTIVITY_CAMERA_CAPTURE = 16;
+	public static final int ACTIVITY_GET_VIDEO = 17;
+	public static final int ACTIVITY_GET_AUDIO = 18;
 
 	/** Bottom Menu id */
 	public static final int ITEM0 = Menu.FIRST;
