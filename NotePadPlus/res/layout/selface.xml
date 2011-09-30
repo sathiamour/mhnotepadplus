@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_gravity = "center"
+    android:layout_width="fill_parent"
+    android:layout_height="300dip">
+    
+        <GridView android:id="@+id/facegrid"
+	              android:layout_width="fill_parent" 
+	              android:layout_height="fill_parent"
+	              android:verticalSpacing="10dp"
+                  android:horizontalSpacing="10dp"
+                  android:numColumns="4"
+                  android:columnWidth="30dp"
+                  android:stretchMode="columnWidth"
+                  android:gravity="center" 
+                  android:scrollbars="none"/>
+          
+</LinearLayout>
