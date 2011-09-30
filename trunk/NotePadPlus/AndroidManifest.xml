@@ -34,6 +34,7 @@
 	    <activity android:name=".EditMultiMediaNoteActivity" android:screenOrientation="portrait"/>  
 	    <activity android:name=".SelImgActivity" android:screenOrientation="portrait" />
 	    <activity android:name=".ShowImgActivity" android:screenOrientation="portrait" />
+	    <activity android:name=".SelFaceActivity" android:theme="@android:style/Theme.Translucent" android:screenOrientation="portrait" />
 	    
 		<activity android:name="AddItemActivity" android:theme="@android:style/Theme.Dialog"  android:screenOrientation="portrait"/>
 		<activity android:name=".NoteUserDefViewActivity" android:screenOrientation="portrait"/>
