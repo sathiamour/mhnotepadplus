@@ -9,6 +9,7 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
@@ -26,6 +27,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
@@ -38,9 +40,12 @@ public class AddMultiMediaNoteActivity extends Activity {
 	private static final int PictureWidth = 80;
 	private static final int PictureHeight = 90;
 	
-	private static final String ImgTagFmt = "[pic%1$spic]";
-	private static final String BreforeTag = "[pic";
-	private static final String AfterTag = "pic]";
+	private static final String ImgTagFmt = "[files%1$sfiles]";
+	private static final String BreforeTag = "[files";
+	private static final String AfterTag = "files]";
+	private static final String VideoTagFmt = "[video%1$svideo]";
+	private static final String AudioTagFmt = "[audio%1$saudio]";
+	private static final String FaceTagFmt = "[faces%1$sfaces]";
 	
 	private EditText NoteTitle;
 	private EditText NoteBody;
@@ -66,6 +71,7 @@ public class AddMultiMediaNoteActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.addmultimedianote);
+		getWindow().setFlags(WindowManager.LayoutParams.FLAG_BLUR_BEHIND, WindowManager.LayoutParams.FLAG_BLUR_BEHIND);
 		
 		// Initialize & open database
 		NotesDb = new NoteDbAdapter(this);
@@ -126,12 +132,30 @@ public class AddMultiMediaNoteActivity extends Activity {
 
 			@Override
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
+				Intent intent = new Intent(AddMultiMediaNoteActivity.this, SelFaceActivity.class);
+				startActivity(intent);
 				
 			}
 	    	
 	    });
-	    
+	    // add video picker
+	    VideoBtn.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				   StartPickVideo();
+			}
+	    	
+	    });
+	    // add voice picker
+	    VoiceBtn.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				   StartPickVoice();
+			}
+	    	
+	    });
 	    //
 	    // Set edit text view listener	    
 	    NoteBody.addTextChangedListener(new TextWatcher(){  	  
@@ -190,11 +214,11 @@ public class AddMultiMediaNoteActivity extends Activity {
             			
         } else if( requestCode == ProjectConst.ACTIVITY_EDIT_PIC ) {
         	if( resultCode == RESULT_OK ){
-        		final Uri uri = data.getParcelableExtra(SelImgActivity.Key_PicUri);  
+        		final Uri PicUri = data.getParcelableExtra(SelImgActivity.Key_PicUri);  
         		int TurnAngle = data.getIntExtra(SelImgActivity.Key_PicData, ProjectConst.Zero);
         		Drawable FinalBitmap = null;
     			try {
-    				Bitmap Picture = HelperFunctions.DecodeBitmapFromUri(this, uri, (int)(PictureWidth*NotePadPlus.ScreenDensity), (int)(PictureHeight*NotePadPlus.ScreenDensity));
+    				Bitmap Picture = HelperFunctions.DecodeBitmapFromUri(this, PicUri, (int)(PictureWidth*NotePadPlus.ScreenDensity), (int)(PictureHeight*NotePadPlus.ScreenDensity));
     				if( ProjectConst.Zero != 0 )
     				{
     				    Matrix TransMatrix=new Matrix();   
@@ -207,24 +231,13 @@ public class AddMultiMediaNoteActivity extends Activity {
     			} catch (FileNotFoundException e) {
     				// TODO Auto-generated catch block
     				e.printStackTrace();
-    				Log.d(ProjectConst.TAG, uri.toString()+" doesn't find"); 
+    				Log.d(ProjectConst.TAG, PicUri.toString()+" doesn't find"); 
     			}
       
+    			
     			if( FinalBitmap != null )
-    			{
-    				NotInsert = true;
-    				FinalBitmap.setBounds(0, 0, FinalBitmap.getIntrinsicWidth(), FinalBitmap.getIntrinsicHeight());
-    				int CursorPos = NoteBody.getSelectionStart();
-    				if( CursorPos < 0 )
-    					CursorPos = 0;
-    				String Tag = String.format(ImgTagFmt, uri.toString());
-                    Content.insert(CursorPos, Tag);
-                    ImageSpan ImgSpan = new ImageSpan(FinalBitmap, ImageSpan.ALIGN_BASELINE);
-                    Content.setSpan(ImgSpan, CursorPos, CursorPos+Tag.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    NoteBody.setText(Content);
-                    NoteBody.setSelection(CursorPos+Tag.length());
-
-    			} else
+    				InsertImg(ImgTagFmt, PicUri.toString(), FinalBitmap);
+    			else
     				Toast.makeText(this, R.string.multimedianote_loadbmp_err, Toast.LENGTH_SHORT).show();
 
         	} else {
@@ -234,11 +247,31 @@ public class AddMultiMediaNoteActivity extends Activity {
 				    StartPickGallery();				
         	}
         } else if( requestCode == ProjectConst.ACTIVITY_CAMERA_CAPTURE ) {
-        	IsCameraCapture = true;
-            Intent SelImgIntent = new Intent(this, SelImgActivity.class);
-            SelImgIntent.putExtra(SelImgActivity.Key_PicUri, Uri.fromFile(new File(FolderPath, CameraFileName)));
-            startActivityForResult(SelImgIntent, ProjectConst.ACTIVITY_EDIT_PIC); 
-        } else if ( requestCode == ProjectConst.ACTIVITY_SET_TAGCLR && resultCode == RESULT_OK) {
+        	if( resultCode == RESULT_OK )
+        	{
+        	    IsCameraCapture = true;
+                Intent SelImgIntent = new Intent(this, SelImgActivity.class);
+                SelImgIntent.putExtra(SelImgActivity.Key_PicUri, Uri.fromFile(new File(FolderPath, CameraFileName)));
+                startActivityForResult(SelImgIntent, ProjectConst.ACTIVITY_EDIT_PIC);
+        	}
+        } else if( requestCode == ProjectConst.ACTIVITY_GET_VIDEO ) {   
+            if( resultCode == RESULT_OK )   
+            {
+                Uri UriVideo = data.getData();
+        		Drawable FinalBitmap = new BitmapDrawable(BitmapFactory.decodeResource(getResources(), R.drawable.video_icon));
+    			
+        		InsertImg(VideoTagFmt, UriVideo.toString(), FinalBitmap);
+            }     
+        } else if( requestCode == ProjectConst.ACTIVITY_GET_AUDIO ) {     
+            if( resultCode == RESULT_OK )
+            {    
+                Uri VoiceUri = data.getData();
+                Drawable FinalBitmap = new BitmapDrawable(BitmapFactory.decodeResource(getResources(), R.drawable.record_icon));
+    			
+        		InsertImg(AudioTagFmt, VoiceUri.toString(), FinalBitmap);
+                
+            }    
+        } else if ( requestCode == ProjectConst.ACTIVITY_SET_TAGCLR && resultCode == RESULT_OK ) {
     	    Bundle SelIdxData = data.getExtras();
     	    AddOneNote.DrawableResIdx = SelIdxData.getInt(OneNote.KEY_DRAWABLE_ID);
     	    SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
@@ -355,6 +388,22 @@ public class AddMultiMediaNoteActivity extends Activity {
 	}
     
  
+    private void InsertImg(String StdTag, String UriStr, Drawable FinalBitmap)
+    {
+		NotInsert = true;
+		FinalBitmap.setBounds(0, 0, FinalBitmap.getIntrinsicWidth(), FinalBitmap.getIntrinsicHeight());
+		int CursorPos = NoteBody.getSelectionStart();
+		if( CursorPos < 0 )
+			CursorPos = 0;
+		String Tag = String.format(StdTag, UriStr);
+        Content.insert(CursorPos, Tag);
+        ImageSpan ImgSpan = new ImageSpan(FinalBitmap, ImageSpan.ALIGN_BASELINE);
+        Content.setSpan(ImgSpan, CursorPos, CursorPos+Tag.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        NoteBody.setText(Content);
+        NoteBody.setSelection(CursorPos+Tag.length());
+
+    }
+    
     private void StartNotifyActivity()
 	{
     	// start notify time activity
@@ -374,18 +423,33 @@ public class AddMultiMediaNoteActivity extends Activity {
     
     private void StartPickGallery()
     {
-		 Intent intent = new Intent();  
-		 intent.setType("image/*");  
-         intent.setAction(Intent.ACTION_GET_CONTENT);     
-         startActivityForResult(intent, ProjectConst.ACTIVITY_GET_PICTURE);  
+		Intent intent = new Intent();  
+		intent.setType("image/*");  
+        intent.setAction(Intent.ACTION_GET_CONTENT);     
+        startActivityForResult(intent, ProjectConst.ACTIVITY_GET_PICTURE);  
     }
+    
+    private void StartPickVideo() 
+    {    
+        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);    
+        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);    
+        startActivityForResult(intent, ProjectConst.ACTIVITY_GET_VIDEO);    
+    } 
+    
+    private void StartPickVoice() 
+    {    
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);    
+        intent.setType("audio/amr");    
+        startActivityForResult(intent, ProjectConst.ACTIVITY_GET_AUDIO);    
+    }    
+
     
     private void StartPickCamera()
     {
-		 CameraFileName = DateFormat.format("yyyy-MM-dd_hh-mm-ss", Calendar.getInstance())+".jpg";;
-		 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);     
-         intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(FolderPath, CameraFileName)));     
-         startActivityForResult(intent, ProjectConst.ACTIVITY_CAMERA_CAPTURE); 
+		CameraFileName = DateFormat.format("yyyy-MM-dd_hh-mm-ss", Calendar.getInstance())+".jpg";;
+		Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);     
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(FolderPath, CameraFileName)));     
+        startActivityForResult(intent, ProjectConst.ACTIVITY_CAMERA_CAPTURE); 
     }
     
     public void StartPhotoZoom(Uri uri) {    
