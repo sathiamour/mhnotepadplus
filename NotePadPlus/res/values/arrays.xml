@@ -9,6 +9,12 @@
         <item>自定义视图</item> 
     </string-array>
 
+    <string-array name="mediatype">
+        <item>图片媒体</item>
+        <item>音频媒体</item> 
+        <item>视频媒体</item> 
+    </string-array>
+    
     <string-array name="notestyle">
         <item>文本类型</item>
         <item>清单类型</item> 
