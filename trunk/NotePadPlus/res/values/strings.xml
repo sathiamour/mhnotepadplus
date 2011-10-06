@@ -113,4 +113,5 @@
 <string name="multimedianote_loadbmp_err">加载图片出错！请检查图片原始文件是否存在，SD是否已经准备好！</string>
 <string name="enlarge_img_err">已经把图片放到最大！</string>
 <string name="lessen_img_err">已经把图片缩到最小！</string>
+<string name="meidaview_title">查看日志中的媒体文件</string>
 </resources>
