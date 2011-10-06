@@ -17,7 +17,7 @@ public class ShowImgActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.showimg);
 		
-		Uri PicUri = getIntent().getParcelableExtra(SelImgActivity.Key_PicUri);
+		Uri PicUri = getIntent().getParcelableExtra(ProjectConst.Key_Uri);
 		
 		 // Load picture
         ContentResolver cr = getContentResolver();  

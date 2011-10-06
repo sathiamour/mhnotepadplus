@@ -391,7 +391,6 @@ public class NotePadPlus extends Activity {
 		NoteList.setLayoutAnimation(ListAnimController);
 		MainLayout.removeAllViews();
 
-		
 		for (int i = 0; i < Count && NotesCursor.moveToNext(); ++i) {
 			// Get note's parameter
 			String Title = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_TITLE));
@@ -484,7 +483,7 @@ public class NotePadPlus extends Activity {
         setContentView(MainLayout);
 	}
        
-	/** Menu click callback */
+	/** Menu click call back */
 	@Override
 	public boolean onContextItemSelected(MenuItem Item) {
 		AdapterView.AdapterContextMenuInfo Info = (AdapterView.AdapterContextMenuInfo) Item.getMenuInfo();

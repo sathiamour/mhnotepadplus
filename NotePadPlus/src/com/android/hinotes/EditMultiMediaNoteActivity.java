@@ -9,10 +9,12 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
+import android.app.AlertDialog.Builder;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -31,6 +33,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -40,9 +43,6 @@ import android.widget.Toast;
 
 public class EditMultiMediaNoteActivity extends Activity {
 	
-	private static final int PictureWidth = 80;
-	private static final int PictureHeight = 90;
-	private static final String ImgTagFmt = "[pic:%1$spic]";
 	// Views
 	private EditText NoteTitleCtrl = null;
 	private EditText NoteBody = null;
@@ -107,6 +107,9 @@ public class EditMultiMediaNoteActivity extends Activity {
 		FootPanel = (LinearLayout)findViewById(R.id.foot_btn_panel);
 	    Button GalleryBtn = (Button)findViewById(R.id.sys_mediagallery_btn);
 	    Button CameraBtn = (Button)findViewById(R.id.camera_btn);
+	    Button FaceBtn = (Button)findViewById(R.id.face_btn);
+	    Button VoiceBtn = (Button)findViewById(R.id.voice_btn);
+	    Button VideoBtn = (Button)findViewById(R.id.video_btn);
 		// Uri holder
 		MediaUri = new Vector<String>();
 		// Get parameters from intent
@@ -157,7 +160,7 @@ public class EditMultiMediaNoteActivity extends Activity {
 			NoteTitleCtrl.setText(EditOneNote.NoteTitle);
 
 			// Set note body 
-			ParseMultiMediaNote(EditOneNote.NoteBody);
+			ParseMultiMediaNote(EditOneNote.NoteBody, ProjectConst.Prefix, ProjectConst.Suffix);
 			NoteBody.setText(Content);
 
 			if( EditOneNote.Use_NotifyTime.equals(ProjectConst.Yes) && HelperFunctions.CmpDatePrefix2(EditOneNote.NotifyTime, Calendar.getInstance())>0 )
@@ -235,6 +238,35 @@ public class EditMultiMediaNoteActivity extends Activity {
 			}
 	    	
 	    });
+	    // add emotion face
+	    FaceBtn.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(EditMultiMediaNoteActivity.this, SelFaceActivity.class);
+				startActivityForResult(intent, ProjectConst.ACTIVITY_SEL_FACE);
+				
+			}
+	    	
+	    });
+	    // add video picker
+	    VideoBtn.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				   StartPickVideo();
+			}
+	    	
+	    });
+	    // add voice picker
+	    VoiceBtn.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				   StartPickVoice();
+			}
+	    	
+	    });
 		
 	}
 	
@@ -255,6 +287,7 @@ public class EditMultiMediaNoteActivity extends Activity {
 		menu.add(Menu.NONE, ProjectConst.ITEM3, 4, "Ëø¶¨").setIcon(R.drawable.ic_menu_lock).setEnabled(!IsDeleted);
 		menu.add(Menu.NONE, ProjectConst.ITEM4, 5, "±à¼­").setIcon(android.R.drawable.ic_menu_edit).setEnabled(!IsDeleted);
 		menu.add(Menu.NONE, ProjectConst.ITEM5, 6, "·ÖÏí").setIcon(android.R.drawable.ic_menu_share).setEnabled(!IsDeleted);
+		menu.add(Menu.NONE, ProjectConst.ITEM6, 7, "Ã½Ìå").setIcon(android.R.drawable.ic_menu_view);
         return true;
 	}
 	
@@ -287,6 +320,9 @@ public class EditMultiMediaNoteActivity extends Activity {
               case ProjectConst.ITEM5:
             	   showDialog(ProjectConst.ShareBy_Dlg);
             	   break;
+              case ProjectConst.ITEM6:
+           	       showDialog(ProjectConst.MediaView_Dlg);
+           	       break;
            }
            return false;
 	}
@@ -303,8 +339,10 @@ public class EditMultiMediaNoteActivity extends Activity {
 		   case ProjectConst.NoteHasLock_Dlg:
 		        return BuildNoteHasLockDialog(this, R.string.note_lock_dlg_title, R.string.notehaslock_msg);
 		   case ProjectConst.ShareBy_Dlg:
-			    String Body = ParseMultiMediaNoteShareBy(Content.toString());
+			    String Body = ParseMultiMediaNoteShareBy(Content.toString(), ProjectConst.Prefix, ProjectConst.Suffix, ProjectConst.FaceTag);
 			    return HelperFunctions.BuildMediaShareByDlg(this, R.string.shareby_title, EditOneNote.NoteTitle, Body, MediaUri);
+		   case ProjectConst.MediaView_Dlg:
+			    return BuildMediaViewDlg(this, R.string.meidaview_title, R.array.mediatype);
 		}
 		return null;
 	}
@@ -392,6 +430,45 @@ public class EditMultiMediaNoteActivity extends Activity {
 	    ChgTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[EditOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
 	}
 	
+	private Dialog BuildMediaViewDlg(Context AppContext, int Title, int Items)
+	{
+        Builder builder = new AlertDialog.Builder(this);  
+        builder.setIcon(R.drawable.ic_dialog_menu_generic);  
+        builder.setTitle(Title);  
+        BaseAdapter adapter = new CommonListItemAdapter(new int[]{R.drawable.common_choose_picture, R.drawable.common_choose_record, R.drawable.common_take_vidicon},Items, AppContext);  
+        DialogInterface.OnClickListener listener =   
+            new DialogInterface.OnClickListener() {  
+                @Override  
+                public void onClick(DialogInterface dialogInterface, int which) {  
+               	            switch(which)
+               	            {
+               	               case 0:
+               	            	    StartShowMediaListActivity(ProjectConst.ImgPrefix, ShowImgListActivity.class);
+               	            	    break; 
+               	               case 1:
+               	            	    StartShowMediaListActivity(ProjectConst.AudioPrefix, ShowAudioListActivity.class);
+               	            	    break;
+               	               case 2:
+              	            	    StartShowMediaListActivity(ProjectConst.VideoPrefix, ShowVideoListActivity.class);
+               	            	    break;
+               	            }
+                }  
+            };  
+        builder.setAdapter(adapter, listener);  
+        return builder.create();  
+	}
+	
+    private void StartShowMediaListActivity(String Prefix, Class<?> ShowActivity)
+    {
+   	    ParseSpecificMedia(Content.toString(), Prefix, ProjectConst.Suffix);
+   	    Intent intent = new Intent(this, ShowActivity);
+   	    int Count = MediaUri.size();
+   	    intent.putExtra(ProjectConst.Key_Count, Count);
+   	    for( int i = 0; i < Count; ++i )
+   	    	 intent.putExtra(ProjectConst.Key_Uri+Integer.toString(i), MediaUri.get(i));
+   	    startActivity(intent);
+    }
+    
     private void StartPickGallery()
     {
 		 Intent intent = new Intent();  
@@ -407,6 +484,20 @@ public class EditMultiMediaNoteActivity extends Activity {
          intent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(new File(FolderPath, CameraFileName)));     
          startActivityForResult(intent, ProjectConst.ACTIVITY_CAMERA_CAPTURE); 
     }
+    
+    private void StartPickVideo() 
+    {    
+        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);    
+        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);    
+        startActivityForResult(intent, ProjectConst.ACTIVITY_GET_VIDEO);    
+    } 
+    
+    private void StartPickVoice() 
+    {    
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);    
+        intent.setType("audio/amr");    
+        startActivityForResult(intent, ProjectConst.ACTIVITY_GET_AUDIO);    
+    } 
 	// Turn to set notify time activity
 	private void StartNotifyActivity()
 	{
@@ -496,57 +587,91 @@ public class EditMultiMediaNoteActivity extends Activity {
 		return builder.create();
 	}
 	
-	public String ParseMultiMediaNoteShareBy(String NoteBody)
+	public void ParseSpecificMedia(String NoteBody, String Prefix, String Suffix)
 	{
+		// Clear result set
 		MediaUri.clear();
-		
-		String Tag1 = "[pic:";
-		String Tag2 = "]";
-		String Result = ProjectConst.EmptyStr;
-		int DefPos = 5;
+        // Parse 
+		int DefPos = Prefix.length();
+		int SuffixLen = Suffix.length();
 		int Start = ProjectConst.Zero; 
 		int Pos = ProjectConst.NegativeOne;
-		while( (Pos=NoteBody.indexOf(Tag1, Start)) != ProjectConst.NegativeOne )
+		while( (Pos=NoteBody.indexOf(Prefix, Start)) != ProjectConst.NegativeOne )
 		{
-			int EndPos = NoteBody.indexOf(Tag2, Pos+1);
+			int EndPos = NoteBody.indexOf(Suffix, Pos+1);
 			String Pic = NoteBody.substring(Pos, EndPos);
-			MediaUri.add(Pic.substring(DefPos));
-			Result = Result + NoteBody.substring(Start, Pos);
-			Start = EndPos+1;
+		    MediaUri.add(Pic.substring(DefPos));
+			Start = EndPos+SuffixLen;
+		}
+
+	}
+	
+	public String ParseMultiMediaNoteShareBy(String NoteBody, String Prefix, String Suffix, String Ignore)
+	{
+		// Clear result set
+		MediaUri.clear();
+        // Parse 
+		String Result = ProjectConst.EmptyStr;
+		int DefPos = Prefix.length();
+		int SuffixLen = Suffix.length();
+		int Start = ProjectConst.Zero; 
+		int Pos = ProjectConst.NegativeOne;
+		while( (Pos=NoteBody.indexOf(Prefix, Start)) != ProjectConst.NegativeOne )
+		{
+			int EndPos = NoteBody.indexOf(Suffix, Pos+1);
+			String Pic = NoteBody.substring(Pos, EndPos);
+			String Type = Pic.substring(DefPos, DefPos+ProjectConst.MediaTagLen);
+			if( !Type.equals(Ignore) )
+			{
+			    MediaUri.add(Pic.substring(DefPos+ProjectConst.MediaTagLen+1));
+			    Result = Result + NoteBody.substring(Start, Pos);
+			}
+			Start = EndPos+SuffixLen;
 		}
 		Result = Result + NoteBody.substring(Start);
 		return Result;
 	}
 	
-	public void ParseMultiMediaNote(String NoteBody)
+	public void ParseMultiMediaNote(String NoteBody, String Prefix, String Suffix)
 	{
         Content = new SpannableStringBuilder(NoteBody);
-		String Tag1 = "[pic:";
-		String Tag2 = "pic]";
-		int DefPos = 5;
+		int DefPos = Prefix.length()+ProjectConst.MediaTagLen+1;
 		int Start = ProjectConst.Zero; 
 		int Pos = ProjectConst.NegativeOne;
-		while( (Pos=NoteBody.indexOf(Tag1, Start)) != ProjectConst.NegativeOne )
+		while( (Pos=NoteBody.indexOf(Prefix, Start)) != ProjectConst.NegativeOne )
 		{
-			int EndPos = NoteBody.indexOf(Tag2, Pos+1);
+			int EndPos = NoteBody.indexOf(Suffix, Pos+1);
 			String Pic = NoteBody.substring(Pos, EndPos);
-			
-            Uri uri = Uri.parse(Pic.substring(DefPos));
-            Drawable InsertPicture = null;
-			try {
-				InsertPicture = new BitmapDrawable(HelperFunctions.DecodeBitmapFromUri(this, uri, PictureWidth, PictureHeight));
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				Log.d(ProjectConst.TAG, uri.toString()+" doesn't find"); 
+			String Type = Pic.substring(ProjectConst.PrefTagLen, ProjectConst.PrefTagLen+ProjectConst.MediaTagLen);
+            
+			Drawable InsertPicture = null;
+			if( Type.equals(ProjectConst.ImgTag) )
+			{
+			    Uri uri = Uri.parse(Pic.substring(DefPos));
+			    try {
+				      InsertPicture = new BitmapDrawable(HelperFunctions.DecodeBitmapFromUri(this, uri, ProjectConst.PictureWidth, ProjectConst.PictureHeight));
+			    } catch (FileNotFoundException e) {
+				      // TODO Auto-generated catch block
+				      e.printStackTrace();
+				      Log.d(ProjectConst.TAG, uri.toString()+" doesn't find"); 
+			    }
+			} else if( Type.equals(ProjectConst.AudioTag) )
+				InsertPicture = new BitmapDrawable(BitmapFactory.decodeResource(getResources(), R.drawable.record_icon));
+			else if( Type.equals(ProjectConst.VideoTag) )
+				InsertPicture = new BitmapDrawable(BitmapFactory.decodeResource(getResources(), R.drawable.video_icon));
+			else if( Type.equals(ProjectConst.FaceTag) ) {
+				int FaceId = Integer.parseInt(Pic.substring(DefPos));
+				InsertPicture = new BitmapDrawable(BitmapFactory.decodeResource(getResources(), SelFaceActivity.Faces[FaceId]));
 			}
+
+			
             if( InsertPicture != null )
             {
 			    InsertPicture.setBounds(0, 0, InsertPicture.getIntrinsicWidth(), InsertPicture.getIntrinsicHeight());
 			    ImageSpan span = new ImageSpan(InsertPicture, ImageSpan.ALIGN_BASELINE);
-	            Content.setSpan(span, Pos, EndPos+1, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+	            Content.setSpan(span, Pos, EndPos+ProjectConst.PrefTagLen, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
             }
-			Start = EndPos+1;
+			Start = EndPos+ProjectConst.PrefTagLen;
 		}
 		
 	}
@@ -565,7 +690,7 @@ public class EditMultiMediaNoteActivity extends Activity {
         		Uri uri = data.getParcelableExtra(SelImgActivity.Key_PicUri);  
         		Drawable InsertPicture = null;
     			try {
-    				InsertPicture = new BitmapDrawable(HelperFunctions.DecodeBitmapFromUri(this, uri, PictureWidth, PictureHeight));
+    				InsertPicture = new BitmapDrawable(HelperFunctions.DecodeBitmapFromUri(this, uri, ProjectConst.PictureWidth, ProjectConst.PictureHeight));
     			} catch (FileNotFoundException e) {
     				// TODO Auto-generated catch block
     				e.printStackTrace();
@@ -579,7 +704,7 @@ public class EditMultiMediaNoteActivity extends Activity {
     				int CursorPos = NoteBody.getSelectionStart();
     				if( CursorPos < 0 )
     					CursorPos = 0;
-    				String Tag = String.format(ImgTagFmt, uri.toString());
+    				String Tag = String.format(ProjectConst.ImgTagFmt, uri.toString());
                     Content.insert(CursorPos, Tag);
                     ImageSpan span = new ImageSpan(InsertPicture, ImageSpan.ALIGN_BASELINE);
                     Content.setSpan(span, CursorPos, CursorPos+Tag.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);

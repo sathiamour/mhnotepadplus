@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -13,6 +14,10 @@ import android.widget.SimpleAdapter;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class SelFaceActivity extends Activity {
+    
+	public static final String KEY_FACE_ID = "faceid";
+	public static final int[] Faces = {R.drawable.face_01,R.drawable.face_02,R.drawable.face_03,R.drawable.face_04,R.drawable.face_05,R.drawable.face_06,R.drawable.face_07,R.drawable.face_08,R.drawable.face_09,R.drawable.face_10,R.drawable.face_11,R.drawable.face_12,R.drawable.face_13,R.drawable.face_14,R.drawable.face_15,R.drawable.face_16,R.drawable.face_17,R.drawable.face_18,R.drawable.face_19,R.drawable.face_20,R.drawable.face_21,R.drawable.face_22,R.drawable.face_23,R.drawable.face_24,R.drawable.face_25,R.drawable.face_26,R.drawable.face_27,R.drawable.face_28,R.drawable.face_29,R.drawable.face_30};
+    
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -24,13 +29,17 @@ public class SelFaceActivity extends Activity {
 		FaceGrid.setOnItemClickListener(new OnItemClickListener() {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-				   
+         	       // Set return data
+	    	       Intent ReturnBackIntent = new Intent();
+	    	       ReturnBackIntent.putExtra(KEY_FACE_ID, position);
+	    	       setResult(RESULT_OK, ReturnBackIntent);
+	    	       // Return to launching activity
+		    	   finish();
 			}
 		});
         // Fill faces
 		ArrayList<HashMap<String, Object>> GridFaces = new ArrayList<HashMap<String, Object>>();
-		int[] Faces = {R.drawable.face_01,R.drawable.face_02,R.drawable.face_03,R.drawable.face_04,R.drawable.face_05,R.drawable.face_06,R.drawable.face_07,R.drawable.face_08,R.drawable.face_09,R.drawable.face_10,R.drawable.face_11,R.drawable.face_12,R.drawable.face_13,R.drawable.face_14,R.drawable.face_15,R.drawable.face_16,R.drawable.face_17,R.drawable.face_18,R.drawable.face_19,R.drawable.face_20,R.drawable.face_21,R.drawable.face_22,R.drawable.face_23,R.drawable.face_24,R.drawable.face_25,R.drawable.face_26,R.drawable.face_27,R.drawable.face_28,R.drawable.face_29,R.drawable.face_30};
-		for (int i = 0; i < 30; ++i) 
+		for (int i = 0; i < Faces.length; ++i) 
 		{
 			// Item
 			HashMap<String, Object> Note = new HashMap<String, Object>();
