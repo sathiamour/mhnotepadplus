@@ -27,7 +27,7 @@ import android.widget.Toast;
   
 public class SelImgActivity extends Activity {   
 
-    public static final String Key_PicUri = "pic";  
+    public static final String Key_PicUri = "uri";  
     public static final String Key_PicData = "data";
 
   

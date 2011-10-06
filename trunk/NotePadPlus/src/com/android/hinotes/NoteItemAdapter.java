@@ -79,10 +79,24 @@ public class NoteItemAdapter extends SimpleAdapter
 		});
 		
 		Tag.setBackgroundColor(ItemBgColor[position]);
-		if( NoteType[position] == OneNote.TextNote )
-			Tag.setImageResource(R.drawable.ic_item_text);
-		else
-			Tag.setImageResource(R.drawable.ic_item_list);
+		// Set note type icon
+		switch( NoteType[position] )
+		{
+		    case OneNote.TextNote:
+			     Tag.setImageResource(R.drawable.ic_item_text);
+			     break;
+		    case OneNote.ListNote:
+		    	 Tag.setImageResource(R.drawable.ic_item_list);
+		    	 break;
+		    case OneNote.ScrawlNote:
+		    	 Tag.setImageResource(R.drawable.ic_item_scrawl);
+		    	 break;
+		    case OneNote.MultiMediaNote:
+		    default:
+		    	Tag.setImageResource(R.drawable.ic_item_scrawl);
+	    	    break;
+		}
+	
 
 		Title.setTextSize(AppSetting.FontSizeArray[Integer.parseInt(NotePadPlus.SysSettings.FontSize)]);
 

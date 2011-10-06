@@ -28,6 +28,7 @@ public class ProjectConst
     public static final int Item_TooLong_Prompt_Dlg = 20;
     public static final int Item_Empty_Prompt_Dlg = 21;
     public static final int NotifyTime_Err_Dlg = 22;
+    public static final int MediaView_Dlg = 23;
     
 	/** Action id for activity redirection */
 	public static final int ACTIVITY_CREATE = 0;
@@ -49,6 +50,7 @@ public class ProjectConst
 	public static final int ACTIVITY_CAMERA_CAPTURE = 16;
 	public static final int ACTIVITY_GET_VIDEO = 17;
 	public static final int ACTIVITY_GET_AUDIO = 18;
+	public static final int ACTIVITY_SEL_FACE = 19;
 
 	/** Bottom Menu id */
 	public static final int ITEM0 = Menu.FIRST;
@@ -57,6 +59,7 @@ public class ProjectConst
 	public static final int ITEM3 = Menu.FIRST + 3;
 	public static final int ITEM4 = Menu.FIRST + 4;
 	public static final int ITEM5 = Menu.FIRST + 5;
+	public static final int ITEM6 = Menu.FIRST + 6;
 	
 	/** Actions */
 	
@@ -78,7 +81,7 @@ public class ProjectConst
 	public static final String SERVICE_SCREENORIENT_ACTION = "com.android.hinotes.ScreenOrient";
 	/** Log identifier */
 	public static final String TAG = "log";
-	/** Source from notepadplus or notifyalarmreceiver's notification */
+	/** Source from edit or notifyalarmreceiver's notification */
 	public static final String KEY_SOURCE = "source";
 	/** String const */
 	public static final String Yes = "Y";
@@ -101,6 +104,30 @@ public class ProjectConst
 	
 	/** SD card application folder name */
 	public static final String AppName = "∞Æ«W±„«©";
+	
+	/** Image pass parameter key */
+	public static final String Key_Count = "count";
+	public static final String Key_Uri = "uri";
+	
+	/** Multimedia  notes */
+	public static final int PictureWidth = 80;
+	public static final int PictureHeight = 90;
+	
+	public static final String Prefix = "[media:";
+	public static final String Suffix = ":media]";
+	public static final String ImgPrefix = "[media:image:";
+	public static final String VideoPrefix = "[media:video:";
+	public static final String AudioPrefix = "[media:audio:";
+	public static final String ImgTagFmt   = "[media:image:%1$s:media]";
+	public static final String VideoTagFmt = "[media:video:%1$s:media]";
+	public static final String AudioTagFmt = "[media:audio:%1$s:media]";
+	public static final String FaceTagFmt  = "[media:faces:%1$s:media]";
+	public static final String ImgTag = "image";
+	public static final String AudioTag = "audio";
+	public static final String VideoTag = "video";
+	public static final String FaceTag = "faces";
+	public static final int MediaTagLen = 5;
+	public static final int PrefTagLen = 7;
 	
 	
 }

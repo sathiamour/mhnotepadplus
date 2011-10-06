@@ -17,8 +17,8 @@ import android.view.View;
 public class MyClickableSpan extends ClickableSpan {  
   
     int color = -1;  
-    private Context context;  
-    private Intent intent;  
+    //private Context context;  
+    //private Intent intent;  
   
     public MyClickableSpan()
     {
@@ -39,8 +39,8 @@ public class MyClickableSpan extends ClickableSpan {
         if (color!=-1) {  
             this.color = color;  
         }  
-        this.context = context;  
-        this.intent = intent;  
+        //this.context = context;  
+        //this.intent = intent;  
     }  
   
     /** 
