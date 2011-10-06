@@ -13,9 +13,7 @@ import android.util.Log;
 
 public class NotifyAlarmReceiver extends BroadcastReceiver {
 	
-	private String Title = ProjectConst.EmptyStr;
 	private int NoteRowId = ProjectConst.NegativeOne;
-	private int NotifyMethodIdx = ProjectConst.NegativeOne;
 	
 	
 	@Override
@@ -25,12 +23,22 @@ public class NotifyAlarmReceiver extends BroadcastReceiver {
 			return;
 		
 		if( Parameters != null )
-		{   
+		{   			
 			// Get parameters
-			Title = Parameters.getString(OneNote.KEY_TITLE);
 			NoteRowId = Parameters.getInt(OneNote.KEY_ROWID);
-			NotifyMethodIdx = Parameters.getInt(OneNote.KEY_NOTIFYMETHOD);
-				
+
+			// Open database
+			NoteDbAdapter NotesDb = new NoteDbAdapter(context);
+			NotesDb.open();
+			Cursor Note = NotesDb.GetOneNote(NoteRowId);
+			
+			// Get notify parameters
+			String Title = Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_TITLE));
+			int NotifyMethodIdx = Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_NOTIFYMETHOD));
+			String Pwd = Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_PWD));	
+			int Type = Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_NOTETYPE));
+			String RingMusic = Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_RINGMUSIC));
+
 		    // Close dialogs and window shade
 	        Intent closeDialogs = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
 	        context.sendBroadcast(closeDialogs);
@@ -48,7 +56,9 @@ public class NotifyAlarmReceiver extends BroadcastReceiver {
 	        // Play the alarm alert and vibrate the device.
 	        Log.d(ProjectConst.TAG,"NotifyAlarmReceiver: Play notify ring of Note NO. "+NoteRowId);
 	        Intent PlayAlarm = new Intent(ProjectConst.ALARM_NOTIFY_RING);
-	        PlayAlarm.putExtras(Parameters);
+	        PlayAlarm.putExtra(OneNote.KEY_ROWID, NoteRowId);
+	        PlayAlarm.putExtra(OneNote.KEY_RINGMUSIC, RingMusic);
+	        PlayAlarm.putExtra(OneNote.KEY_NOTIFYMETHOD, NotifyMethodIdx);
 	        context.startService(PlayAlarm);
 	        
 	        // Show Dialog if it is ring method
@@ -61,13 +71,16 @@ public class NotifyAlarmReceiver extends BroadcastReceiver {
                 context.startActivity(NotifyDlg);
 	        }
 	        
-	        // Show notifyication
-	        ShowNotification(context, NoteRowId, Title);     
+	        // Show notification
+	        ShowNotification(context, NoteRowId, Title, Pwd, Type);   
+	        
+	        // Close database
+			NotesDb.close();
 		}
 	}
 	
 	
-	private void ShowNotification(Context context, int NoteRowId, String Title) {
+	private void ShowNotification(Context context, int NoteRowId, String Title, String Pwd, int Type) {
 
 		NotificationManager notificationManager = (NotificationManager)context.getSystemService(android.content.Context.NOTIFICATION_SERVICE);
 		Notification notification = new Notification(R.drawable.icon, context.getText(R.string.app_name), System.currentTimeMillis());
@@ -78,24 +91,23 @@ public class NotifyAlarmReceiver extends BroadcastReceiver {
 		notification.ledOnMS = 300;  
 
 		// Set parameters
-		NoteDbAdapter NotesDb = new NoteDbAdapter(context);
-		NotesDb.open();
-		Cursor Note = NotesDb.GetOneNote(NoteRowId);
 		Intent ActivityIntent = null;
-		if( Note.getString(Note.getColumnIndexOrThrow(OneNote.KEY_PWD)).length() > 0 )
+		if( Pwd.length() > 0 )
             ActivityIntent = new Intent(context, NotificationPwdDlgActivity.class);
 		else {
-			int Type = Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_NOTETYPE));
 			if( Type == OneNote.ListNote )
 				ActivityIntent = new Intent(context, EditCheckListNoteActivity.class);
 	        else if( Type == OneNote.TextNote )
 	        	ActivityIntent = new Intent(context, EditNoteActivity.class);
+	        else if( Type == OneNote.MultiMediaNote )
+	        	ActivityIntent = new Intent(context, EditMultiMediaNoteActivity.class);
 		}
+
 		ActivityIntent.putExtra(OneNote.KEY_ROWID, NoteRowId);
 		ActivityIntent.putExtra(ProjectConst.KEY_SOURCE, ProjectConst.ALARM_ALERT_ACTION);
-		NotesDb.close();
+
 		// Show notification
-		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, ActivityIntent, 0);
+		PendingIntent contentIntent = PendingIntent.getActivity(context, 0, ActivityIntent, PendingIntent.FLAG_CANCEL_CURRENT);
 		notification.setLatestEventInfo(context, context.getText(R.string.app_name), Title, contentIntent);
 		// Cancel the same one
 		notificationManager.cancel(NoteRowId);
