@@ -17,15 +17,13 @@ public class NotePadWidgetProvider extends AppWidgetProvider {
 	   public final static int Widget_Show_Portrait_Slot = 5;
 	   public final static int Widget_Show_Landscape_Slot = 3;
 	   public static int AppProviderId = 0;
-	   /** Database helper */
-	   private NoteDbAdapter mDbHelper = null;
-	   
+	      
       
        @Override
        public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
        {
               // Open note database 
-   		      mDbHelper = new NoteDbAdapter(context);
+    	      NoteDbAdapter mDbHelper = new NoteDbAdapter(context);
 		      mDbHelper.open();       
 		      
 		      RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.widgetview4x2);
@@ -62,20 +60,16 @@ public class NotePadWidgetProvider extends AppWidgetProvider {
 			  // Update widget
 		      appWidgetManager.updateAppWidget(thisWidget, remoteViews); 
 		      
-    	      // App init jobs, if the user uses widget first
+    	      // Application initialization jobs, if the user uses widget first
 		      if( AppProviderId == 0 )
 		      {
 		    	  Log.d("log","in 4x2 widget provider to call appinit jobs");
 		    	  AppSetting.AppInitJobs(context);
 		      }
     	      AppProviderId = appWidgetIds[0];
-       }
-       
-       @Override
-       public void onDeleted(Context context, int[] appWidgetIds)
-       {
-    		  if( mDbHelper != null )
-        		  mDbHelper.close(); 
+    	      
+    	      // Close database
+    	      mDbHelper.close(); 
        }
        
 }
