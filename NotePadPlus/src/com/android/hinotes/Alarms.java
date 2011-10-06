@@ -14,12 +14,10 @@ import android.util.Log;
 
 public class Alarms
 {
-	// Notes
-	private static int RowId = ProjectConst.NegativeOne;
+	//private static int RowId = -2;
 	private static String NoteTitle = ProjectConst.EmptyStr;
 	private static long NextAlertTime = Long.MAX_VALUE;
-	private static String RingMusic = ProjectConst.EmptyStr;
-	private static int NotifyMethodIdx = ProjectConst.NegativeOne;	
+
 
     // Notes with same notify time
 	public static Vector<Integer> Notes = new Vector<Integer>(); 
@@ -27,15 +25,19 @@ public class Alarms
     public static void AddOneAlarm(Context ActivityContext){
  
     	 int CurRowId = CalculateNextAlarm(ActivityContext);
-    	 Log.d(ProjectConst.TAG, "Alarms: AddOneAlarm, CurRowId "+CurRowId+" RowId  "+RowId);
+    	 int PreRowId = AppSetting.GetIntParam(ActivityContext, AppSetting.Key_Alarm_RowId, ProjectConst.NegativeOne);
+    	 Log.d(ProjectConst.TAG, "Alarms: AddOneAlarm, CurRowId "+CurRowId);
     	 // We find one and current one is not the previous one
-    	 if( CurRowId != RowId && CurRowId != ProjectConst.NegativeOne ) 
+    	 if( CurRowId != PreRowId && CurRowId != ProjectConst.NegativeOne ) 
     	 {
-    		 // If previous one does exist, diable it
-    		 if( RowId != ProjectConst.NegativeOne )
-    			 DisableAlter(ActivityContext);
-    		 RowId = CurRowId;
-    	     EnableAlert(ActivityContext, NextAlertTime);
+    		 // If previous one does exist, disable it
+    		 if( PreRowId != ProjectConst.NegativeOne )
+    		  	 DisableAlter(ActivityContext);
+    		 //RowId = CurRowId;
+    		 // Enable the alarm time service
+    	     EnableAlert(ActivityContext, NextAlertTime, CurRowId);
+    	     // Save row id into preference
+    	     AppSetting.PutIntParam(ActivityContext, AppSetting.Key_Alarm_RowId, CurRowId);
     	 }
     }
     
@@ -47,8 +49,8 @@ public class Alarms
     public static void DeleteOneAlarm(Context ActivityContext, int NoteRowId){
     	// Remove the notify ring time in database
 		DisableDbNoteAlarm(ActivityContext, NoteRowId);
-		// If delete one is current one, do disalbe it and set next one
-    	if( NoteRowId != ProjectConst.NegativeOne && NoteRowId == RowId )
+		// If delete one is current one, do disable it and set next one
+    	if( NoteRowId != ProjectConst.NegativeOne /*&& NoteRowId == RowId*/ )
     	{
     		Log.d("log", "Alarms: delete one alarm "+NoteRowId);
     		DisableAlter(ActivityContext);
@@ -57,9 +59,14 @@ public class Alarms
     }
     
     public static void SetNextAlarm(Context ActivityContext){
-    	 RowId = CalculateNextAlarm(ActivityContext);
-   	     if( RowId != ProjectConst.NegativeOne ) // We find one
-   	         EnableAlert(ActivityContext, NextAlertTime);
+    	 //RowId = CalculateNextAlarm(ActivityContext);
+    	 int CurRowId = CalculateNextAlarm(ActivityContext);
+     	 // We find one
+   	     if( CurRowId != ProjectConst.NegativeOne ) 
+   	         EnableAlert(ActivityContext, NextAlertTime, CurRowId);
+	     // Save row id into preference, if CurRowId == NegativeOne, means there is no next alarm
+	     AppSetting.PutIntParam(ActivityContext, AppSetting.Key_Alarm_RowId, CurRowId);
+
     }
     
     public static void UpdateDbNoteAlarm(Context ActivityContext, int NoteRowId)
@@ -77,8 +84,8 @@ public class Alarms
         	     // If it has been stopped, do not turn it on, else set next time
         		 Calendar Time = HelperFunctions.String2Calenar(NotifyRingTime);
         		 Time.add(Calendar.MINUTE, OneNote.GetNotifyDura(NotifyDuraIdx));
-    	         NotesDb.UpdateNoteNotifyRingTime(RowId, Time);
-    	         Log.d("log","Alarms: Next notify time is "+HelperFunctions.Calendar2String(Time)+" row id is"+RowId);
+    	         NotesDb.UpdateNoteNotifyRingTime(NoteRowId, Time);
+    	         Log.d("log","Alarms: Next notify time is "+HelperFunctions.Calendar2String(Time)+" row id is "+NoteRowId);
         }
                 
     	NotesDb.close();
@@ -86,42 +93,33 @@ public class Alarms
     
     public static void DisableDbNoteAlarm(Context ActivityContext, int NoteRowId)
     {
-    	NoteDbAdapter NotesDb = new NoteDbAdapter(ActivityContext);
-        NotesDb.open();
+    	 NoteDbAdapter NotesDb = new NoteDbAdapter(ActivityContext);
+         NotesDb.open();
 
-    	NotesDb.StopNoteNotify(NoteRowId);
+    	 NotesDb.StopNoteNotify(NoteRowId);
 
-    	NotesDb.close();
+    	 NotesDb.close();
     }
     
     
-    private static void EnableAlert(Context ActivityContext, long AlertTime)
+    private static void EnableAlert(Context ActivityContext, long AlertTime, int CurRowId)
     {
     	 Intent AlertIntent = new Intent(ProjectConst.ALARM_ALERT_ACTION);
-    	 AlertIntent.putExtra(OneNote.KEY_ROWID, RowId);
-    	 AlertIntent.putExtra(OneNote.KEY_TITLE, NoteTitle);
-    	 AlertIntent.putExtra(OneNote.KEY_RINGMUSIC, RingMusic);
-    	 AlertIntent.putExtra(OneNote.KEY_NOTIFYMETHOD, NotifyMethodIdx);
-
+    	 AlertIntent.putExtra(OneNote.KEY_ROWID, CurRowId);
          PendingIntent AlertSender = PendingIntent.getBroadcast(ActivityContext, 0, AlertIntent, PendingIntent.FLAG_CANCEL_CURRENT);
- 	     // Schedule end date check alarm
  	     AlarmManager NextAlarmMng = (AlarmManager)ActivityContext.getSystemService(Context.ALARM_SERVICE);
  	     NextAlarmMng.set(AlarmManager.RTC_WAKEUP, AlertTime, AlertSender);
  	     // Log
- 	     Log.d("log", "Enable alarms: Next alarm is "+RowId+ " and title is "+NoteTitle);
+ 	     Log.d("log", "Enable alarms: Next alarm is "+CurRowId+ " and title is "+NoteTitle);
     }
     
     private static void DisableAlter(Context ActivityContext){
     	 Intent AlertIntent = new Intent(ProjectConst.ALARM_ALERT_ACTION);
-    	 AlertIntent.putExtra(OneNote.KEY_ROWID, RowId);
-    	 AlertIntent.putExtra(OneNote.KEY_TITLE, NoteTitle);
-    	 AlertIntent.putExtra(OneNote.KEY_RINGMUSIC, RingMusic);
-    	 AlertIntent.putExtra(OneNote.KEY_NOTIFYMETHOD, NotifyMethodIdx);
          PendingIntent AlertSender = PendingIntent.getBroadcast(ActivityContext, 0, AlertIntent, PendingIntent.FLAG_CANCEL_CURRENT);
-
 	     // Cancel the alter
 	     AlarmManager NextAlarmMng = (AlarmManager)ActivityContext.getSystemService(Context.ALARM_SERVICE);
 	     NextAlarmMng.cancel(AlertSender);
+	     Log.d("log", "DisableAlter alarm ");
     }
     
     public static int CalculateNextAlarm(Context ActivityContext){
@@ -140,8 +138,6 @@ public class Alarms
 	    int CurRowId = ProjectConst.NegativeOne;
 	    NextAlertTime = Long.MAX_VALUE;
 	    NoteTitle = ProjectConst.EmptyStr;
-        RingMusic = ProjectConst.EmptyStr;
-        NotifyMethodIdx = ProjectConst.NegativeOne;
         
         Log.d("log", "Calculate alarms: number of alarm " + Count);
         Log.d("log", "Now time is "+ HelperFunctions.FormatCalendar2ReadableStr2(Now));
@@ -163,8 +159,6 @@ public class Alarms
 	        	 CurRowId = TmpRowId;
 	        	 NextAlertTime = NotifyTime.getTimeInMillis();
 	             NoteTitle = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_TITLE));
-	             RingMusic = NotesCursor.getString(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_RINGMUSIC));
-	             NotifyMethodIdx = NotesCursor.getInt(NotesCursor.getColumnIndexOrThrow(OneNote.KEY_NOTIFYMETHOD));
 	         }else if( NextAlertTime == NotifyTime.getTimeInMillis() )
 	        	 Notes.addElement(TmpRowId);
 	    }
