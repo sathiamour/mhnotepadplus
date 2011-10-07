@@ -16,6 +16,7 @@
                android:textColor="#ff000000" 
                android:gravity="top"   
                android:background="@null"
+               android:singleLine="false"
                android:scrollbars="vertical" 
                android:layout_width="fill_parent" 
                android:layout_height="fill_parent" android:layout_marginLeft="5.0dip" android:layout_marginTop="5.0dip" android:layout_marginRight="5.0dip" android:layout_weight="1.0"/>
