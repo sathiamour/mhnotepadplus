@@ -110,8 +110,8 @@ public class ProjectConst
 	public static final String Key_Uri = "uri";
 	
 	/** Multimedia  notes */
-	public static final int PictureWidth = 80;
-	public static final int PictureHeight = 90;
+	public static final int PictureWidth = 90;
+	public static final int PictureHeight = 80;
 	
 	public static final String Prefix = "[media:";
 	public static final String Suffix = ":media]";

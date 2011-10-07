@@ -156,7 +156,8 @@ public class AddMultiMediaNoteActivity extends Activity {
 	        public void beforeTextChanged(CharSequence s, int start, int count, int after){}  
 	  
 	        @Override  
-	        public void onTextChanged(CharSequence s, int start, int before, int count) {  
+	        public void onTextChanged(CharSequence s, int start, int before, int count) { 
+	        	   Log.d("log","in onTextChanged");
 	        	   if( !NotInsert )
 	        	       Content.replace(start, start+before, s.subSequence(start, start+count).toString());
 	        	   else
@@ -237,30 +238,21 @@ public class AddMultiMediaNoteActivity extends Activity {
         		else
 				    StartPickGallery();				
         	}
-        } else if( requestCode == ProjectConst.ACTIVITY_CAMERA_CAPTURE ) {
-        	if( resultCode == RESULT_OK )
-        	{
+        } else if( requestCode == ProjectConst.ACTIVITY_CAMERA_CAPTURE && resultCode == RESULT_OK ) {
         	    IsCameraCapture = true;
                 Intent SelImgIntent = new Intent(this, SelImgActivity.class);
                 SelImgIntent.putExtra(SelImgActivity.Key_PicUri, Uri.fromFile(new File(FolderPath, CameraFileName)));
                 startActivityForResult(SelImgIntent, ProjectConst.ACTIVITY_EDIT_PIC);
-        	}
-        } else if( requestCode == ProjectConst.ACTIVITY_GET_VIDEO ) {   
-            if( resultCode == RESULT_OK )   
-            {
+        } else if( requestCode == ProjectConst.ACTIVITY_GET_VIDEO && resultCode == RESULT_OK ) {   
                 Uri UriVideo = data.getData();
         		Drawable FinalBitmap = new BitmapDrawable(BitmapFactory.decodeResource(getResources(), R.drawable.video_icon));
     			
         		InsertImg(ProjectConst.VideoTagFmt, UriVideo.toString(), FinalBitmap);
-            }     
-        } else if( requestCode == ProjectConst.ACTIVITY_GET_AUDIO ) {     
-            if( resultCode == RESULT_OK )
-            {    
+        } else if( requestCode == ProjectConst.ACTIVITY_GET_AUDIO && resultCode == RESULT_OK ) {     
                 Uri VoiceUri = data.getData();
                 Drawable FinalBitmap = new BitmapDrawable(BitmapFactory.decodeResource(getResources(), R.drawable.record_icon));
     			
-        		InsertImg(ProjectConst.AudioTagFmt, VoiceUri.toString(), FinalBitmap);   
-            }    
+        		InsertImg(ProjectConst.AudioTagFmt, VoiceUri.toString(), FinalBitmap);       
         } else if( requestCode == ProjectConst.ACTIVITY_SEL_FACE && resultCode == RESULT_OK ) {
      	    Bundle SelIdxData = data.getExtras();
     	    int FaceId = SelIdxData.getInt(SelFaceActivity.KEY_FACE_ID);

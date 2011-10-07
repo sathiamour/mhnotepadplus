@@ -698,19 +698,8 @@ public class EditMultiMediaNoteActivity extends Activity {
     			}
       
     			if( InsertPicture != null )
-    			{
-    				NotInsert = true;
-    				InsertPicture.setBounds(0, 0, InsertPicture.getIntrinsicWidth(), InsertPicture.getIntrinsicHeight());
-    				int CursorPos = NoteBody.getSelectionStart();
-    				if( CursorPos < 0 )
-    					CursorPos = 0;
-    				String Tag = String.format(ProjectConst.ImgTagFmt, uri.toString());
-                    Content.insert(CursorPos, Tag);
-                    ImageSpan span = new ImageSpan(InsertPicture, ImageSpan.ALIGN_BASELINE);
-                    Content.setSpan(span, CursorPos, CursorPos+Tag.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    NoteBody.setText(Content);
-                    NoteBody.setSelection(CursorPos+Tag.length());
-    			} else
+    				InsertImg(ProjectConst.ImgTagFmt, uri.toString(), InsertPicture);
+    			else
     				Toast.makeText(this, R.string.multimedianote_loadbmp_err, Toast.LENGTH_SHORT).show();
 
         	} else {
@@ -720,11 +709,30 @@ public class EditMultiMediaNoteActivity extends Activity {
 				    StartPickGallery();				
         	}
         } else if( requestCode == ProjectConst.ACTIVITY_CAMERA_CAPTURE ) {
-        	IsCameraCapture = true;
-            Intent SelImgIntent = new Intent(this, SelImgActivity.class);
-            SelImgIntent.putExtra(SelImgActivity.Key_PicUri, Uri.fromFile(new File(FolderPath, CameraFileName)));
-            startActivityForResult(SelImgIntent, ProjectConst.ACTIVITY_EDIT_PIC); 
-        } else if( requestCode == ProjectConst.ACTIVITY_SET_NOTIFYTIME && resultCode == RESULT_OK ) {
+        	if( resultCode == RESULT_OK )
+        	{
+        	    IsCameraCapture = true;
+                Intent SelImgIntent = new Intent(this, SelImgActivity.class);
+                SelImgIntent.putExtra(SelImgActivity.Key_PicUri, Uri.fromFile(new File(FolderPath, CameraFileName)));
+                startActivityForResult(SelImgIntent, ProjectConst.ACTIVITY_EDIT_PIC);
+        	}
+        } else if( requestCode == ProjectConst.ACTIVITY_GET_VIDEO && resultCode == RESULT_OK ) {   
+            Uri UriVideo = data.getData();
+    		Drawable FinalBitmap = new BitmapDrawable(BitmapFactory.decodeResource(getResources(), R.drawable.video_icon));
+			
+    		InsertImg(ProjectConst.VideoTagFmt, UriVideo.toString(), FinalBitmap);
+        } else if( requestCode == ProjectConst.ACTIVITY_GET_AUDIO && resultCode == RESULT_OK ) {     
+            Uri VoiceUri = data.getData();
+            Drawable FinalBitmap = new BitmapDrawable(BitmapFactory.decodeResource(getResources(), R.drawable.record_icon));
+			
+    		InsertImg(ProjectConst.AudioTagFmt, VoiceUri.toString(), FinalBitmap);       
+        } else if( requestCode == ProjectConst.ACTIVITY_SEL_FACE && resultCode == RESULT_OK ) {
+ 	        Bundle SelIdxData = data.getExtras();
+	        int FaceId = SelIdxData.getInt(SelFaceActivity.KEY_FACE_ID);
+	        Drawable FinalBitmap = new BitmapDrawable(BitmapFactory.decodeResource(getResources(), SelFaceActivity.Faces[FaceId]));
+		
+		    InsertImg(ProjectConst.FaceTagFmt, Integer.toString(FaceId), FinalBitmap);
+        }else if( requestCode == ProjectConst.ACTIVITY_SET_NOTIFYTIME && resultCode == RESULT_OK ) {
 	    	Bundle Result = data.getExtras();
 	    	if( Result.isEmpty() )
 	    	{
@@ -753,4 +761,20 @@ public class EditMultiMediaNoteActivity extends Activity {
         
         super.onActivityResult(requestCode, resultCode, data);  
     }  
+	
+    private void InsertImg(String StdTag, String UriStr, Drawable FinalBitmap)
+    {
+		NotInsert = true;
+		FinalBitmap.setBounds(0, 0, FinalBitmap.getIntrinsicWidth(), FinalBitmap.getIntrinsicHeight());
+		int CursorPos = NoteBody.getSelectionStart();
+		if( CursorPos < 0 )
+			CursorPos = 0;
+		String Tag = String.format(StdTag, UriStr);
+        Content.insert(CursorPos, Tag);
+        ImageSpan ImgSpan = new ImageSpan(FinalBitmap, ImageSpan.ALIGN_BASELINE);
+        Content.setSpan(ImgSpan, CursorPos, CursorPos+Tag.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        NoteBody.setText(Content);
+        NoteBody.setSelection(CursorPos+Tag.length());
+
+    }
 }
