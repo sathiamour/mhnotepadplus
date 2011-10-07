@@ -7,6 +7,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
@@ -70,11 +71,13 @@ public class ShowImgListActivity extends Activity {
 	public class ImageAdapter extends BaseAdapter { 
 		  private Vector<Uri> MediaUri;
 		  private int CellWidth;
+		  private float PictureSize;
 	      public ImageAdapter(Context c, Vector<Uri> Uris, int Width) 
 	      { 
 	             mContext = c;   
 	             MediaUri = Uris;
 	             CellWidth = Width;
+	             PictureSize = Width*1.0f-3;
 	      }
 
 	      public int getCount()
@@ -99,9 +102,10 @@ public class ShowImgListActivity extends Activity {
 	             {
 	                 imageView = new ImageView(mContext);
 	                 imageView.setLayoutParams(new GridView.LayoutParams(CellWidth, CellWidth));
+	                 imageView.setBackgroundResource(R.drawable.image_border);
 	                 imageView.setAdjustViewBounds(false);
-	                 imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-	                 //imageView.setPadding(8, 8, 8, 8);
+	                 imageView.setScaleType(ImageView.ScaleType.FIT_CENTER);
+	                 imageView.setPadding(3, 3, 3, 3);
 	             } else {
 	                 imageView = (ImageView) convertView;  
 	             }          
@@ -110,7 +114,9 @@ public class ShowImgListActivity extends Activity {
 	             
 	    		 try {
 					Picture = HelperFunctions.DecodeBitmapFromUri(mContext, MediaUri.get(position), CellWidth, CellWidth);
-		            imageView.setImageBitmap(Picture);
+					Matrix TransMatrix=new Matrix();   
+ 				    TransMatrix.postScale(PictureSize/Picture.getWidth(),PictureSize/Picture.getHeight());         
+		            imageView.setImageBitmap(Bitmap.createBitmap(Picture,0,0,Picture.getWidth(),Picture.getHeight(),TransMatrix,true));
 				} catch (FileNotFoundException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
