@@ -92,9 +92,12 @@ public class NoteItemAdapter extends SimpleAdapter
 		    	 Tag.setImageResource(R.drawable.ic_item_scrawl);
 		    	 break;
 		    case OneNote.MultiMediaNote:
+		    	 Tag.setImageResource(R.drawable.ic_item_multimedia);
+	    	     break;
 		    default:
-		    	Tag.setImageResource(R.drawable.ic_item_scrawl);
-	    	    break;
+		    	Tag.setImageResource(R.drawable.ic_item_text);
+		        break;
+		    	
 		}
 	
 

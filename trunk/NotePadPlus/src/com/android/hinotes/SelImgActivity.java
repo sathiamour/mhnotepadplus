@@ -245,7 +245,7 @@ public class SelImgActivity extends Activity {
 
  			@Override
  			public void onClick(View v) {
-                String BmpFilePath = SavePicture();
+                String BmpFilePath = SaveBmpPicture();
                 Uri Path = PicUri;
                 if( !BmpFilePath.equals(ProjectConst.EmptyStr) )
                     Path = Uri.fromFile(new File(BmpFilePath));
@@ -290,7 +290,7 @@ public class SelImgActivity extends Activity {
 		}
 	}
 	
-	private String SavePicture()
+	private String SaveBmpPicture()
 	{
 		String BmpFilePath = ProjectConst.EmptyStr;
 		if( HasEdited )

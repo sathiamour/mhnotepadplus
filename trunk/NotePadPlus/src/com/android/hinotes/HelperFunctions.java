@@ -574,4 +574,29 @@ public class HelperFunctions{
               }
         }
 	}
+	
+	// Save bitmap to jpeg
+	public static boolean SaveBmpPicture(Bitmap Pic, String Path)
+	{
+	    FileOutputStream  BmpFileOutPutStream = null; 
+	    try { 
+		     BmpFileOutPutStream = new FileOutputStream(Path);
+		} catch (FileNotFoundException e) { 
+		     // TODO Auto-generated catch block 
+			 e.printStackTrace(); 
+			 return false;
+	    } 
+		Pic.compress(Bitmap.CompressFormat.JPEG, 100, BmpFileOutPutStream);
+		try { 
+		      BmpFileOutPutStream.flush(); 
+		      BmpFileOutPutStream.close(); 
+		} catch (IOException e) { 
+		      // TODO Auto-generated catch block 
+		      e.printStackTrace(); 
+		      return false;
+		} 
+		
+		return true;
+		
+	}
 }
