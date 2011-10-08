@@ -238,5 +238,7 @@ public class AddScrawlNoteActivity extends GraphicsActivity
    	    NotesDb.CreateOneNote(AddOneNote);
    	    // Refresh widget note list
    	    HelperFunctions.RefreshWidgetNoteList(this, NotesDb.GetAllNotes());
+   	    // Close the activity
+   	    finish();
     }
 }
