@@ -39,6 +39,8 @@
 	    <activity android:name=".ShowAudioListActivity" android:screenOrientation="portrait" />
 	    <activity android:name=".ShowVideoListActivity" android:screenOrientation="portrait" />
 	    
+	    <activity android:name=".AddScrawlNoteActivity" android:screenOrientation="portrait" />
+	    
 		<activity android:name="AddItemActivity" android:theme="@android:style/Theme.Dialog"  android:screenOrientation="portrait"/>
 		<activity android:name=".NoteUserDefViewActivity" android:screenOrientation="portrait"/>
 		<activity android:name=".EditNoteActivity" android:screenOrientation="portrait" />
