@@ -57,7 +57,7 @@ public class NotePadPlus extends Activity {
 	/** Note tag color */
 	public static final int[] TagClr = {0xffd51a1a, 0xffffcc00, 0xff0024ff, 0xff0cd206, 0xffb806d2, 0xff239239, 0xfff9fba9, 0xfff55305, 0xff6835a6}; 
 		    //0xff6596cf, 0xfff58f7f, 0xffbaa131, 0xff4fb248, 0xffa052a0, 0xfff15b22, 0xff90a8d7, 0xffe28f25,	0xffdb2636};
-	public static final int[] ItemBgClr = {0xfffde1e1, 0xfff9f983, 0xffaceefb, 0xffb9fba9, 0xfff895fb, 0xff76de8b, 0xffffffff, 0xfffc9969, 0xff9465cd};
+	public static final int[] ItemBgClr = {0xfffde1e1, 0xfff9f983, 0xffaceefb, 0xffb9fba9, 0xfff895fb, 0xff76de8b, 0xffacacac, 0xfffc9969, 0xff9465cd};
 		    //0xffb3daf4, 0xfff9bebe, 0xffdcde4c,	0xff96c93d, 0xff9a6daf, 0xfff78e1e, 0xffd6d6ec, 0xffe1e31a, 0xffc94730};
 	public static final int ClrNum = ItemBgClr.length;
 
@@ -593,7 +593,8 @@ public class NotePadPlus extends Activity {
 	
 	private void AddGraffitiNote()
 	{
-		
+		Intent i = new Intent(this, AddScrawlNoteActivity.class);
+		startActivity(i);
 	}
 	
 	
@@ -890,6 +891,7 @@ public class NotePadPlus extends Activity {
                 	            	 break;
                 	            case OneNote.MultiMediaNote:
                 	            	 AddMultiMediaNote();
+                	            	 break;
                 	            case OneNote.ScrawlNote:
                 	            	 AddGraffitiNote();
                 	            	 break;
@@ -922,7 +924,7 @@ public class NotePadPlus extends Activity {
 		case ProjectConst.OrderBySel_Dlg:
 			 return BuildOrderByDlg(this, R.string.orderby_title, R.array.orderby);
 		case ProjectConst.CreateTypeSel_Dlg:
-			 return BuildCreateTypeSelDlg(this, R.string.typesel_title, R.array.notestyle, new int[]{R.drawable.ic_item_text, R.drawable.ic_item_list, R.drawable.ic_item_scrawl, R.drawable.ic_item_scrawl});
+			 return BuildCreateTypeSelDlg(this, R.string.typesel_title, R.array.notestyle, new int[]{R.drawable.ic_item_text, R.drawable.ic_item_list, R.drawable.ic_item_multimedia, R.drawable.ic_item_scrawl});
 		}
 		return null;
 	}
@@ -1078,7 +1080,7 @@ public class NotePadPlus extends Activity {
             	             Log.d("log","one click");
             	         } else if ( ClickCount == 2  ){  
             	             secClick = Calendar.getInstance().getTimeInMillis();//System.currentTimeMillis();  
-            	             if( secClick - firClick < 300 /*&& !IsMove*/ )
+            	             if( secClick - firClick < 600 /*&& !IsMove*/ )
             	             {  
             	            	 
             	            	 if( IsLock ) {
