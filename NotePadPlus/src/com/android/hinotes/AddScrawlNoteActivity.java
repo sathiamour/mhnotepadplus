@@ -20,14 +20,17 @@ import java.util.UUID;
 
 import android.content.Context;
 import android.graphics.*;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnLongClickListener;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class AddScrawlNoteActivity extends GraphicsActivity
         implements ColorPickerDialog.OnColorChangedListener {    
@@ -61,20 +64,27 @@ public class AddScrawlNoteActivity extends GraphicsActivity
         mPaint.setStyle(Paint.Style.STROKE);
         mPaint.setStrokeJoin(Paint.Join.ROUND);
         mPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPaint.setStrokeWidth(12);
+        mPaint.setStrokeWidth(6);
         
         mEmboss = new EmbossMaskFilter(new float[] { 1, 1, 1 }, 0.4f, 6, 3.5f);
 
         mBlur = new BlurMaskFilter(8, BlurMaskFilter.Blur.NORMAL);
         
         ContentView = (FingerPaintView) findViewById(R.id.scraw_content);
-        Button SelClrBtn = (Button)findViewById(R.id.selnoteclr);
-        LinearLayout AddPanel = (LinearLayout)findViewById(R.id.addnote_panel);
+        //LinearLayout AddPanel = (LinearLayout)findViewById(R.id.addnote_panel);
 		
-        ContentView.InitFingerPaintView(mPaint);
+        ContentView.InitFingerPaintView(mPaint,HelperFunctions.CreateTitleBarBg(NotePadPlus.ScreenWidthDip, NotePadPlus.ScreenHeightDip, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx]));
+        ContentView.setOnLongClickListener(new OnLongClickListener(){
+
+			@Override
+			public boolean onLongClick(View v) {
+				Toast.makeText(AddScrawlNoteActivity.this, "sfsf", Toast.LENGTH_SHORT);
+				return false;
+			}
+        	
+        });
 		// Randomly select color
-        SelClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
-    	AddPanel.setBackgroundDrawable(HelperFunctions.CreateTitleBarBg(NotePadPlus.ScreenWidthDip, NotePadPlus.ScreenHeightDip, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx])); 
+    	//AddPanel.setBackgroundDrawable(new BitmapDrawable()); 
     }
     
  
@@ -101,14 +111,16 @@ public class AddScrawlNoteActivity extends GraphicsActivity
         
 		menu.add(Menu.NONE, ProjectConst.ITEM0, 1, "放弃").setIcon(android.R.drawable.ic_menu_close_clear_cancel);
 		menu.add(Menu.NONE, ProjectConst.ITEM1, 2, "提醒").setIcon(R.drawable.ic_menu_reminder);
-		menu.add(Menu.NONE, ProjectConst.ITEM2, 3, "锁定").setIcon(R.drawable.ic_menu_lock);
-		menu.add(Menu.NONE, ProjectConst.ITEM3, 4, "分享").setIcon(android.R.drawable.ic_menu_share);
-
-        menu.add(0, COLOR_MENU_ID, 0, "Color").setShortcut('3', 'c');
-        menu.add(0, EMBOSS_MENU_ID, 0, "Emboss").setShortcut('4', 's');
-        menu.add(0, BLUR_MENU_ID, 0, "Blur").setShortcut('5', 'z');
-        menu.add(0, ERASE_MENU_ID, 0, "Erase").setShortcut('5', 'z');
-        menu.add(0, SRCATOP_MENU_ID, 0, "SrcATop").setShortcut('5', 'z');
+		menu.add(Menu.NONE, ProjectConst.ITEM2, 3, "颜色").setIcon(android.R.drawable.ic_menu_view);
+		menu.add(Menu.NONE, ProjectConst.ITEM3, 4, "标题").setIcon(R.drawable.ic_menu_compose);
+		menu.add(Menu.NONE, ProjectConst.ITEM4, 5, "锁定").setIcon(R.drawable.ic_menu_lock);
+		menu.add(Menu.NONE, ProjectConst.ITEM5, 6, "分享").setIcon(android.R.drawable.ic_menu_share);
+		
+        //menu.add(0, COLOR_MENU_ID, 0, "Color").setShortcut('3', 'c');
+        //menu.add(0, EMBOSS_MENU_ID, 0, "Emboss").setShortcut('4', 's');
+        //menu.add(0, BLUR_MENU_ID, 0, "Blur").setShortcut('5', 'z');
+        //menu.add(0, ERASE_MENU_ID, 0, "Erase").setShortcut('5', 'z');
+        //menu.add(0, SRCATOP_MENU_ID, 0, "SrcATop").setShortcut('5', 'z');
 
         /****   Is this the mechanism to extend with filter effects?
         Intent intent = new Intent(null, getIntent().getData());

@@ -89,7 +89,7 @@ public class AddMultiMediaNoteActivity extends Activity {
 		
 		// Randomly select color
     	SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
-    	AddPanel.setBackgroundDrawable(HelperFunctions.CreateTitleBarBg(NotePadPlus.ScreenWidthDip, NotePadPlus.ScreenHeightDip, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx])); 
+    	AddPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateTitleBarBg(NotePadPlus.ScreenWidthDip, NotePadPlus.ScreenHeightDip, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx]))); 
 
     	// Select tag color
     	SelectTagClrBtn.setOnClickListener(new OnClickListener(){
@@ -263,7 +263,7 @@ public class AddMultiMediaNoteActivity extends Activity {
     	    Bundle SelIdxData = data.getExtras();
     	    AddOneNote.DrawableResIdx = SelIdxData.getInt(OneNote.KEY_DRAWABLE_ID);
     	    SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
-    	    AddPanel.setBackgroundDrawable(HelperFunctions.CreateTitleBarBg(NotePadPlus.ScreenWidthDip, NotePadPlus.ScreenHeightDip, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx]));
+    	    AddPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateTitleBarBg(NotePadPlus.ScreenWidthDip, NotePadPlus.ScreenHeightDip, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx])));
         } else if( requestCode == ProjectConst.ACTIVITY_SET_NOTIFYTIME ) {
 	    	if( resultCode == RESULT_OK ) {
 	    		Bundle Result = data.getExtras();
@@ -284,7 +284,7 @@ public class AddMultiMediaNoteActivity extends Activity {
 	    	    Bundle SelIdxData = data.getExtras();
 	    	    AddOneNote.DrawableResIdx = SelIdxData.getInt(OneNote.KEY_DRAWABLE_ID);
 	    	    SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
-	    	    AddPanel.setBackgroundDrawable(HelperFunctions.CreateTitleBarBg(NotePadPlus.ScreenWidthDip, NotePadPlus.ScreenHeightDip, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx]));
+	    	    AddPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateTitleBarBg(NotePadPlus.ScreenWidthDip, NotePadPlus.ScreenHeightDip, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx])));
 	    } else if( requestCode == ProjectConst.ACTIVITY_SET_PWD && resultCode == RESULT_OK )
 	    	    AddOneNote.Password = data.getStringExtra(OneNote.KEY_PWD);   
          

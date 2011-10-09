@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -79,7 +80,7 @@ public class AddCheckListNoteActivity extends Activity {
 		
 		// Randomly select color
     	SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
-    	AddPanel.setBackgroundDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx]));
+    	AddPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx])));
     	
     	// Set tag color
     	SelectTagClrBtn.setOnClickListener(new OnClickListener(){
@@ -289,7 +290,7 @@ public class AddCheckListNoteActivity extends Activity {
 	    	    Bundle SelIdxData = data.getExtras();
 	    	    AddOneNote.DrawableResIdx = SelIdxData.getInt(OneNote.KEY_DRAWABLE_ID);
 	    	    SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
-	    	    AddPanel.setBackgroundDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx]));
+	    	    AddPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx])));
 	    } else if( requestCode == ProjectConst.ACTIVITY_SET_PWD && resultCode == RESULT_OK )
 	    	    AddOneNote.Password = data.getStringExtra(OneNote.KEY_PWD); 
 	    else if( requestCode == ProjectConst.ACTIVITY_ADD_ITEM && resultCode == RESULT_OK ) {
