@@ -29,7 +29,7 @@ public class NoteDbAdapter {
     // Database name & table name & database version
 	private static final String DATABASE_NAME = "database";
 	private static final String DATABASE_TABLE = "diary";
-	private static final int DATABASE_VERSION = 23;
+	private static final int DATABASE_VERSION = 24;
 	// Order by options
 	private static String OrderBy;
 	public static final String OrderByCreatedTime = "_id desc";

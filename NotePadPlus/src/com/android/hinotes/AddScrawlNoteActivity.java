@@ -25,6 +25,9 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class AddScrawlNoteActivity extends GraphicsActivity
         implements ColorPickerDialog.OnColorChangedListener {    
@@ -35,18 +38,21 @@ public class AddScrawlNoteActivity extends GraphicsActivity
 	private NoteDbAdapter NotesDb;
 	/** One note */
 	private OneNote AddOneNote;
+	// Paint flag
+	boolean IsPainted;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ContentView = new FingerPaintView(this);
-        setContentView(ContentView);
-
+        setContentView(R.layout.addscrawlnote);
+        
 		// Initialize & open database
 		NotesDb = new NoteDbAdapter(this);
 		NotesDb.open();
 		// Initialize the note
 		AddOneNote = new OneNote(OneNote.ScrawlNote);
+		// Is painted flag
+		IsPainted = false;
 		
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
@@ -60,7 +66,18 @@ public class AddScrawlNoteActivity extends GraphicsActivity
         mEmboss = new EmbossMaskFilter(new float[] { 1, 1, 1 }, 0.4f, 6, 3.5f);
 
         mBlur = new BlurMaskFilter(8, BlurMaskFilter.Blur.NORMAL);
+        
+        ContentView = (FingerPaintView) findViewById(R.id.scraw_content);
+        Button SelClrBtn = (Button)findViewById(R.id.selnoteclr);
+        LinearLayout AddPanel = (LinearLayout)findViewById(R.id.addnote_panel);
+		
+        ContentView.InitFingerPaintView(mPaint);
+		// Randomly select color
+        SelClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
+    	AddPanel.setBackgroundDrawable(HelperFunctions.CreateTitleBarBg(NotePadPlus.ScreenWidthDip, NotePadPlus.ScreenHeightDip, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx])); 
     }
+    
+ 
     
     private Paint       mPaint;
     private MaskFilter  mEmboss;
@@ -70,92 +87,7 @@ public class AddScrawlNoteActivity extends GraphicsActivity
         mPaint.setColor(color);
     }
 
-    public class FingerPaintView extends View {
-        
-        private static final float MINP = 0.25f;
-        private static final float MAXP = 0.75f;
-        
-        private Bitmap  mBitmap;
-        private Canvas  mCanvas;
-        private Path    mPath;
-        private Paint   mBitmapPaint;
-        
-        public FingerPaintView(Context c) {
-            super(c);
-            
-            mBitmap = Bitmap.createBitmap(320, 480, Bitmap.Config.ARGB_8888);
-            mCanvas = new Canvas(mBitmap);
-            mPath = new Path();
-            mBitmapPaint = new Paint(Paint.DITHER_FLAG);
-        }
 
-        @Override
-        protected void onSizeChanged(int w, int h, int oldw, int oldh) {
-            super.onSizeChanged(w, h, oldw, oldh);
-        }
-        
-        @Override
-        protected void onDraw(Canvas canvas) {
-            canvas.drawColor(0xFFAAAAAA);
-            
-            canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
-            
-            canvas.drawPath(mPath, mPaint);
-        }
-        
-        private float mX, mY;
-        private static final float TOUCH_TOLERANCE = 4;
-        
-        private void touch_start(float x, float y) {
-            mPath.reset();
-            mPath.moveTo(x, y);
-            mX = x;
-            mY = y;
-        }
-        private void touch_move(float x, float y) {
-            float dx = Math.abs(x - mX);
-            float dy = Math.abs(y - mY);
-            if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-                mPath.quadTo(mX, mY, (x + mX)/2, (y + mY)/2);
-                mX = x;
-                mY = y;
-            }
-        }
-        private void touch_up() {
-            mPath.lineTo(mX, mY);
-            // commit the path to our off screen
-            mCanvas.drawPath(mPath, mPaint);
-            // kill this so we don't double draw
-            mPath.reset();
-        }
-        
-        @Override
-        public boolean onTouchEvent(MotionEvent event) {
-            float x = event.getX();
-            float y = event.getY();
-            
-            switch (event.getAction()) {
-                case MotionEvent.ACTION_DOWN:
-                    touch_start(x, y);
-                    invalidate();
-                    break;
-                case MotionEvent.ACTION_MOVE:
-                    touch_move(x, y);
-                    invalidate();
-                    break;
-                case MotionEvent.ACTION_UP:
-                    touch_up();
-                    invalidate();
-                    break;
-            }
-            return true;
-        }
-        
-        public Bitmap getFingerPaint()
-        {
-        	return mBitmap;
-        }
-    }
     
     private static final int COLOR_MENU_ID = Menu.FIRST;
     private static final int EMBOSS_MENU_ID = Menu.FIRST + 1;
@@ -231,13 +163,16 @@ public class AddScrawlNoteActivity extends GraphicsActivity
     
     @Override 
 	public void onBackPressed(){
-    	// Get a random file name
-   	    AddOneNote.NoteFilePath = HelperFunctions.MakeCameraFolder()+"/"+UUID.randomUUID().toString()+".jpg";
-   	    HelperFunctions.SaveBmpPicture(ContentView.getFingerPaint(), AddOneNote.NoteFilePath);
-   	    // Add database record
-   	    NotesDb.CreateOneNote(AddOneNote);
-   	    // Refresh widget note list
-   	    HelperFunctions.RefreshWidgetNoteList(this, NotesDb.GetAllNotes());
+    	if( IsPainted )
+    	{
+    	    // Get a random file name
+   	        AddOneNote.NoteFilePath = HelperFunctions.MakeCameraFolder()+"/"+UUID.randomUUID().toString()+".jpg";
+   	        HelperFunctions.SaveBmpPicture(ContentView.getFingerPaint(), AddOneNote.NoteFilePath);
+   	        // Add database record
+   	        NotesDb.CreateOneNote(AddOneNote);
+   	        // Refresh widget note list
+   	        HelperFunctions.RefreshWidgetNoteList(this, NotesDb.GetAllNotes());
+    	}
    	    // Close the activity
    	    finish();
     }
