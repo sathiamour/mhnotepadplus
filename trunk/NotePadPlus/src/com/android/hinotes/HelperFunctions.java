@@ -323,7 +323,7 @@ public class HelperFunctions{
         return Bg;
 	}
 	
-	public static BitmapDrawable CreateTitleBarBg(int Width, int Height, int StartClr, int EndClr){
+	public static Bitmap CreateTitleBarBg(int Width, int Height, int StartClr, int EndClr){
 		Shader mShader = new LinearGradient(0, 0, Width, Height, new int[] {StartClr, EndClr}, null, Shader.TileMode.MIRROR);
 	    Bitmap Bg = Bitmap.createBitmap(Width, Height, Bitmap.Config.ARGB_8888);
 	    Canvas canvas = new Canvas(Bg);
@@ -332,8 +332,7 @@ public class HelperFunctions{
         p.setShader(mShader);
         canvas.drawPaint(p);
        
- 	    BitmapDrawable bd= new BitmapDrawable(Bg); 
-        return bd;
+        return Bg;
 	    
 	}
 	
