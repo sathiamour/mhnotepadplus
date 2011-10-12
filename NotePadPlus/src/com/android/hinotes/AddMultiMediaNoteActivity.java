@@ -259,11 +259,6 @@ public class AddMultiMediaNoteActivity extends Activity {
     	    Drawable FinalBitmap = new BitmapDrawable(BitmapFactory.decodeResource(getResources(), SelFaceActivity.Faces[FaceId]));
 			
     		InsertImg(ProjectConst.FaceTagFmt, Integer.toString(FaceId), FinalBitmap);
-        } else if ( requestCode == ProjectConst.ACTIVITY_SET_TAGCLR && resultCode == RESULT_OK ) {
-    	    Bundle SelIdxData = data.getExtras();
-    	    AddOneNote.DrawableResIdx = SelIdxData.getInt(OneNote.KEY_DRAWABLE_ID);
-    	    SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
-    	    AddPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateTitleBarBg(NotePadPlus.ScreenWidthDip, NotePadPlus.ScreenHeightDip, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx])));
         } else if( requestCode == ProjectConst.ACTIVITY_SET_NOTIFYTIME ) {
 	    	if( resultCode == RESULT_OK ) {
 	    		Bundle Result = data.getExtras();
@@ -441,7 +436,7 @@ public class AddMultiMediaNoteActivity extends Activity {
 	{
     	// start notify time activity
     	Intent intent = new Intent();
-		intent.setClass(AddMultiMediaNoteActivity.this, NotifyDateActivity.class);
+		intent.setClass(this, NotifyDateActivity.class);
 		// Set time
 		Bundle Parameters = new Bundle();
 		Parameters.putString(OneNote.KEY_NOTIFYTIME, HelperFunctions.Calendar2String(AddOneNote.NotifyTime));
