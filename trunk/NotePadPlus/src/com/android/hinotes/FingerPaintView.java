@@ -19,6 +19,7 @@ public class FingerPaintView extends View {
         private Path    mPath;
         private Paint   mBitmapPaint;
         private Paint   FingerPaint;
+        private int BgClr;
         
 		public FingerPaintView(Context context) {
 	    	super(context);
@@ -32,14 +33,22 @@ public class FingerPaintView extends View {
 			super(context, attrs, defStyle);
 		}
 		
-        public void InitFingerPaintView(Paint Finger, Bitmap Src)
+        public void InitFingerPaintView(Paint Finger, int Width, int Height, int Clr)
         {
-        	mBitmap = Src;//Bitmap.createBitmap(320, 480, Bitmap.Config.ARGB_8888);
+        	mBitmap = Bitmap.createBitmap(Width, Height, Bitmap.Config.ARGB_8888);
+        	BgClr = Clr;
             mCanvas = new Canvas(mBitmap);
             mPath = new Path();
             mBitmapPaint = new Paint(Paint.DITHER_FLAG);
         	FingerPaint = Finger;
         }
+        
+        public void SetBgColor(int Clr)
+        {
+            BgClr = Clr;
+            invalidate();
+        }
+        
         @Override
         protected void onSizeChanged(int w, int h, int oldw, int oldh) {
             super.onSizeChanged(w, h, oldw, oldh);
@@ -47,10 +56,8 @@ public class FingerPaintView extends View {
         
         @Override
         protected void onDraw(Canvas canvas) {
-            //canvas.drawColor(0xFFAAAAAA);
-            
+            canvas.drawColor(BgClr);
             canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
-            
             canvas.drawPath(mPath, FingerPaint);
         }
         

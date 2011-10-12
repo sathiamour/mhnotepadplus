@@ -704,7 +704,7 @@ public class NotePadPlus extends Activity {
 	private Dialog BuildEditNotePromptPwdDlg(Context AppContext, int Title, int Msg){
         LayoutInflater factory = LayoutInflater.from(this);
         final View PromptView = factory.inflate(R.layout.promptpwd_dlg, null);
-        return new AlertDialog.Builder(NotePadPlus.this)
+        return new AlertDialog.Builder(this)
                .setIcon(R.drawable.alert_dialog_icon)
                .setTitle(Title)
                .setView(PromptView)

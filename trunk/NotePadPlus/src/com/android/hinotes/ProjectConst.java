@@ -29,6 +29,7 @@ public class ProjectConst
     public static final int Item_Empty_Prompt_Dlg = 21;
     public static final int NotifyTime_Err_Dlg = 22;
     public static final int MediaView_Dlg = 23;
+    public static final int Input_Title_Dlg = 24;
     
 	/** Action id for activity redirection */
 	public static final int ACTIVITY_CREATE = 0;
