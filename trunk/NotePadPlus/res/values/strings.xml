@@ -114,4 +114,5 @@
 <string name="enlarge_img_err">已经把图片放到最大！</string>
 <string name="lessen_img_err">已经把图片缩到最小！</string>
 <string name="meidaview_title">查看日志中的媒体文件</string>
+<string name="input_title_tip">请输入日志标题</string>
 </resources>
