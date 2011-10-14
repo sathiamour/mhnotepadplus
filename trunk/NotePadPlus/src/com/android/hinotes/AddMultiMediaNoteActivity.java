@@ -2,6 +2,7 @@ package com.android.hinotes;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.UUID;
 import java.util.Vector;
@@ -89,7 +90,7 @@ public class AddMultiMediaNoteActivity extends Activity {
 		
 		// Randomly select color
     	SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
-    	AddPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateTitleBarBg(NotePadPlus.ScreenWidthDip, NotePadPlus.ScreenHeightDip, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx]))); 
+    	AddPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateBgLinearGraient(NotePadPlus.ScreenWidthDip, NotePadPlus.ScreenHeightDip, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx]))); 
 
     	// Select tag color
     	SelectTagClrBtn.setOnClickListener(new OnClickListener(){
@@ -279,7 +280,7 @@ public class AddMultiMediaNoteActivity extends Activity {
 	    	    Bundle SelIdxData = data.getExtras();
 	    	    AddOneNote.DrawableResIdx = SelIdxData.getInt(OneNote.KEY_DRAWABLE_ID);
 	    	    SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
-	    	    AddPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateTitleBarBg(NotePadPlus.ScreenWidthDip, NotePadPlus.ScreenHeightDip, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx])));
+	    	    AddPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateBgLinearGraient(NotePadPlus.ScreenWidthDip, NotePadPlus.ScreenHeightDip, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx])));
 	    } else if( requestCode == ProjectConst.ACTIVITY_SET_PWD && resultCode == RESULT_OK )
 	    	    AddOneNote.Password = data.getStringExtra(OneNote.KEY_PWD);   
          
@@ -368,7 +369,11 @@ public class AddMultiMediaNoteActivity extends Activity {
 			    return HelperFunctions.BuildAltertDialog(this, R.string.prompt_title, R.string.notifydate_expire_tip);
 		   case ProjectConst.ShareBy_Dlg:
 			    String Body = ParseMultiMediaNoteShareBy(Content.toString(), ProjectConst.Prefix, ProjectConst.Suffix, ProjectConst.FaceTag);
-			    return HelperFunctions.BuildMediaShareByDlg(this, R.string.shareby_title, AddOneNote.NoteTitle, Body, MediaUri);
+			    ArrayList<Uri> AttachList = new ArrayList<Uri>();
+			    int Count = MediaUri.size();
+			    for( int i = 0; i < Count; ++i )
+			    	 AttachList.add(Uri.fromFile(new File(MediaUri.get(i))));
+			    return HelperFunctions.BuildMediaShareByDlg(this, R.string.shareby_title, AddOneNote.NoteTitle, Body, AttachList);
 		   case ProjectConst.MediaView_Dlg:
 			    return BuildMediaViewDlg(this, R.string.meidaview_title, R.array.mediatype);
 

@@ -2,6 +2,7 @@ package com.android.hinotes;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Vector;
 
@@ -167,7 +168,7 @@ public class EditMultiMediaNoteActivity extends Activity {
 				NotifyTimeLabel.setText(HelperFunctions.FormatCalendar2ReadableStr(EditOneNote.NotifyTime));
 		}
 
-		EditPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight,  NotePadPlus.ItemBgClr[EditOneNote.DrawableResIdx], NotePadPlus.TagClr[EditOneNote.DrawableResIdx])));
+		EditPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateBgLinearGraient(ScreenWidth, ScreenHeight,  NotePadPlus.ItemBgClr[EditOneNote.DrawableResIdx], NotePadPlus.TagClr[EditOneNote.DrawableResIdx])));
 		
 		// Set text changed listener
 		NoteTitleCtrl.addTextChangedListener(new TextWatcher(){  
@@ -340,7 +341,11 @@ public class EditMultiMediaNoteActivity extends Activity {
 		        return BuildNoteHasLockDialog(this, R.string.note_lock_dlg_title, R.string.notehaslock_msg);
 		   case ProjectConst.ShareBy_Dlg:
 			    String Body = ParseMultiMediaNoteShareBy(Content.toString(), ProjectConst.Prefix, ProjectConst.Suffix, ProjectConst.FaceTag);
-			    return HelperFunctions.BuildMediaShareByDlg(this, R.string.shareby_title, EditOneNote.NoteTitle, Body, MediaUri);
+			    ArrayList<Uri> AttachList = new ArrayList<Uri>();
+			    int Count = MediaUri.size();
+			    for( int i = 0; i < Count; ++i )
+			    	 AttachList.add(Uri.fromFile(new File(MediaUri.get(i))));
+			    return HelperFunctions.BuildMediaShareByDlg(this, R.string.shareby_title, EditOneNote.NoteTitle, Body, AttachList);
 		   case ProjectConst.MediaView_Dlg:
 			    return BuildMediaViewDlg(this, R.string.meidaview_title, R.array.mediatype);
 		}
@@ -752,7 +757,7 @@ public class EditMultiMediaNoteActivity extends Activity {
 	       	    Bundle SelIdxData = data.getExtras();
 	    	    EditOneNote.DrawableResIdx = SelIdxData.getInt(OneNote.KEY_DRAWABLE_ID);
 	    	    ChgTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[EditOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
-	    	    EditPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight,  NotePadPlus.ItemBgClr[EditOneNote.DrawableResIdx], NotePadPlus.TagClr[EditOneNote.DrawableResIdx])));
+	    	    EditPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateBgLinearGraient(ScreenWidth, ScreenHeight,  NotePadPlus.ItemBgClr[EditOneNote.DrawableResIdx], NotePadPlus.TagClr[EditOneNote.DrawableResIdx])));
 	    } else if( requestCode == ProjectConst.ACTIVITY_SET_PWD && resultCode == RESULT_OK  ) {
 	    	    EditOneNote.Password = data.getStringExtra(OneNote.KEY_PWD);
 	    } else if( requestCode == ProjectConst.ACTIVITY_CLR_PWD && resultCode == RESULT_OK ) {

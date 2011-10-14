@@ -14,8 +14,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
-import java.util.Vector;
-
 import android.content.Context;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -322,13 +320,24 @@ public class HelperFunctions{
         return Bg;
 	}
 	
-	public static Bitmap CreateTitleBarBg(int Width, int Height, int StartClr, int EndClr){
+	public static Bitmap CreateBgLinearGraient(int Width, int Height, int StartClr, int EndClr){
 		Shader mShader = new LinearGradient(0, 0, Width, Height, new int[] {StartClr, EndClr}, null, Shader.TileMode.MIRROR);
 	    Bitmap Bg = Bitmap.createBitmap(Width, Height, Bitmap.Config.ARGB_8888);
 	    Canvas canvas = new Canvas(Bg);
 		Paint p = new Paint();
         //p.setColor(Color.RED);
         p.setShader(mShader);
+        canvas.drawPaint(p);
+       
+        return Bg;
+	    
+	}
+	
+	public static Bitmap CreateBgMono(int Width, int Height, int Clr){
+	    Bitmap Bg = Bitmap.createBitmap(Width, Height, Bitmap.Config.ARGB_8888);
+	    Canvas canvas = new Canvas(Bg);
+		Paint p = new Paint(Clr);
+        p.setColor(Clr);
         canvas.drawPaint(p);
        
         return Bg;
@@ -370,7 +379,7 @@ public class HelperFunctions{
         return builder.create();  
 	}
 	
-	public static Dialog BuildMediaShareByDlg(final Context AppContext, int Title, final String SharedTitle, final String SharedBody, final Vector<String> MultiMediaUri)
+	public static Dialog BuildMediaShareByDlg(final Context AppContext, int Title, final String SharedTitle, final String SharedBody, final ArrayList<Uri> AttachList)
 	{
         Builder builder = new AlertDialog.Builder(AppContext);  
         builder.setIcon(R.drawable.ic_dialog_menu_generic);  
@@ -382,16 +391,10 @@ public class HelperFunctions{
                 public void onClick(DialogInterface dialogInterface, int which) { 
                 	ShareByListItemAdapter Adapter = (ShareByListItemAdapter)adapter;
                 	Intent intent = new Intent();
-                	
-                	int Count = MultiMediaUri.size();
-                	 
                     intent.setAction(Intent.ACTION_SEND_MULTIPLE);
                 	intent.setComponent(new ComponentName(Adapter.Apps.get(which).activityInfo.packageName, Adapter.Apps.get(which).activityInfo.name));
                     intent.putExtra(Intent.EXTRA_SUBJECT, SharedTitle);               
                     intent.putExtra(Intent.EXTRA_TEXT, SharedBody);
-                    ArrayList<Uri> AttachList = new ArrayList<Uri>();
-                    for( int i = 0; i < Count; ++i )
-                    	 AttachList.add(Uri.parse(MultiMediaUri.get(i)));
                     intent.putParcelableArrayListExtra(Intent.EXTRA_STREAM, AttachList);
                     intent.setType("image/*");
                     
