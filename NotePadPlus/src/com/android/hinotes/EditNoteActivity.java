@@ -133,7 +133,7 @@ public class EditNoteActivity extends Activity {
 				NotifyTimeLabel.setText(HelperFunctions.FormatCalendar2ReadableStr(EditOneNote.NotifyTime));
 		}
 
-		EditPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight,  NotePadPlus.ItemBgClr[EditOneNote.DrawableResIdx], NotePadPlus.TagClr[EditOneNote.DrawableResIdx])));
+		EditPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateBgLinearGraient(ScreenWidth, ScreenHeight,  NotePadPlus.ItemBgClr[EditOneNote.DrawableResIdx], NotePadPlus.TagClr[EditOneNote.DrawableResIdx])));
 		
 		// Set text changed listener
 		NoteTitleCtrl.addTextChangedListener(new TextWatcher(){  
@@ -451,7 +451,7 @@ public class EditNoteActivity extends Activity {
 	       	    Bundle SelIdxData = data.getExtras();
 	    	    EditOneNote.DrawableResIdx = SelIdxData.getInt(OneNote.KEY_DRAWABLE_ID);
 	    	    ChgTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[EditOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
-	    	    EditPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight,  NotePadPlus.ItemBgClr[EditOneNote.DrawableResIdx], NotePadPlus.TagClr[EditOneNote.DrawableResIdx])));
+	    	    EditPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateBgLinearGraient(ScreenWidth, ScreenHeight,  NotePadPlus.ItemBgClr[EditOneNote.DrawableResIdx], NotePadPlus.TagClr[EditOneNote.DrawableResIdx])));
 	    } else if( requestCode == ProjectConst.ACTIVITY_SET_PWD && resultCode == RESULT_OK  ) {
 	    	    EditOneNote.Password = data.getStringExtra(OneNote.KEY_PWD);
 	    } else if( requestCode == ProjectConst.ACTIVITY_CLR_PWD && resultCode == RESULT_OK ) {

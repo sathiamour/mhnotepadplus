@@ -1,14 +1,15 @@
 package com.android.hinotes;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.UUID;
-import java.util.Vector;
-
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.*;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -29,8 +30,6 @@ public class AddScrawlNoteActivity extends GraphicsActivity
 	private NoteDbAdapter NotesDb;
 	/** One note */
 	private OneNote AddOneNote;
-	// Paint flag
-	private boolean IsPainted;
 	// Graphic object
 	private Paint       mPaint;
 	private MaskFilter  mEmboss;
@@ -45,8 +44,6 @@ public class AddScrawlNoteActivity extends GraphicsActivity
 		NotesDb.open();
 		// Initialize the note
 		AddOneNote = new OneNote(OneNote.ScrawlNote);
-		// Is painted flag
-		IsPainted = false;
 		
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
@@ -57,7 +54,7 @@ public class AddScrawlNoteActivity extends GraphicsActivity
         mPaint.setStrokeCap(Paint.Cap.ROUND);
         mPaint.setStrokeWidth(6);
         
-        mEmboss = new EmbossMaskFilter(new float[] { 1, 1, 1 }, 0.4f, 6, 3.5f);
+        mEmboss = new EmbossMaskFilter(new float[] {1, 1, 1}, 0.4f, 6, 3.5f);
 
         mBlur = new BlurMaskFilter(8, BlurMaskFilter.Blur.NORMAL);
         
@@ -115,8 +112,13 @@ public class AddScrawlNoteActivity extends GraphicsActivity
 
 			@Override
 			public void onClick(View v) {
-				mPaint.setAlpha(0xFF);
-		        mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+				mPaint.setMaskFilter(null);
+				mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_OUT));
+				mPaint.setColor(NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx]);
+				//mPaint.setAlpha(100);
+		        //mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
+				
+				
 			}
         	
         });
@@ -125,6 +127,8 @@ public class AddScrawlNoteActivity extends GraphicsActivity
 
 			@Override
 			public void onClick(View v) {
+				//mPaint.setXfermode(null);
+		        //mPaint.setAlpha(0xFF);
 		        mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_ATOP));
                 mPaint.setAlpha(0x80);
 				
@@ -194,7 +198,7 @@ public class AddScrawlNoteActivity extends GraphicsActivity
     
     @Override 
 	public void onBackPressed(){
-    	if( IsPainted )
+    	if( ContentView.getPainted() )
     	{
     	    // Get a random file name
    	        AddOneNote.NoteFilePath = HelperFunctions.MakeCameraFolder()+"/"+UUID.randomUUID().toString()+".jpg";
@@ -212,8 +216,8 @@ public class AddScrawlNoteActivity extends GraphicsActivity
 	protected Dialog onCreateDialog(int id) {
 		switch (id) {
 		   case ProjectConst.ShareBy_Dlg:
-			    Vector<String> MediaUri = new Vector<String>();
-			    MediaUri.add(AddOneNote.NoteFilePath);
+			    ArrayList<Uri> MediaUri = new ArrayList<Uri>();
+			    MediaUri.add(Uri.fromFile(new File(AddOneNote.NoteFilePath)));
 			    return HelperFunctions.BuildMediaShareByDlg(this, R.string.shareby_title, AddOneNote.NoteTitle, AddOneNote.NoteTitle, MediaUri);
 		   case ProjectConst.Input_Title_Dlg:
 			    return BuildEditNotePromptPwdDlg(this, R.string.input_title_tip);

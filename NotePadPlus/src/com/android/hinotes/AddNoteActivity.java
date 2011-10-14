@@ -65,7 +65,7 @@ public class AddNoteActivity extends Activity {
 
 		// Randomly select color
     	SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
-    	AddPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx]))); 
+    	AddPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateBgLinearGraient(ScreenWidth, ScreenHeight, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx]))); 
 
 		// Set text changed listener		
     	NoteBodyCtrl.addTextChangedListener(new TextWatcher(){  	  
@@ -252,7 +252,7 @@ public class AddNoteActivity extends Activity {
 	    	    Bundle SelIdxData = data.getExtras();
 	    	    AddOneNote.DrawableResIdx = SelIdxData.getInt(OneNote.KEY_DRAWABLE_ID);
 	    	    SelectTagClrBtn.getBackground().setColorFilter(NotePadPlus.TagClr[AddOneNote.DrawableResIdx], PorterDuff.Mode.MULTIPLY);
-	    	    AddPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateTitleBarBg(ScreenWidth, ScreenHeight, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx])));
+	    	    AddPanel.setBackgroundDrawable(new BitmapDrawable(HelperFunctions.CreateBgLinearGraient(ScreenWidth, ScreenHeight, NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx], NotePadPlus.TagClr[AddOneNote.DrawableResIdx])));
 	    } else if( requestCode == ProjectConst.ACTIVITY_SET_PWD && resultCode == RESULT_OK )
 	    	    AddOneNote.Password = data.getStringExtra(OneNote.KEY_PWD); 
 	}

@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.PorterDuff;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -20,6 +21,7 @@ public class FingerPaintView extends View {
         private Paint   mBitmapPaint;
         private Paint   FingerPaint;
         private int BgClr;
+        private boolean IsPainted;
         
 		public FingerPaintView(Context context) {
 	    	super(context);
@@ -40,7 +42,11 @@ public class FingerPaintView extends View {
             mCanvas = new Canvas(mBitmap);
             mPath = new Path();
             mBitmapPaint = new Paint(Paint.DITHER_FLAG);
-        	FingerPaint = Finger;
+            mBitmapPaint.setColor(Clr);
+            FingerPaint = Finger;
+        	IsPainted = false;
+        	
+        	 
         }
         
         public void SetBgColor(int Clr)
@@ -57,7 +63,9 @@ public class FingerPaintView extends View {
         @Override
         protected void onDraw(Canvas canvas) {
             canvas.drawColor(BgClr);
+            
             canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
+        	//canvas.drawPaint(mBitmapPaint);
             canvas.drawPath(mPath, FingerPaint);
         }
         
@@ -91,7 +99,7 @@ public class FingerPaintView extends View {
         public boolean onTouchEvent(MotionEvent event) {
             float x = event.getX();
             float y = event.getY();
-            
+            IsPainted = true;
             switch (event.getAction()) {
                 case MotionEvent.ACTION_DOWN:
                     touch_start(x, y);
@@ -112,5 +120,10 @@ public class FingerPaintView extends View {
         public Bitmap getFingerPaint()
         {
         	return mBitmap;
+        }
+        
+        public boolean getPainted()
+        {
+        	return IsPainted;
         }
 }
