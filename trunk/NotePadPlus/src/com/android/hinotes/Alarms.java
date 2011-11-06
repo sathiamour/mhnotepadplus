@@ -1,6 +1,5 @@
 package com.android.hinotes;
 
-
 import java.util.Calendar;
 import java.util.Vector;
 

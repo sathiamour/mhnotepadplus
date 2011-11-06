@@ -45,6 +45,7 @@ public class AddScrawlNoteActivity extends GraphicsActivity
 		// Initialize the note
 		AddOneNote = new OneNote(OneNote.ScrawlNote);
 		
+		// Graphic objects
         mPaint = new Paint();
         mPaint.setAntiAlias(true);
         mPaint.setDither(true);
@@ -117,8 +118,6 @@ public class AddScrawlNoteActivity extends GraphicsActivity
 				mPaint.setColor(NotePadPlus.ItemBgClr[AddOneNote.DrawableResIdx]);
 				//mPaint.setAlpha(100);
 		        //mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-				
-				
 			}
         	
         });
