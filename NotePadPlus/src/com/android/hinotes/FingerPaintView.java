@@ -49,6 +49,18 @@ public class FingerPaintView extends View {
         	 
         }
         
+        public void InitFingerPaintView(Bitmap Src, Paint Finger, int Clr)
+        {
+        	mBitmap = Src;
+        	BgClr = Clr;
+            mCanvas = new Canvas(mBitmap);
+            mPath = new Path();
+            mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+            mBitmapPaint.setColor(Clr);
+            FingerPaint = Finger;
+        	IsPainted = false;  	 
+        }
+        
         public void SetBgColor(int Clr)
         {
             BgClr = Clr;

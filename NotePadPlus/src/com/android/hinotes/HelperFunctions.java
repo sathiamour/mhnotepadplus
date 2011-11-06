@@ -308,6 +308,7 @@ public class HelperFunctions{
 	        return upperBound;
 	    }
 	}
+	
 	public static Bitmap GetAlpha1x1Bg(Context AppCtx, int DrawableId, int W, int H, int BgClrId){
 	    InputStream is = AppCtx.getResources().openRawResource(DrawableId);
 	    Bitmap Src = BitmapFactory.decodeStream(is);
@@ -330,7 +331,6 @@ public class HelperFunctions{
         canvas.drawPaint(p);
        
         return Bg;
-	    
 	}
 	
 	public static Bitmap CreateBgMono(int Width, int Height, int Clr){
@@ -342,6 +342,11 @@ public class HelperFunctions{
        
         return Bg;
 	    
+	}
+	
+	public static Bitmap CreateBgFromFile(String Path) {
+		Bitmap Src = BitmapFactory.decodeFile(Path);
+		return Src;
 	}
 	
 	public static String ComposeSharedItems(ArrayList<String> Items, int Start, int End)
