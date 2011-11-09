@@ -206,9 +206,18 @@ public class AddScrawlNoteActivity extends GraphicsActivity
    	        NotesDb.CreateOneNote(AddOneNote);
    	        // Refresh widget note list
    	        HelperFunctions.RefreshWidgetNoteList(this, NotesDb.GetAllNotes());
-    	}
-   	    // Close the activity
-   	    finish();
+   	        // Set return code(unable to return row id)
+   		    Intent ReturnBackData = new Intent();
+   		    ReturnBackData.putExtra(OneNote.KEY_TITLE, AddOneNote.NoteTitle);
+   		    ReturnBackData.putExtra(OneNote.KEY_PWD, AddOneNote.Password);
+   		    ReturnBackData.putExtra(OneNote.KEY_ROWID, NotesDb.GetOneNoteRowId(AddOneNote.NoteFilePath));
+   		    ReturnBackData.putExtra(OneNote.KEY_DRAWABLE_ID, AddOneNote.DrawableResIdx);
+   		    ReturnBackData.putExtra(OneNote.KEY_NOTETYPE, AddOneNote.NoteType);
+   		    setResult(RESULT_OK, ReturnBackData);
+    	} else
+    		setResult(RESULT_CANCELED);
+    	// Return to main activity
+   	    finish(); 
     }
     
     @Override

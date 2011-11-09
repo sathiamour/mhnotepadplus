@@ -345,7 +345,7 @@ public class HelperFunctions{
 	}
 	
 	public static Bitmap CreateBgFromFile(String Path) {
-		Bitmap Src = BitmapFactory.decodeFile(Path);
+		Bitmap Src = BitmapFactory.decodeFile(Path).copy(Bitmap.Config.ARGB_8888, true);
 		return Src;
 	}
 	
