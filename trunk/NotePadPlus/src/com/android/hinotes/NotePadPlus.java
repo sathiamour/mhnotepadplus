@@ -594,7 +594,7 @@ public class NotePadPlus extends Activity {
 	private void AddGraffitiNote()
 	{
 		Intent i = new Intent(this, AddScrawlNoteActivity.class);
-		startActivity(i);
+		startActivityForResult(i, ProjectConst.ACTIVITY_CREATE);	
 	}
 	
 	
@@ -626,6 +626,10 @@ public class NotePadPlus extends Activity {
 				OneNoteData.putExtra(OneNote.KEY_ROWID, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
 			} else if( Type == OneNote.MultiMediaNote ) {
 				OneNoteData = new Intent(this, EditMultiMediaNoteActivity.class);
+				OneNoteData.putExtra(ProjectConst.KEY_SOURCE, ProjectConst.MAIN_EDIT_ATION);
+				OneNoteData.putExtra(OneNote.KEY_ROWID, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
+	        } else if( Type == OneNote.ScrawlNote ) {
+	        	OneNoteData = new Intent(this, EditScrawlNoteActivity.class);
 				OneNoteData.putExtra(ProjectConst.KEY_SOURCE, ProjectConst.MAIN_EDIT_ATION);
 				OneNoteData.putExtra(OneNote.KEY_ROWID, Note.getInt(Note.getColumnIndexOrThrow(OneNote.KEY_ROWID)));
 	        } else {

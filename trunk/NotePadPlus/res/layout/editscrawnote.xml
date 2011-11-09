@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout android:id="@+id/addnote_panel" 
+<FrameLayout android:id="@+id/editnote_panel" 
               android:orientation="vertical" 
               android:layout_width="fill_parent" 
               android:layout_height="fill_parent"

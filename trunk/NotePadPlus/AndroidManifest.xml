@@ -40,6 +40,7 @@
 	    <activity android:name=".ShowVideoListActivity" android:screenOrientation="portrait" />
 	    
 	    <activity android:name=".AddScrawlNoteActivity" android:screenOrientation="portrait" />
+	    <activity android:name=".EditScrawlNoteActivity" android:screenOrientation="portrait" />
 	    
 		<activity android:name="AddItemActivity" android:theme="@android:style/Theme.Dialog"  android:screenOrientation="portrait"/>
 		<activity android:name=".NoteUserDefViewActivity" android:screenOrientation="portrait"/>
